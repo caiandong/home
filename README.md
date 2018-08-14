@@ -1,2 +1,4 @@
 # c++11并行
-# java8 lambda
+# java8
+    [java8 lambda](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html)
+    [java8 lambda](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
