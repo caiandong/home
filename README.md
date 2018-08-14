@@ -9,6 +9,7 @@
 
    * [git官方中文教程](https://git-scm.com/book/zh/v2)
    * [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
+   * [markdown语法说明](https://www.appinn.com/markdown)
 # openSUSE日常使用
    * [mariadb数据库](/openSUSE15.0/mariadb.md)
 
