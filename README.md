@@ -8,4 +8,6 @@
 # git使用
 
    * [git官方中文教程](https://git-scm.com/book/zh/v2)
+   * [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
+
 
