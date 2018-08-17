@@ -1,0 +1,43 @@
+区域解析器配置原理
+
+        @Bean
+		@ConditionalOnMissingBean
+		@ConditionalOnProperty(prefix = "spring.mvc", name = "locale") //如果配置了这个属性为WebMvcProperties.LocaleResolver.FIXED
+		public LocaleResolver localeResolver() {					   //就配置	FixedLocaleResolver 如果不配置 despatchservlet会自己生成
+			if (this.mvcProperties									   //FixedLocaleResolver 否则配置AcceptHeaderLocaleResolver
+					.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED) {
+				return new FixedLocaleResolver(this.mvcProperties.getLocale());
+			}
+			AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
+			localeResolver.setDefaultLocale(this.mvcProperties.getLocale());
+			return localeResolver;
+		}
+2.LocaleChangeInterceptor用来拦截区域信息
+public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws ServletException {
+
+		String newLocale = request.getParameter(getParamName());
+		if (newLocale != null) {
+			if (checkHttpMethod(request.getMethod())) {
+				LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request); //获取区域解析器
+				if (localeResolver == null) {
+					throw new IllegalStateException(
+							"No LocaleResolver found: not in a DispatcherServlet request?");
+				}
+				try {
+					localeResolver.setLocale(request, response, parseLocaleValue(newLocale)); //区域解析器调用自己的setLocale方法
+				}								//设置从参数中解析到的旧区域为新区域，达到拦截的目的
+				catch (IllegalArgumentException ex) {
+					if (isIgnoreInvalidLocale()) {
+						logger.debug("Ignoring invalid locale value [" + newLocale + "]: " + ex.getMessage());
+					}
+					else {
+						throw ex;
+					}
+				}
+			}
+		}
+		// Proceed in any case.
+		return true;
+	}	
+3.	
