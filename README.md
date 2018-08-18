@@ -13,4 +13,4 @@
    * [README.md基本编写](https://blog.csdn.net/ljc_563812704/article/details/53464039)
 # openSUSE日常使用
    * [mariadb数据库](/openSUSE15.0/mariadb.md)
-  
+   * [openSUSU新手指南](https://opensuse-guide.ustclug.org/)
