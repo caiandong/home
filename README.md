@@ -17,3 +17,4 @@
    * [安装后添加国内中科大镜像源](/openSUSE15.0/安装.md)
 # 数据库操作
    * [MariaDB教程(w3c)](https://www.w3cschool.cn/mariadb)
+   * [sql基本操作](/sql/sql基本操作)
