@@ -16,5 +16,6 @@
    * [openSUSU新手指南](https://opensuse-guide.ustclug.org/)
    * [安装后添加国内中科大镜像源](/openSUSE15.0/安装.md)
 # 数据库操作
+   * [SQL 基础教程](http://www.w3school.com.cn/sql)
    * [MariaDB教程(w3c)](https://www.w3cschool.cn/mariadb)
    * [sql基本操作](/sql/sql基本操作)
