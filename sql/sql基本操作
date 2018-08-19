@@ -1,0 +1,46 @@
+创建表时添加主键约束
+    MySQL:
+        CREATE TABLE Persons
+        (
+        Id_P int NOT NULL,
+        LastName varchar(255) NOT NULL,
+        FirstName varchar(255),
+        Address varchar(255),
+        City varchar(255),
+        PRIMARY KEY (Id_P) 主键约束
+        )
+    SQL Server / Oracle / MS Access:
+        CREATE TABLE Persons
+        (
+        Id_P int NOT NULL PRIMARY KEY, 主键约束
+        LastName varchar(255) NOT NULL,
+        FirstName varchar(255),
+        Address varchar(255),
+        City varchar(255)
+        )
+修改主键约束
+        ALTER TABLE Persons
+        ADD PRIMARY KEY (Id_P)
+    添加多个主键约束
+        ALTER TABLE Persons
+        ADD CONSTRAINT pk_PersonID PRIMARY KEY (Id_P,LastName)
+撤销 PRIMARY KEY 约束
+    MySQL:
+        ALTER TABLE Persons
+        DROP PRIMARY KEY
+    SQL Server / Oracle / MS Access:
+        ALTER TABLE Persons
+        DROP CONSTRAINT pk_PersonID
+
+ALTER TABLE 语句用于在已有的表中添加、修改或删除列。
+    如需在表中添加列，请使用下列语法:
+        ALTER TABLE table_name
+        ADD column_name datatype
+    要删除表中的列，请使用下列语法：
+        ALTER TABLE table_name 
+        DROP COLUMN column_name
+        =======================
+    要改变表中列的数据类型，请使用下列语法：
+        ALTER TABLE table_name
+        ALTER COLUMN column_name datatype
+        =============================
