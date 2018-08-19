@@ -15,3 +15,5 @@
    * [mariadb数据库](/openSUSE15.0/mariadb.md)
    * [openSUSU新手指南](https://opensuse-guide.ustclug.org/)
    * [安装后添加国内中科大镜像源](/openSUSE15.0/安装.md)
+# 数据库操作
+   * [MariaDB教程(w3c)](https://www.w3cschool.cn/mariadb)
