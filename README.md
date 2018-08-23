@@ -8,10 +8,10 @@
      * [java8 lambda 2](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
      * [java8 lambda 3](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
      * [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
-   ## springmvc
-   * [springmvc学习官方笔记](/springMVC/one)
-   * 模板引擎
-     * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
+   * ## springmvc
+     * [springmvc学习官方笔记](/springMVC/one)
+     * 模板引擎
+       * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 # git使用
 
    * [git官方中文教程](https://git-scm.com/book/zh/v2)
