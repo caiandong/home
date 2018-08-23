@@ -4,8 +4,9 @@ MultipartResolver from the org.springframework.web.multipart package is a strate
 file uploads. There is one implementation based on Commons FileUpload and another based on Servlet 3.0 multipart request parsing.
 
 To enable multipart handling, you need declare a MultipartResolver bean in your DispatcherServlet Spring configuration 
-with the name "multipartResolver". 
-The DispatcherServlet detects it and applies it to incoming request. When a POST with content-type of "multipart/form-data" is received, the resolver parses the content 
+with the name `"multipartResolver"`. 
+The DispatcherServlet detects it and applies it to incoming request. When a POST with content-type of "multipart/form-data" 
+is received, the resolver parses the content 
 and wraps the current HttpServletRequest as MultipartHttpServletRequest in order to provide access to resolved parts 
 in addition to exposing them as request parameters.
 ```java
@@ -63,3 +64,4 @@ with the name multipartResolver.
       }
 
     }
+```
