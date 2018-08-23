@@ -12,6 +12,3 @@ If a URL is expected to contain matrix variables, the request mapping for a cont
 that variable content and ensure the request can be matched successfully independent of matrix variable order and presence. 
 Below is an example:
 
-  sdadad
-  sdfasf
-  fdfsdf
