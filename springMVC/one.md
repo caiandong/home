@@ -1,5 +1,5 @@
 Matrix variables
-
+------------
       RFC 3986 discusses name-value pairs in path segments. 
     In Spring MVC we refer to those as "matrix variables" based on an "old post" by Tim Berners-Lee 
     but they can be also be referred to as URI path parameters.
@@ -11,4 +11,5 @@ Matrix variables
       If a URL is expected to contain matrix variables, the request mapping for a controller method must use a URI variable to mask 
     that variable content and ensure the request can be matched successfully independent of matrix variable order and presence. 
     Below is an example:
+
 
