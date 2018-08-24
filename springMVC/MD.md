@@ -67,5 +67,5 @@ with the name multipartResolver.
 ```
 slf4j官方整合框架示意图
 --------
-* 面向slf4j编程![ss](concrete-bindings.png)
-* 替换底层日志现![ss](legacy.png)
+* `面向slf4j编程`![ss](concrete-bindings.png)
+* `替换底层日志现`![ss](legacy.png)
