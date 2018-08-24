@@ -10,6 +10,7 @@
      * [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
    * ## springmvc
      * [springmvc学习官方笔记](/springMVC/one.md)
+     * [springmvc部分配置](/springMVC/MD.md)
      * 模板引擎
        * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
 # git使用
