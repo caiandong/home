@@ -65,3 +65,6 @@ with the name multipartResolver.
 
     }
 ```
+slf4j官方整合框架示意图
+--------
+![ss](/my_data/springMVC/legacy.png)
