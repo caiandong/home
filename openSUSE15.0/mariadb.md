@@ -1,9 +1,12 @@
 # 安装
-    1安装完成后（opensuse自带，无需安装）执行mysql_secure_installation 进行安全设置
-    2要想远程连接，需要进行防火墙设置
-    firewall-cmd --parmanent --add-service=mysql
-    firewall-cmd --reload （图形界面有个管理程序，第一次需要安装 在里面可以找到mysql设置）
-    3到/etc/my.cnf文件注释band-address那行 解邦ip;
+   1安装完成后（opensuse自带，无需安装）执行mysql_secure_installation 进行安全设置
+   
+   2要想远程连接，需要进行防火墙设置
+   
+   firewall-cmd --parmanent --add-service=mysql
+   firewall-cmd --reload （图形界面有个管理程序，第一次需要安装 在里面可以找到mysql设置）
+   
+   3到/etc/my.cnf文件注释band-address那行 解邦ip;
 # 赋予账户权限
   * GRANT 权限ON 数据库.表单名称TO 账户名@主机名
     * 对某个特定数据库中的特定表单给予授权
