@@ -68,4 +68,6 @@ with the name multipartResolver.
 slf4j官方整合框架示意图
 --------
 * `面向slf4j编程`![ss](concrete-bindings.png)
+    也就是 slf4j开头的包+相应其他日志.jar
 * `替换底层日志现`![ss](legacy.png)
+    是 其他日志+slf4j.jar 和任意一种日志实现(slf4j开头的包+相应其他日志.jar)两个包
