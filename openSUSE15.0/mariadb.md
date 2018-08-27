@@ -21,5 +21,5 @@
 # 移除权限
   * REVOKE 权限ON 数据库.表单名称FROM 账户名@主机名
 # 数据库备份与恢复
-  * 备份 mysqldump -u 用户 -p 数据库名 > 路径+名字+.dump后缀
-  * 恢复 mysql -u 用户 -p 数据库名 < 备份文件名
+  * 备份 mysqldump -u 用户 -p 数据库名 [tab1 tab2 ...] > 路径+名字+.dump后缀
+  * 恢复 mysql -u 用户 -p 数据库名 [tab1 tab2 ...] < 备份文件名
