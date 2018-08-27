@@ -39,8 +39,24 @@ ALTER TABLE 语句用于在已有的表中添加、修改或删除列。
     要删除表中的列，请使用下列语法：
         ALTER TABLE table_name 
         DROP COLUMN column_name
-        =======================
-    要改变表中列的数据类型，请使用下列语法：
-        ALTER TABLE table_name
-        ALTER COLUMN column_name datatype
-        =============================
+   使用ALTER语句中的MODIFY或CHANGE子句更改列定义或名称。 这些子句具有类似的效果，但是使用明显不同的语法。
+
+查看下面给出的CHANGE示例 -
+
+mysql> ALTER TABLE products_tbl CHANGE discontinued status CHAR(4);
+在使用CHANGE的语句中，指定原始列，然后指定将替换它的新列。 查看下面的MODIFY示例 -
+
+mysql> ALTER TABLE products_tbl MODIFY discontinued CHAR(4);
+ALTER命令还允许更改默认值。 查看示例 -
+
+mysql> ALTER TABLE products_tbl ALTER discontinued SET DEFAULT N;
+您还可以使用它通过将其与DROP子句配对来删除默认约束 -
+
+mysql> ALTER TABLE products_tbl ALTER discontinued DROP DEFAULT;
+使用ALTER修改表
+使用TYPE子句更改表类型 -
+
+mysql> ALTER TABLE products_tbl TYPE = INNODB;
+重命名具有RENAME关键字的表 -
+
+mysql> ALTER TABLE products_tbl RENAME TO products2016_tbl;
