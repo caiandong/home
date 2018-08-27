@@ -16,7 +16,7 @@
     in addition to exposing them as request parameters.
  ```
 ## Apache FileUpload
-To use Apache Commons FileUpload, simply configure a bean of type CommonsMultipartResolver with the name multipartResolver. Of course you also need to have commons-fileupload as a dependency on your classpath.
+To use Apache Commons FileUpload, simply configure a bean of type ``CommonsMultipartResolver`` with the name `multipartResolver`. Of course you also need to have commons-fileupload as a dependency on your classpath.
 
 ## servlet3.0以上
 Servlet 3.0 multipart parsing needs to be enabled through Servlet container configuration:
