@@ -42,11 +42,13 @@ ALTER TABLE 语句用于在已有的表中添加、修改或删除列。
    使用ALTER语句中的MODIFY或CHANGE子句更改列定义或名称。 这些子句具有类似的效果，但是使用明显不同的语法。
 
 查看下面给出的CHANGE示例 -
-
 mysql> ALTER TABLE products_tbl CHANGE discontinued status CHAR(4);
-在使用CHANGE的语句中，指定原始列，然后指定将替换它的新列。 查看下面的MODIFY示例 -
+在使用CHANGE的语句中，指定原始列，然后指定将替换它的新列。
 
+查看下面的MODIFY示例 -
 mysql> ALTER TABLE products_tbl MODIFY discontinued CHAR(4);
+修改原始列的属性
+
 ALTER命令还允许更改默认值。 查看示例 -
 
 mysql> ALTER TABLE products_tbl ALTER discontinued SET DEFAULT N;
