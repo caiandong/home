@@ -27,3 +27,6 @@
    * [SQL 基础教程(w3c)](http://www.w3school.com.cn/sql)
    * [MariaDB教程(w3c)](https://www.w3cschool.cn/mariadb)
    * [sql基本操作](/sql/sql基本操作)
+# 前端
+  * [jquery 在线手册](http://hemin.cn/jq)
+  * [jQuery API 3.3.1 速查表](http://jquery.cuishifeng.cn)
