@@ -1,4 +1,6 @@
 # c++11并行
+## Qt
+  * [Qt 编程指南](https://qtguide.ustclug.org)
 
 # java
 
