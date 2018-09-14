@@ -22,10 +22,8 @@
    * [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
    * [markdown语法说明](https://www.appinn.com/markdown)
    
-# openSUSE15.0日常使用
-   * [mariadb数据库](/openSUSE15.0/mariadb.md)
-   * [openSUSU新手指南](https://opensuse-guide.ustclug.org/)
-   * [安装后添加国内中科大镜像源](/openSUSE15.0/安装.md)
+# [openSUSE15.0日常使用](/openSUSE15.0/MD.md)
+   
 # 数据库操作
    * [SQL 基础教程(w3c)](http://www.w3school.com.cn/sql)
    * [MariaDB教程(w3c)](https://www.w3cschool.cn/mariadb)
