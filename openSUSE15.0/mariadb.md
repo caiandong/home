@@ -1,3 +1,5 @@
+# [这个好像是官网](https://mariadb.com/)
+
 # 安装
    1安装完成后（opensuse自带，无需安装）执行mysql_secure_installation 进行安全设置
    
