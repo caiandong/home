@@ -9,6 +9,9 @@
    firewall-cmd --reload （图形界面有个管理程序，第一次需要安装 在里面可以找到mysql设置）
    
    3到/etc/my.cnf文件注释band-address那行 解邦ip;
+# 创建账户
+  * create user 用户名@主机名（主机名也可以是 '*' 表示任意主机） identified by '密码'
+  * 应该直接 intsert into user 也可以，我没有试。
 # 赋予账户权限
   * GRANT 权限ON 数据库.表单名称TO 账户名@主机名
     * 对某个特定数据库中的特定表单给予授权
@@ -19,7 +22,9 @@
   * GRANT 权限1,权限2 ON 数据库.*TO 账户名@主机名  
     * 对某个数据库中的所有表单给予多个授权
   * GRANT ALL PRIVILEGES ON *.*TO 账户名@主机
-    *对所有数据库及所有表单给予全部授权（需谨
+    *对所有数据库及所有表单给予全部授权
+# 查看权限
+   * show grants for 用户名@'主机名' 
 # 移除权限
   * REVOKE 权限ON 数据库.表单名称FROM 账户名@主机名
 # 数据库备份与恢复
