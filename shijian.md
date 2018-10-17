@@ -1,3 +1,3 @@
 ## 红黑树
 
-![](datastructure/红黑树插入.gif)
+![](datastructure/红黑插入.gif)
