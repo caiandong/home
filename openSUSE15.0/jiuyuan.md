@@ -29,3 +29,13 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 ```text
 grub2-install /dev/sda
 ```
+## ubuntu18.10
+```text
+  我先安装openSUSE15.0，随后安装ubuntu。没想到把openSUSE引导覆盖了，在用上面的方法修复好openSUSE后，
+  openSUSE会自动找到其他系统并添加到启动项。
+  然而我重启后虽然找到ubuntu启动项，但是出现找不到内核文件情况。
+  偶然情况，我从openSUSE系统中进入到ubuntu所在分区，发现其挂载路径多出一个'/@',并且后来发现这个/@是btrfs文件系统产生的，
+  我的ubuntu根分区也是和 openSUSE一样 格式化为btrfs。随后又在ubuntu的grub下看到grub.cfg中的启动项是有/@的，
+  于是我觉得应该在openSUSE中的grub.cnf中
+  加入它，结果成功了。
+  ```
