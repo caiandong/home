@@ -1,3 +1,5 @@
+# openSUSE和ubuntu双系统产生的问题
+
 ## [这是社区解决方法](https://zh.opensuse.org/%E4%BF%AE%E5%A4%8DGRUB2)
 ### 挂载原系统的各分区
 首先查看各分区的情况，使用命令：
@@ -29,7 +31,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 ```text
 grub2-install /dev/sda
 ```
-## ubuntu18.10
+## 修复ubuntu18.10
 ```text
   我先安装openSUSE15.0，随后安装ubuntu。没想到把openSUSE引导覆盖了，在用上面的方法修复好openSUSE后，
   openSUSE会自动找到其他系统并添加到启动项。
