@@ -1,5 +1,5 @@
-# [部分数据结构与排序算法](/caiandong/datastructures)
-# [实践](shijian.md)
+# [部分数据结构与排序算法](https://github.com/caiandong/datastructures)
+# [红黑树图示](shijian.md)
 ## Qt
   * [Qt 编程指南](https://qtguide.ustclug.org)
 
@@ -7,10 +7,10 @@
    * ## [并发](java/并发.md)
    * ## java8
    
-     * [java8 lambda 1](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
-     * [java8 lambda 2](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
-     * [java8 lambda 3](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
-     * [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
+     [java8 lambda 1，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
+     [java8 lambda 2，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
+     [java8 lambda 3，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
+     [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
    * ## [spring](https://spring.io)
      * [springmvc学习官方笔记](/springMVC/one.md)
      * [springmvc部分配置](/springMVC/MD.md)
