@@ -1,3 +1,4 @@
+## [安装注意事项](anzhuangzhiqian.md)
 ## [安装方式](https://zh.opensuse.org/SDB:DVD_安装方式)
 ## [mariadb数据库](/openSUSE15.0/mariadb.md)
 ## [openSUSU新手指南](https://opensuse-guide.ustclug.org/)
