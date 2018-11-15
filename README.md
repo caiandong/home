@@ -22,7 +22,7 @@
        * [Mybatis pagehelper](https://github.com/pagehelper/pagehelper-spring-boot)
      * 模板引擎
        * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
-# git使用
+# [git使用](usegit.md)
 
    * [git官方中文教程](https://git-scm.com/book/zh/v2)
    * [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
