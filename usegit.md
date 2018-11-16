@@ -1,3 +1,11 @@
+## 用户配置
+    $ git config --global user.name "John Doe"
+    $ git config --global user.email johndoe@example.com
+    
+## 检查配置信息
+
+    如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置。
+
 ## 查看分支
     git branch -vv
 ## 跟踪远程分支
