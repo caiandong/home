@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-## 远程仓库 
- * 重命名仓库
-   
-    git remote rename oldname newname
-    
-  * 删除远程仓库
-  
-    git remote rm remotename
-=======
+
+
 ## 用户配置
     $ git config --global user.name "John Doe"
     $ git config --global user.email johndoe@example.com
@@ -17,8 +9,16 @@
     如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置。
 # 特别的，github生成ssh密钥
     $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
->>>>>>> 8fda9f5873488900cb11257a764513ec7ee98439
 
+## 远程仓库 
+ * 重命名仓库
+   
+    git remote rename oldname newname
+    
+  * 删除远程仓库
+  
+    git remote rm remotename
+    
 ## 查看分支
     git branch -vv
  
