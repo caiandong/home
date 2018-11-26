@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 远程仓库 
  * 重命名仓库
    
@@ -6,12 +7,23 @@
   * 删除远程仓库
   
     git remote rm remotename
+=======
+## 用户配置
+    $ git config --global user.name "John Doe"
+    $ git config --global user.email johndoe@example.com
+    
+## 检查配置信息
+
+    如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置。
+# 特别的，github生成ssh密钥
+    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+>>>>>>> 8fda9f5873488900cb11257a764513ec7ee98439
 
 ## 查看分支
     git branch -vv
  
 ## 跟踪远程分支
-  * git checkout -b [name] [remotename/remotebranch] 
+  * git checkout -b [name]  [remotename/remotebranch] 
   
     新建分支跟踪远程分支
   
@@ -26,18 +38,19 @@
   * git branch -u [remotename/remotebranch] 
   
     更换当前分支跟踪远程分支或者添加跟踪远程分支
+    
 ## 推送远程分支
-  * git push [remotename] [localbranch] 
+  * git push [remotename]  [localbranch] 
   
     推送本地分支作为远程分支
   
-    如果不存在远程分支名为'localbranch'，那么会生成新的名为'localbranch'的远程分
+    如果不存在远程分支名为`localbranch`，那么会生成新的名为`localbranch`的远程分
     
     支（并不会自动跟踪，下同）
     
     如果存在，则更新同名远程分支
     
-  * git push [remotename] [localbranch:remotebranch] 
+  * git push [remotename]  [localbranch:remotebranch] 
     
     推送不同名分支
     不存在，则生成。存在则更新。

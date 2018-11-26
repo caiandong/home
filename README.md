@@ -9,7 +9,7 @@
   * [Qt 编程指南](https://qtguide.ustclug.org)
 
 # java
-   * ## [并发](java/并发.md)
+   * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
    * ## java8
    
      [java8 lambda 1，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
