@@ -1,5 +1,15 @@
+## 远程仓库 
+ * 重命名仓库
+   
+    git remote rename oldname newname
+    
+  * 删除远程仓库
+  
+    git remote rm remotename
+
 ## 查看分支
     git branch -vv
+ 
 ## 跟踪远程分支
   * git checkout -b [name] [remotename/remotebranch] 
   
