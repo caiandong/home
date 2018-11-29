@@ -1,5 +1,9 @@
 
 
+   # [git官方中文教程](https://git-scm.com/book/zh/v2)
+   # [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
+   # [markdown语法说明](https://www.appinn.com/markdown)
+   
 ## 用户配置
     $ git config --global user.name "John Doe"
     $ git config --global user.email johndoe@example.com
