@@ -15,21 +15,29 @@
     $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 ## 仓库
   * git init
+  
     初始化一个仓库
   * git clone [仓库名]  [仓库的本地名]
+  
     如果本地名省略。默认为 origin
 ## 分支
   * git branch -vv
+  
      详细查看分支
   * git branch --merged
+
      详细查看已合并分支;--no-merged是未合并分支
   * git branch [newbranch_name]
+  
     新建分支
   * git checkout [branch_name]
+  
     切换到分支
   * git branch -b [newbranch_name]
+  
     新建分支并且切换到新分支
   * git branch -d [branch_name]
+  
     删除分支 -D强制删除，即使没有合并
 ## 远程仓库 
  * 重命名仓库
@@ -79,7 +87,9 @@
     此命令用来删除远程分支
 ## 抓取远程仓库数据
   * git fetch remotename 
+  
     更新本地的所有远程分支指针，并不合并
 ## 合并分支
   * git merge branch_name
+  
     branch_name既可以是本地分支也可以是远程分支指针
