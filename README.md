@@ -1,27 +1,11 @@
-# [杂项讨论](zaxiang.md)
+
 # [部分数据结构与排序算法](https://github.com/caiandong/datastructures)
 # [快排，基于qt的图形界面演示](https://github.com/caiandong/kuaipai)
 # [汉诺塔，基于qt图形界面演示](https://github.com/caiandong/hannuota)
 # [红黑树图示](shijian.md)
 # [springboot图书增删查改](https://github.com/caiandong/springboot_ssud)
 # [ssm员工增删查改](https://github.com/caiandong/my_ssud)
-## Qt
-  * [Qt 编程指南](https://qtguide.ustclug.org)
-
-# java
-   * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
-   * ## java8
-   
-     [java8 lambda 1，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
-     [java8 lambda 2，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
-     [java8 lambda 3，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
-     [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
-   * ## [spring](https://spring.io)
-     * [springmvc学习官方笔记](/springMVC/one.md)
-     * [springmvc部分配置](/springMVC/MD.md)
-       * [Mybatis pagehelper](https://github.com/pagehelper/pagehelper-spring-boot)
-     * 模板引擎
-       * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
+# [杂项讨论](zaxiang.md)
 # [git使用](usegit.md)
 
    * [git官方中文教程](https://git-scm.com/book/zh/v2)
@@ -29,6 +13,22 @@
    * [markdown语法说明](https://www.appinn.com/markdown)
    
 # [openSUSE15.0日常使用](/openSUSE15.0/MD.md)
+# java
+   * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
+   * ## [spring](https://spring.io)
+     * [springmvc学习官方笔记](/springMVC/one.md)
+     * [springmvc部分配置](/springMVC/MD.md)
+       * [Mybatis pagehelper](https://github.com/pagehelper/pagehelper-spring-boot)
+     * 模板引擎
+       * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
+   * ## java8
+   
+     [java8 lambda 1，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
+     [java8 lambda 2，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
+     [java8 lambda 3，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
+     [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
+## Qt
+  * [Qt 编程指南](https://qtguide.ustclug.org)
    
 # 数据库操作
    * [SQL 基础教程(w3c)](http://www.w3school.com.cn/sql)
