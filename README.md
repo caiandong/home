@@ -7,11 +7,6 @@
 # [ssm员工增删查改](https://github.com/caiandong/my_ssud)
 # [杂项讨论](zaxiang.md)
 # [git使用](usegit.md)
-
-   * [git官方中文教程](https://git-scm.com/book/zh/v2)
-   * [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
-   * [markdown语法说明](https://www.appinn.com/markdown)
-   
 # [openSUSE15.0日常使用](/openSUSE15.0/MD.md)
 # java
    * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
