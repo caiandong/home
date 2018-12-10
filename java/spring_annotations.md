@@ -9,4 +9,4 @@
 
 * @Import 导入其他配置类
 * @Configuration
-* @ImportResource 导入bean配置文件
+* @ImportResource 导入bean  xml配置文件
