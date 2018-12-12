@@ -11,8 +11,8 @@
    * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
    * ## [springboot官方阅读笔记](java/springboot_read.md)
    * ## [spring](https://spring.io)
-     * [springmvc学习官方笔记](/springMVC/one.md)
-     * [springmvc部分配置](/springMVC/MD.md)
+     * [springmvc学习官方笔记](java/springMVC/one.md)
+     * [springmvc部分配置](java/springMVC/MD.md)
        * [Mybatis pagehelper](https://github.com/pagehelper/pagehelper-spring-boot)
      * 模板引擎
        * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
