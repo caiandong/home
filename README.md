@@ -16,6 +16,7 @@
      * [springmvc学习官方笔记](java/springMVC/one.md)
      * [springmvc部分配置](java/springMVC/MD.md)
        * [Mybatis pagehelper](https://github.com/pagehelper/pagehelper-spring-boot)
+     * [mybatis配置与使用](java/mybatis/mybatis.md)
      * 模板引擎
        * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
    * ## java8
