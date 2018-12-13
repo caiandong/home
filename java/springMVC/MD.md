@@ -1,4 +1,4 @@
-# 1.2.11. Multipart resolver
+# 1.2.11. Multipart resolver(文件上传)
 ```text
     MultipartResolver from the org.springframework.web.multipart package is a strategy for 
     parsing multipart requests including 
@@ -77,7 +77,9 @@ with the name `multipartResolver`.
     }
     
 ```
+
 ```java
+
 配置multipartResolver流程：
 DispatcherServlet.initStrategies(ApplicationContext context)方法
   initMultipartResolver（ApplicationContext context）方法
@@ -88,7 +90,19 @@ DispatcherServlet.initStrategies(ApplicationContext context)方法
 springboot 中是DispatcherServletRegistrationBean（ServletRegistrationBean的子类）configure(ServletRegistration.Dynamic registration)方法
 最终通过ServletRegistration.Dynamic setMultipartConfig(MultipartConfigElement multipartConfig) 方法
 获得解析器设置元素
+
 ```
+# Internationalization using MessageSource(国际化i18n)
+```text
+   spring容器ApplicationContext被加载时会查找MessageSource类，名为messageSource。如果当前容器没有，则查找父容器。
+   If the ApplicationContext cannot find any source for messages, an empty DelegatingMessageSource is instantiated 
+   in order to be able to accept calls to the methods defined above.
+   Spring provides two MessageSource implementations, ResourceBundleMessageSource and StaticMessageSource. 
+   Both implement HierarchicalMessageSource in order to do nested messaging. 
+   The StaticMessageSource is rarely used but provides programmatic ways to add messages to the source
+   
+```
+
 slf4j官方整合框架示意图
 --------
 * `面向slf4j编程`![ss](concrete-bindings.png)
