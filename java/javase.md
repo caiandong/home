@@ -13,10 +13,11 @@
             action.accept(t);
         }
     }
-    }
-
+}
+```
 这是Collections中排序的静态方法参数T的类型
 
+```java
 public class Collections {
 
     @SuppressWarnings("unchecked")
@@ -25,8 +26,8 @@ public class Collections {
         }
     }
 ```
-
-这是thinkinginjava中的一个例子：
+带有通配符的下界泛型参数第一次看起来令人不知所措。其中一个目的用来解决泛型被擦除类型的问题。
+这是thinkinginjava中的一个例子,由于擦除，无法多次实现一个不同泛型参数的相同接口：
 
 ```java
 //: generics/HijackedInterface.java
@@ -43,4 +44,3 @@ class Cat extends ComparablePet implements Comparable<Cat>{
 
 } ///:~
 ``` 
-带有通配符的下界泛型参数第一次看起来令人不知所措。其中一个目的用来解决泛型被擦除类型的问题。
