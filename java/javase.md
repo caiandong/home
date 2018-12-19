@@ -27,8 +27,8 @@ public class Collections {
     }
 ```
 带有通配符的下界泛型参数第一次看起来令人不知所措。
-泛型被擦除导致很多问题，例如运行时类型丢失。
-由于编译时泛型参数被擦除为Obeject，一个接口的不同泛型的声明形式事实上是两个相同的参数为Object类型的接口，因此任何类无法多次实现一个不同泛型参数的相同接口。
+泛型被擦除导致一些问题，例如运行时类型丢失。
+由于编译时泛型参数被擦除为`Object`，一个接口的不同泛型的声明形式事实上是两个相同的参数为Object类型的接口，因此任何类无法多次实现一个不同泛型参数的相同接口。
 这是thinkinginjava中的一个例子:
 
 ```java
@@ -62,4 +62,4 @@ class SpeakingPet{
 }
 ```
 假如我们的`Cat.class`已由其他人继承自`ComparablePet`，因而此时其无法作为参数`T`；并且如讨论的那样，`Cat`也无法重新实现`Comparable<Cat>`。我们仍旧想让其sayhello是不可能的，
-惟一的做法添加一个通配符，`<T extends Comparable<? super T> >`,这也是和Collections.sort()方法声明如出一辙。
+为了让它说点什么，惟一的做法添加一个通配符，`<T extends Comparable<? super T> >`,这也是和Collections.sort()方法声明如出一辙。
