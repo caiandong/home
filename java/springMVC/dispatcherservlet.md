@@ -143,7 +143,8 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 }
 
 ```
-* FrameworkServlet
+* FrameworkServlet重写initServletBean()来创建容器（如果不存在）并设置父容器（可为空）。新增onRefresh(ApplicationContext context)方法让子类从容器中
+获取组件（各种解析器）。并且最终重写所有do get，post，put。。。所有基类（HttpServlet）方法。并且在processRequest内调用新增的方法doService由子类实现。
 
 ```java
 
@@ -227,11 +228,12 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	protected WebApplicationContext createWebApplicationContext(@Nullable ApplicationContext parent) {
 		Class<?> contextClass = getContextClass();
-	
+        //创建context
 		ConfigurableWebApplicationContext wac =
 				(ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
 		wac.setEnvironment(getEnvironment());
+		//设置父容器
 		wac.setParent(parent);
 		
 		configureAndRefreshWebApplicationContext(wac);
@@ -241,22 +243,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac) {
 	
-
 		postProcessWebApplicationContext(wac);
 		applyInitializers(wac);
+		//刷新context
 		wac.refresh();
 	}
 	
 	protected void initFrameworkServlet() throws ServletException {
-	}
-
-	
-	public void refresh() {
-		WebApplicationContext wac = getWebApplicationContext();
-		if (!(wac instanceof ConfigurableApplicationContext)) {
-			throw new IllegalStateException("WebApplicationContext does not support refresh: " + wac);
-		}
-		((ConfigurableApplicationContext) wac).refresh();
 	}
 
 	
@@ -270,8 +263,23 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	protected void onRefresh(ApplicationContext context) {
 		// For subclasses: do nothing by default.
 	}
+    @Override
+	protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+    }
+    @Override
+	protected final void doDelete(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
+		processRequest(request, response);
+	}
+	@Override
+	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
+		processRequest(request, response);
+	}
+	//等等重写的基类方法
 	/**
 	 * Override the parent class implementation in order to intercept PATCH requests.
 	 */
@@ -296,22 +304,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
-
-
 	protected abstract void doService(HttpServletRequest request, HttpServletResponse response)
 			throws Exception;
-
-
-	private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
-
-		@Override
-		public void onApplicationEvent(ContextRefreshedEvent event) {
-			FrameworkServlet.this.onApplicationEvent(event);
-		}
-	}
-
-
 
 }
 
 ```
+* DispatcherServlet重写onRefresh方法来初始化解析器。在重写的doService方法中在request中放入解析器并调用自己新增的的doDispatch方法。
