@@ -13,3 +13,8 @@
   alternatives --config java 和
   alternatives --config javac 
   ```
+* 修复挂载windows磁盘休眠，无法挂载或者只能以只读方式挂载
+
+  ```text
+  ntfsfix 设备名
+  ```
