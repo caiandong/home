@@ -114,3 +114,7 @@ condition与方括号前后分别有空格
  *)
     commands3 ;;
  esac
+
+ read 命令从标准输入读取一行进入某些fields
+ -p带有提示
+ -t 超时时间
