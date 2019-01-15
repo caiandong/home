@@ -1,0 +1,36 @@
+ 
+=================================摘自
+ C++ Style and Technique FAQ （中文版）
+Bjarne Stroustrup 著， 紫云英 译
+==========================
+ Q: 为什么我无法限制模板的参数？
+让我们来看这段代码：
+
+	template<class Container>
+	void draw_all(Container& c)
+	{
+		for_each(c.begin(),c.end(),mem_fun(&Shape::draw));
+	}
+为了早点捕捉到这个错误，我们可以这样写代码：
+
+	template<class Container>
+	void draw_all(Container& c)
+	{
+		Shape* p = c.front(); // accept only containers of Shape*s
+
+		for_each(c.begin(),c.end(),mem_fun(&Shape::draw));
+	}
+不过这样做不是最好。如果要我来写实际代码，我也许会这样写：
+	template<class Container>
+	void draw_all(Container& c)
+	{
+		typedef typename Container::value_type T;
+		Can_copy<T,Shape*>(); // accept containers of only Shape*s
+
+		for_each(c.begin(),c.end(),mem_fun(&Shape::draw));
+	}
+Can_copy()模板可被这样定义：
+	template<class T1, class T2> struct Can_copy {
+		static void constraints(T1 a, T2 b) { T2 c = a; b = a; }
+		Can_copy() { void(*p)(T1,T2) = constraints; }
+	};
