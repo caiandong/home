@@ -1,0 +1,83 @@
+@Cacheable: Triggers cache population.
+
+@Cacheable("books")
+public Book findBook(ISBN isbn) {...}
+在方法执行前检查缓存，有的话不会重复执行，直接从缓存返回。
+注解可以声明多个缓存名，则生成更多缓存实例。当方法执行前，只要有一个缓存命中，关联值被返回。
+注意：其他所有没有此缓存值的缓存实例中也会更新这次缓存，即使此方法实际没有被调用。
+
+每个被缓存方法需要被转化成合适的缓存访问键key，默认键生成，缓存键的默认生成有三种方式;
+
+如果方法没有参数，则返回SimpleKey.EMPTY.
+
+如果方法仅给定一个参数，则返回参数实例.
+
+如果有给定多个参数，返回一个包含所有参数的SimpleKey.
+
+只要这些参数有自然键(natural keys)并且实现了合法的hashCode()和equals()方法，如果不是这种情况，需要
+实现org.springframework.cache.interceptor.KeyGenerator接口来提供不同的默认键生成器。
+对于一些情况，只有部分参数与缓存键相关;
+@Cacheable("books")
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+第一眼看去，这两个boolean值参数只影响发现书的方式，对缓存没有用，更进一步，
+这两个中只有一个重要，另一个不重要，该怎么办？
+@Cacheable注解通过其key属性来让你指定缓存键如何生成。你可以使用SpEL去挑选感兴趣的参数(或者参数的内嵌属性)，
+执行运算，或者甚至调用随意的方法而不用写任何代码或实现任何接口。这是在默认键生成器之上被推荐的方法，因为随着代码
+基础增长，方法在签名上趋向于相当不同。默认策略也许对一些方法工作很好，但很少对所有方法都这样。
+@Cacheable(cacheNames="books", key="#isbn")
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+
+@Cacheable(cacheNames="books", key="#isbn.rawNumber")
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+
+@Cacheable(cacheNames="books", key="T(someType).hash(#isbn)")
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+
+上述片段展示了他是多容易去选择某一个参数，参数属性之一，甚至随意的静态方法。
+指定KeyGenerator的bean实现的名字来共享生成算法
+@Cacheable(cacheNames="books", keyGenerator="myKeyGenerator")
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+注意：key与keyGenerator是相互独占的，指定两个会导致异常。
+
+实现org.springframework.cache.interceptor.CacheResolver借口提供不用的默认缓存解析器。
+
+存在多个cacheManager时，设置cacheManager;
+
+@Cacheable(cacheNames="books", cacheManager="anotherCacheManager") 
+public Book findBook(ISBN isbn) {...}
+
+指定一个CacheResolver，基于运行时参数来解析要使用的缓存实例;
+
+@Cacheable(cacheResolver="runtimeCacheResolver") 
+public Book findBook(ISBN isbn) {...}
+
+注意：自spring4.1以来，cache注解的value属性不再是强制了，因为特殊信息可以被CacheResolver提供
+而不论注解的内容。
+类似于key and keyGenerator，cacheManager and cacheResolver参数也是相互独占的，指定两个的操作导致异常，
+自定义CacheManager被CacheResolver实现忽略，这可能不是你所期待的。(CacheManager的默认CacheResolver被忽略)
+
+多线程情况下，会产生对于相同参数的并发调用操作。缓存抽象不锁任何东西，相同的值也许被计算好几次，击败了缓存的目标。
+当值被计算时，sync属性来指导底层缓存提供者锁住缓存条目。只有一个线程忙于计算值，其他线程阻塞直到条目被更新在缓存中。
+
+@Cacheable(cacheNames="foos", sync=true) 
+public Foo executeExpensiveOperation(String id) {...}
+
+注意：这是可选特性，你最喜欢的缓存库也许不一定支持它。所有被核心框架提供的CacheManager实现都支持它。
+
+condition属性指定缓存条件，通过根据SpEL表达式计算结果决定是否缓存
+
+@Cacheable(cacheNames="book", condition="#name.length() < 32") 
+public Book findBook(String name)
+
+unless属性指定条件来否定缓存，它在方法调用后执行
+
+@Cacheable(cacheNames="book", condition="#name.length() < 32", unless="#result.hardback") 
+public Book findBook(String name)
+
+@CacheEvict: Triggers cache eviction.
+
+@CachePut: Updates the cache without interfering with the method execution.
+
+@Caching: Regroups multiple cache operations to be applied on a method.
+
+@CacheConfig Shares some common cache-related settings at class-level. 
