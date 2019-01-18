@@ -18,3 +18,8 @@
   ```text
   ntfsfix 设备名
   ```
+* okular打开部分pdf乱码（说的就是tcp-ip详解卷一）
+
+  ```text
+  sudo zypper install poppler-data
+  ```

@@ -1,0 +1,21 @@
+ # RedisTemplate
+
+ 一旦被配置后，template是线程安全的，可以跨多个不同实例间复用。
+ RedisTemplate对于大多数操作使用基于java的序列化器（serializer）。这意味着通过template被写与被读的任何对象都是通过java进行序列与反序列化。你可以改变在template上的序列化机制，Redis模块提供了几个实现，可以在org.springframework.data.redis.serializer中获取可用。你也可以设置任何序列化器为null然后使用RedisTemplate，数据为行字节数组（raw byte arrays），这是通过设置enableDefaultSerializer属性为false。注意，template需要所有keys为 非空。但是values可以为空，只要底层序列化器接受他们。
+ 对于需要某些模板视图的情况，声明这些视图作为依赖并且注入template。容器会自动处理转换，消除 RedisTemplate.opsFor[X]类型的调用.
+ 
+ #Serializers
+
+ 从框架角度看，存储在Redis中的数据仅仅是字节。然而Redis自身支持各种类型，对于大部分，这些是指向数据存储的方式而不是它实际的表示。取决于用户决定是否信息被翻译成字符串或任何其他对象。
+ 在Spring Data，user(custom) types和raw data之间的转换是被Redis处理，在org.springframework.data.redis.serializer package.
+ 包中包含两种类型serializer，掌管序列化过程;
+ Two-way serializers based on RedisSerializer.
+ Element readers and writers that use RedisElementReader and RedisElementWriter.
+ 主要不同在于RedisSerializer主要序列化byte[]而readers和writers使用ByteBuffer。
+ 多个实现可用
+ 1 JdkSerializationRedisSerializer, which is used by default for RedisCache and RedisTemplate.
+ 2 the StringRedisSerializer.
+ 3 OxmSerializer Object/XML mapping through Spring OXM support
+ 4 Jackson2JsonRedisSerializer or GenericJackson2JsonRedisSerializer for storing data in JSON format.
+
+

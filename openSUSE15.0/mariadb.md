@@ -31,3 +31,30 @@
 # 数据库备份与恢复
   * 备份 mysqldump -u 用户 -p 数据库名 [tab1 tab2 ...] > 路径+名字+.dump后缀
   * 恢复 mysql -u 用户 -p 数据库名 [tab1 tab2 ...] < 备份文件名
+# 约束添加
+
+```text
+    create table tablename(
+    id int primary key,
+    name varchar(10) not null,
+    seat int unique,
+    age int default 18,
+    maiorId int #references major(id)
+    #mysql中列级外键约束无效
+    );
+
+```
+  * 建表时直接在列后追加约束类型。
+  
+```text
+    create table tablename(
+    id int ，
+    name varchar(10) ，
+    seat int ，
+    age int ，
+    maiorId int,
+    constraint fk_xxx foreing key (majorId) references
+    major(id) #外键约束
+    );
+```
+  * 这种不支持not null和default
