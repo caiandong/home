@@ -1,0 +1,23 @@
+ByteBuffer
+STATIC:
+#返回一个ByteBuffer
+ByteBuffer.wrap("123".getBytes())
+ByteBuffer.allocate(BSIZE)
+NO-STATIC:
+flip()  #准备缓冲器内容去write，position设置为0,limit设置为capacity
+
+clear()     #准备缓冲器去read，limit设置为position,position设置为0
+
+capacity()  #返回分配的缓冲器大小
+
+limit()     #返回limit值
+
+position()      #返回position
+
+asXXXBuffer().put()   #通过视图缓冲器放入基本数据类型
+
+get()   #返回字节
+
+mark()      #标记当前position
+
+reset()     #回到标记的位置

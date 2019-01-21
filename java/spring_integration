@@ -76,8 +76,79 @@ public Book findBook(String name)
 
 @CacheEvict: Triggers cache eviction.
 
+spring缓存抽象不仅允许缓存填充，也允许缓存清出。这种处理对于移除来自缓存中旧的或未使用的数据非常有用。
+与@Cacheable相反, @CacheEvict界定处理缓存清出的方法（这样的方法，行为类似从缓存中移除数据的触发器）。
+类似于它的兄弟，@CacheEvict需要指定一个或更多被这个方法动作影响的缓存（cacheNames），允许自定义缓存和key解析，
+或要被指定的condition，一个额外参数（allEntries）表明是否需要执行缓存范围清出而不仅仅是一个条目清出（基于key的缓存条目）。
+
+@CacheEvict(cacheNames="books", allEntries=true) 
+public void loadBooks(InputStream batch)
+
+这个选项是随手而来的当一整个缓存区域需要被清空，而不是清空每一个条目（这样花费长时间，因为低效），
+所有的在一个操作中都被移除，如上例子所述。注意框架会忽略任何在这个脚本中指定的key因为它不会应用(整个缓存被清出，不仅仅是一个条目）。
+你可以表明清出应该在方法执行后或执行前发生，通过beforeInvocation属性。beforeInvocation=true总是造成缓存清出
+在方法被调用前发生，这是有用的，在缓存不需要绑定到方法执行结果时。beforeInvocation=false，方法抛出异常或者调用缓存
+，清空不会被发生。
+注意返回值为void的方法也可以使用@CacheEvict，这是和@Cacheable不用的。
+
 @CachePut: Updates the cache without interfering with the method execution.
+
+当缓存需要更新而不干扰方法执行时，可以使用这个注解。那就是，方法总是执行，然后结果被放到缓存中。
+它与@Cacheable有相同的参数，并且应该被用来缓存填充，而不是方法流优化。
+
+@CachePut(cacheNames="book", key="#isbn")
+public Book updateBook(ISBN isbn, BookDescriptor descriptor)
+
+注意：@CachePut and @Cacheable不鼓励在同一方法使用，他们有不同的行为。
+后一个通过使用缓存造成方法执行应该跳过，前一个为了执行缓存更新而强制方法执行。这会导致不期待的行为以及特定的
+角落情况异常（例如注解条件互相排除）。这样的声明应该避免。
+注意这样的conditions不应该依赖于结果对象( the #result variable)，因为这些被提前校验来确认排除规则。
 
 @Caching: Regroups multiple cache operations to be applied on a method.
 
+有时，相同类型的多个注解需要被指定，因为condition和key expression在不同缓存间是不同的。
+@Caching让多个内嵌@Cacheable, @CachePut, and @CacheEvict被使用在相同方法上。
+
+@Caching(evict = { @CacheEvict("primary"), @CacheEvict(cacheNames="secondary", key="#p0") })
+public Book importBooks(String deposit, Date date)
+
 @CacheConfig Shares some common cache-related settings at class-level. 
+
+有些自定义选项配置起来很乏味如果它们被应用到这个类的所有操作上。指定缓存名为每个缓存操作使用，这样的类可以用
+单个类级定义来替换。这就是@CacheConfig发威的地方。
+
+@CacheConfig("books") 
+public class BookRepositoryImpl implements BookRepository {
+
+    @Cacheable
+    public Book findBook(ISBN isbn) {...}
+}
+
+@CacheConfig是一个允许共享缓存名，自定义KeyGenerator，自定义CacheManager，和自定义CacheResolver的类级注解。
+将这个注解放在类上不会开启任何缓存操作。
+operation-level 定制覆盖@CacheConfig定制，以下是覆盖顺序;
+
+Globally configured, available for CacheManager, KeyGenerator.
+
+At the class level, using @CacheConfig.
+
+At the operation level.
+
+在配置类上添加@EnableCaching或者xml文件配置<cache:annotation-driven/>开启缓存抽象。
+
+<!-- the service we want to make cacheable -->
+<bean id="bookService" class="x.y.service.DefaultBookService"/>
+
+<!-- cache definitions -->
+<cache:advice id="cacheAdvice" cache-manager="cacheManager">
+    <cache:caching cache="books">
+        <cache:cacheable method="findBook" key="#isbn"/>
+        <cache:cache-evict method="loadBooks" all-entries="true"/>
+    </cache:caching>
+</cache:advice>
+
+<!-- apply the cacheable behavior to all BookService interfaces -->
+<aop:config>
+    <aop:advisor advice-ref="cacheAdvice" pointcut="execution(* x.y.BookService.*(..))"/>
+</aop:config>
+

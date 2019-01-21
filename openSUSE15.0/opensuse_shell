@@ -1,35 +1,4 @@
-sudo zypper ar -fcg https://mirrors.ustc.edu.cn/opensuse/distribution/leap/42.3/repo/oss USTC:42.3:OSS
-sudo zypper ar -fcg https://mirrors.ustc.edu.cn/opensuse/distribution/leap/42.3/repo/non-oss USTC:42.3:NON-OSS
-sudo zypper ar -fcg https://mirrors.ustc.edu.cn/opensuse/update/leap/42.3/oss USTC:42.3:UPDATE-OSS
-sudo zypper ar -fcg https://mirrors.ustc.edu.cn/opensuse/update/leap/42.3/non-oss USTC:42.3:UPDATE-NON-OSS
--c, --check     Probe given URI.
--f, --refresh
--g, --gpgcheck
-查看网络与设置ip
- nmcli connection show eth0
- 设置ip
- nmcli connection modify eth0 \
- > connection.autoconnect yes \
- > ipv4.method manual \
- > ipv4.addresses 172.16.1.1/16 \
- > ipv4.gateway 172.16.200.254 \
- > ipv4.dns 172.16.200.254
-使设置生效
- nmcli connection up eth0
- 存在dhcp自动获取ip
- nmcli connection modify eth0 \
- > connection.autoconnect yes \
- > ipv4.method auto
 
-
-
- java-1_8_0-openjdk-devel           (OpenJDK 8 Development Environment )
- java-1_8_0-openjdk-src              ( OpenJDK 8 Source Bundle  )
- libqt5-creator                      (Integrated Development Environment targeting Qt apps    )
- stardict         跨平台翻译单词软件
- chromium 谷歌浏览器
- uget       下载
- netease        网易云音乐
 ###################shell脚本#############
 命令替换
 `command`或$(command)
