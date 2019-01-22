@@ -1,8 +1,13 @@
 
+是一个学习过后来查漏补缺的记录，不是初学者教程
+没想到更好的表述方式，以每一个条目为分割，先命令再解释，与先解释再命令表述是等价的。
+较短的格式会放在同一行，希望别糊涂
 
-   # [git官方中文教程](https://git-scm.com/book/zh/v2)
-   # [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
-   # [markdown语法说明](https://www.appinn.com/markdown)
+============
+
+# [git官方中文教程](https://git-scm.com/book/zh/v2)
+# [README.md基本编写](https://www.cnblogs.com/shiy/p/6526868.html)
+# [markdown语法说明](https://www.appinn.com/markdown)
    
 ## 用户配置
     $ git config --global user.name "John Doe"
@@ -20,6 +25,32 @@
   * git clone [仓库名]  [仓库的本地名]
   
     如果本地名省略。默认为 origin
+    
+## 日志
+  * git log
+  ```text
+    -p
+    --graph
+    --pretty=
+  ```
+## 提交前操作
+    
+  * git commit --amend 
+    
+    如果在提交过后突然又觉得此次提交不妥，或者内容增加或改变，甚至提交说明中某个用词想改变下。
+    通常直接 git add . 重新提交下。这里是一个缓解的方式。比方，规定长途汽车在发车最后五分钟时迟到者不允许进了。
+    你通过某种方式打破这条规定，进去了。就好像没有迟到。
+    这条命令和例子很像。这是个危险的命令，把当前暂存区数据提交，结果就是合并前一次提交，
+    看上去所有提交都是，最后的，一次性的，提交。
+    
+  * git reset HEAD <文件名>
+  
+    把某些已经放在暂存区的文件剔除。恢复刚新建此文件，没有跟踪放到暂存区的样子。
+    
+  * git checkout -- <文件>
+    
+    恢复已经跟踪但没有暂存的文件修改。这是危险的命令，因为修改没有提较，导致修改丢失。
+    
 ## 分支
   * git branch -vv
   
@@ -39,16 +70,19 @@
   * git branch -d [branch_name]
   
     删除分支 -D强制删除，即使没有合并
+    
 ## 远程仓库 
- * 重命名仓库
+
+  * 添加远程仓库
+  
+    git remote add <anyname> <url>
+  * 重命名仓库
    
     git remote rename oldname newname
     
   * 删除远程仓库
   
     git remote rm remotename
-    
-
  
 ## 跟踪远程分支
   * git checkout -b [name]  [remotename/remotebranch] 
@@ -85,10 +119,12 @@
   * git push [remotename] --delete [remotebranch]
   
     此命令用来删除远程分支
+    
 ## 抓取远程仓库数据
   * git fetch remotename 
   
-    更新本地的所有远程分支指针，并不合并
+    抓取远程仓库数据放到本地，并不合并
+    
 ## 合并分支
   * git merge branch_name
   

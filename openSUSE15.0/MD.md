@@ -13,3 +13,7 @@
 ## [部分使用问题](using.md)
 ## [网络操作](网络方面.md)
 ## [引导救援](jiuyuan.md)
+
+
+### 与linux有关的方面
+   [骏马金龙的博客](http://www.cnblogs.com/f-ck-need-u)
