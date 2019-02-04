@@ -1,3 +1,44 @@
+spring aop
+java编程配置
+
+@Configuration
+@EnableAspectJAutoProxy
+@Aspect
+public class AppConfig {
+    @Pointcut("execution(* transfer(..))")// the pointcut expression
+    private void anyOldTransfer() {}// the pointcut signature
+    @Before("execution(* com.xyz.myapp.dao.*.*(..))")
+    public void doAccessCheck() {
+        // ...
+    }
+}
+@Aspect要添加在容器中
+五大通知执行流程
+不抛异常情况下
+
+        环绕通知开始
+            before通知执行
+        环绕通知结束
+    after(finally)通知执行
+afterreturning通知执行
+
+抛异常情况下
+
+        环绕通知开始
+            before通知执行
+        \环绕通知结束无法得到执行
+    after(finally)通知执行
+    \afterreturning通知未执行
+异常通知执行
+
+首先，异常通知和返回值通知不能共存。每次最多4个可以同时执行。
+抛异常执行奇怪点在于;
+after通知是放在finally块中被捕获的，所以after会一直得到执行。
+由于抛出异常，方法在异常之后的代码片段得不到执行，所以环绕通知结束不能执行。
+方法由于没有返回(异常抛出后会栈解退，层层直接跳过正常方法执行。)，所以获取返回值的方法不能得到执行，最终只执行异常通知。
+===================
+spring缓存抽象
+
 @Cacheable: Triggers cache population.
 
 @Cacheable("books")
