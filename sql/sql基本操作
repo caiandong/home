@@ -1,3 +1,14 @@
+批量操作：
+    数据库先把sql预编译完成，随后等待要执行的数据。
+子查询
+    在where in 中的子查询先执行
+    再select后from前的子查询后执行
+group by
+    对查询出来的结果进行分组，然后用聚合函数处理每个分组
+    要用having来进行分组筛选
+    顺序：
+        where + group by +having + order by
+
 创建表时添加主键约束
     MySQL:
         CREATE TABLE Persons

@@ -1,35 +1,99 @@
+
+spring事务:
+    xml声明式:
+            <?xml version="1.0" encoding="UTF-8"?>
+        <beans xmlns="http://www.springframework.org/schema/beans"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:aop="http://www.springframework.org/schema/aop"
+            xmlns:tx="http://www.springframework.org/schema/tx"
+            xmlns:context="http://www.springframework.org/schema/context"
+            xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="datasource"></property>
+        </bean>
+        <tx:advice id="tx" transaction-manager="transactionManager">
+            <tx:attributes>
+                <tx:method name="get*" read-only="true" />
+                <tx:method name="insert*" />
+            </tx:attributes>
+        </tx:advice>
+        <aop:config>
+            <aop:advisor advice-ref="tx" pointcut="execution(* cai.com.github.service..*.*(..))"/>
+        </aop:config>
+        </beans>
+        
+    java编程配置:
+        1：@EnableTransactionManagement在配置类上添加此注解。或者在xml中添加<tx:annotation-driven/>标签
+        <tx:annotation-driven transaction-manager="txManager"/>如果事物管理器名字是transactionManager，可以
+        不用指定transaction-manager属性。在@EnableTransactionManagement注解中不能指定。
+        2：在想要事物的类或者方法上添加@Transactional注解，并且在他的属性中配置事物属性。
+
 spring aop
+xml声明式：
+            <?xml version="1.0" encoding="UTF-8"?>
+        <beans xmlns="http://www.springframework.org/schema/beans"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:aop="http://www.springframework.org/schema/aop"
+            xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+        
+        <aop:config>
+            <aop:pointcut expression="execution(* cai.com.github.controller..*.*(..))" id="pointcut_xml"/>
+            <aop:aspect ref="xml_Aspect">
+                <aop:before method="firstHello" pointcut-ref="pointcut_xml"/>
+                <aop:around method="aroundHello" arg-names="jp" pointcut-ref="pointcut_xml"/>
+                
+                <aop:after-returning method="returnHello" returning="ob" pointcut-ref="pointcut_xml"/>
+                <aop:after-throwing method="throwHello" throwing="ex" pointcut-ref="pointcut_xml"/>
+                <aop:after method="afterHello" pointcut-ref="pointcut_xml"/>
+            </aop:aspect>
+        </aop:config>
+        <bean id="xml_Aspect" class="cai.com.github.aop.xmlAspect_sayhello"></bean>
+        </beans>
+
 java编程配置
+        1： @EnableAspectJAutoProxy在配置类上添加此注解。或者在xml中添加<aop:aspectj-autoproxy/>标签
+        2：创建一个类注解@Aspect并且放在容器中，这个类含有advise和pointcut
 
-@Configuration
-@EnableAspectJAutoProxy
-@Aspect
-public class AppConfig {
-    @Pointcut("execution(* transfer(..))")// the pointcut expression
-    private void anyOldTransfer() {}// the pointcut signature
-    @Before("execution(* com.xyz.myapp.dao.*.*(..))")
-    public void doAccessCheck() {
-        // ...
-    }
-}
-@Aspect要添加在容器中
-五大通知执行流程
-不抛异常情况下
+        @Configuration
+        @EnableAspectJAutoProxy
+        @Aspect
+        public class AppConfig {
+            @Pointcut("execution(* transfer(..))")// the pointcut expression
+            private void anyOldTransfer() {}// the pointcut signature
+            @Before("execution(* com.xyz.myapp.dao.*.*(..))")
+            public void doAccessCheck() {
+                // ...
+            }
+        }
+        
+=================
+注意：
+    一个小bug，在注解配置中，是按照下列顺序执行，但在声明式中，除非around声明在before前面，
+    否则先执行before。
+ ===============   
+五大通知执行流程：
 
-        环绕通知开始
-            before通知执行
-        环绕通知结束
-    after(finally)通知执行
-afterreturning通知执行
+        不抛异常情况下
 
-抛异常情况下
+                环绕通知开始
+                    before通知执行
+                环绕通知结束
+            after(finally)通知执行
+        afterreturning通知执行
 
-        环绕通知开始
-            before通知执行
-        \环绕通知结束无法得到执行
-    after(finally)通知执行
-    \afterreturning通知未执行
-异常通知执行
+        抛异常情况下
+
+                环绕通知开始
+                    before通知执行
+                \环绕通知结束无法得到执行
+            after(finally)通知执行
+            \afterreturning通知未执行
+        异常通知执行
 
 首先，异常通知和返回值通知不能共存。每次最多4个可以同时执行。
 抛异常执行奇怪点在于;
@@ -37,6 +101,7 @@ after通知是放在finally块中被捕获的，所以after会一直得到执行
 由于抛出异常，方法在异常之后的代码片段得不到执行，所以环绕通知结束不能执行。
 方法由于没有返回(异常抛出后会栈解退，层层直接跳过正常方法执行。)，所以获取返回值的方法不能得到执行，最终只执行异常通知。
 ===================
+
 spring缓存抽象
 
 @Cacheable: Triggers cache population.
@@ -175,21 +240,26 @@ At the class level, using @CacheConfig.
 
 At the operation level.
 
-在配置类上添加@EnableCaching或者xml文件配置<cache:annotation-driven/>开启缓存抽象。
+xml声明式:
+        <!-- the service we want to make cacheable -->
+        <bean id="bookService" class="x.y.service.DefaultBookService"/>
 
-<!-- the service we want to make cacheable -->
-<bean id="bookService" class="x.y.service.DefaultBookService"/>
+        <!-- cache definitions -->
+        <cache:advice id="cacheAdvice" cache-manager="cacheManager">
+            <cache:caching cache="books">
+                <cache:cacheable method="findBook" key="#isbn"/>
+                <cache:cache-evict method="loadBooks" all-entries="true"/>
+            </cache:caching>
+        </cache:advice>
 
-<!-- cache definitions -->
-<cache:advice id="cacheAdvice" cache-manager="cacheManager">
-    <cache:caching cache="books">
-        <cache:cacheable method="findBook" key="#isbn"/>
-        <cache:cache-evict method="loadBooks" all-entries="true"/>
-    </cache:caching>
-</cache:advice>
+        <!-- apply the cacheable behavior to all BookService interfaces -->
+        <aop:config>
+            <aop:advisor advice-ref="cacheAdvice" pointcut="execution(* x.y.BookService.*(..))"/>
+        </aop:config>
 
-<!-- apply the cacheable behavior to all BookService interfaces -->
-<aop:config>
-    <aop:advisor advice-ref="cacheAdvice" pointcut="execution(* x.y.BookService.*(..))"/>
-</aop:config>
 
+java编程配置：
+
+        1:在配置类上添加@EnableCaching或者xml文件配置<cache:annotation-driven/>开启缓存抽象。
+
+        

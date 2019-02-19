@@ -1,3 +1,16 @@
+
+Q: What is IMAP?
+A: IMAP stands for Internet Message Access Protocol. It is a method of accessing electronic mail messages stored on a (possibly shared) mail server. In other words, it permits a "client" email program to access remote message stores as if they were local. IMAP is defined by RFC2060.
+
+Q: What is SMTP?
+A: SMTP stands for Simple Mail Transfer Protocol. It is used to transfer RFC822-style messages between different mail hosts as well as to submit new messages to a host for delivery. SMTP is in very wide use (it originated in 1982) and is defined by RFC821.
+
+Q: What is MIME?
+A: MIME and RFC822 are the standards for describing email messages that are sent across the Internet. The javax.mail.internet subpackage (which is part of the JavaMail APIs) provides a complete implementation of these two packages. MIME is specified by the following RFCs: RFC2045, RFC2046, RFC2047.
+
+Q: What is POP3?
+A: POP3 stands for Post Office Protocol version 3. POP3 is a very limited protocol for accessing a single mailbox. It is much less capable than IMAP. POP3 is very widely used and is defined by RFC1939.
+
 ByteBuffer
 STATIC:
 #返回一个ByteBuffer

@@ -1,0 +1,115 @@
+Spring Security 安全权限管理手册：http://www.mossle.com/docs/auth/html/index.html
+ 
+
+Authorization   授权
+Authentication  认证
+fundamental 基本的
+principal   主要的
+retrieve    取回
+credentials     证书
+credentials     足够
+leverages       杠杆作用
+
+FilterSecurityInterceptor(处理http资源的安全)
+    need：AuthenticationManager，AccessDecisionManager
+ExceptionTranslationFilter(在前一个之上，处理异常)
+    need：AuthenticationEntryPoint   method:commence()
+          AccessDeniedHandler
+AuthenticationEntryPoint(用户请求一个安全http资源但没有被认证)
+    *default：LoginUrlAuthenticationEntryPoint
+AccessDeniedHandler(用户已认证，但仍旧不能访问受保护的资源)
+    default：AccessDeniedHandlerImpl
+    AccessDeniedException被抛出，并且用户已认证，说明用户没有权限。
+
+UsernamePasswordAuthenticationToken
+
+ExceptionTranslationFilter
+    检测抛出的sringsecurity异常，通常这些异常是被AbstractSecurityInterceptor产生的
+AuthenticationEntryPoint
+    进入认证点（服务器决定需要认证，然后回送信息表示必须认证）
+Authentication Mechanism
+    收集来自用户的认证细节（form-base login and Basic authentication），产生Authentication请求
+    对象呈现给AuthenticationManager
+    authentication mechanism收回完整被填充（fully-populated）Authentication对象，他认为
+    请求合法，并且放置Authentication进SecurityContextHolder，原始请求再次重试。否则再次从头开始认证。
+    authentication credentials (either as an HTTP form post or HTTP header)
+SecurityContextPersistenceFilter
+    在请求间存储SecurityContext，默认情况下在http请求间存储为HttpSession属性。
+    对于每个请求，它恢复context到SecurityContextHolder。请求完成清除SecurityContextHolder。
+    （出于安全目的不应该直接与HttpSession交互，只是没有理由这样做-总是使用SecurityContextHolder代替。
+
+SecurityContextHolder, to provide access to the SecurityContext.
+
+SecurityContext, to hold the Authentication and possibly request-specific security information.
+
+Authentication, to represent the principal in a Spring Security-specific manner.
+
+GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+
+UserDetails, to provide the necessary information to build an Authentication object from your 
+application’s DAOs or other source of security data.
+
+UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+                    
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+大多数情况是 UserDetails
+if (principal instanceof UserDetails) {
+
+String username = ((UserDetails)principal).getUsername();
+
+} else {
+String username = principal.toString();
+}
+
+UsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter
+     :ProviderManager extends AuthenticationManager
+       List:DaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements AuthenticationProvider
+            :UserDetailsService
+                PasswordEncoder
+                UserDetails {GrantedAuthority}
+                    return:Authentication
+            
+            
+WebSecurity
+
+setFilterChainProxySecurityConfigurer
+>springSecurityFilterChain
+>>
+
+
+ WebSecurityConfigurerAdapter implements WebSecurityConfigurer extends SecurityConfigurer
+ 
+1.在servletContext启动时: 
+WebApplicationInitializer.onStartup()->ServletContext
+        insertSpringSecurityFilterChain()->ServletContext
+            new DelegatingFilterProxy()->["springSecurityFilterChain"]
+2.调用DelegatingFilterProxy filter的init方法:
+DelegatingFilterProxy.init()->FilterConfig
+    delegate=initFilterBean()
+        initDelegate()->[wac]WebApplicationContext
+    =       wac.getBean()->["springSecurityFilterChain",Filter.class]Class
+3.实例化WebSecurityConfiguration配置类
+WebSecurityConfiguration.setFilterChainProxySecurityConfigurer()->...
+    webSecurity.apply()->[webSecurityConfigurer]SecurityConfigurer<Filter, WebSecurity>
+["springSecurityFilterChain"]Filter=springSecurityFilterChain()
+    webSecurity.build()
+        doBuild()
+            init()      //回调所有WebSecurityConfigurerAdapter的init()方法
+            configure()     //回调所有WebSecurityConfigurerAdapter的configure()
+=           performBuild()  //返回FilterChainProxy
+        
+WebAsyncManagerIntegrationFilter
+*SecurityContextPersistenceFilter
+HeaderWriterFilter
+LogoutFilter
+*UsernamePasswordAuthenticationFilter
+DefaultLoginPageGeneratingFilter
+DefaultLogoutPageGeneratingFilter
+**BasicAuthenticationFilter
+RequestCacheAwareFilter
+SecurityContextHolderAwareRequestFilter
+AnonymousAuthenticationFilter
+SessionManagementFilter
+*ExceptionTranslationFilter
+*FilterSecurityInterceptor
