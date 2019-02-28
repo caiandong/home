@@ -1,0 +1,12 @@
+Dubbo 提供了4种负载均衡实现，分别是:
+基于权重随机算法的 RandomLoadBalance、
+基于最少活跃调用数算法的 LeastActiveLoadBalance、
+基于 hash 一致性的 ConsistentHashLoadBalance，
+以及基于加权轮询算法的 RoundRobinLoadBalance 
+
+RandomLoadBalance:
+    主要思想是第一次循环确定总权重，然后每次再从头依次减去每个权重。
+    0   3   6   9
+    =============
+    ==========7
+（抽象成数学问题不要和实际考虑过多）

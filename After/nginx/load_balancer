@@ -1,0 +1,52 @@
+nginx支持下面的负载平衡机制：
+round-robin(轮寻) — requests to the application servers are distributed in a round-robin fashion,
+
+least-connected(最少连接) — next request is assigned to the server with the least number of active connections,
+
+ip-hash — a hash-function(ip散列) is used to determine what server should be selected for the next request (based on the client’s IP address).
+
+最简单的配置
+http {
+    upstream myapp1 {
+        server srv1.example.com;
+        server srv2.example.com;    #xxx.xxx.xxx.xxx:xxx 即ip+端口号
+        server srv3.example.com;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://myapp1;
+        }
+    }
+}
+
+upstream：声明一个myapp1的服务集群
+proxy_pass：反向代理到myapp1中的服务器
+
+Server Weights(加权服务)
+upstream backend {
+    server backend1.example.com weight=5;
+    server backend2.example.com;
+    server 192.0.0.1 backup;
+}
+
+如果 s1 s2 s3 Weight分别是 1 2 3,那么调用6次中，对应1 2 3
+
+Passive Health Checks（被动健康检查）
+
+upstream backend {
+    server backend1.example.com;
+    server backend2.example.com max_fails=3 fail_timeout=30s;
+    server backend3.example.com max_fails=2;
+}
+
+max_fails – Sets the number of consecutive（连续的） failed attempts after which NGINX marks the server as unavailable.
+
+fail_timeout – Sets the time during which the number of failed attempts specified by the max_fails parameter must happen for the server to be considered unavailable, and also the length of time that NGINX considers the server unavailable after it is marked so.
+
+默认是1次尝试和10秒。
+如果服务器对于一次请求没有接受或者没有回应，NGINX立即认为此服务器在10秒内是不可用的。
+
+个人总结：当nginx在max_fails次连续尝试某个服务器时得不到响应，它认为此服务在fail_timeout时间内是不可用的。当过了此时间后再继续尝试。
