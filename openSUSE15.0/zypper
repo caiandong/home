@@ -1,0 +1,195 @@
+一般用法
+
+zypper [global-options] command [command-options] [arguments] ..
+放括号内的参数不是必须的，因此最简单执行zypper的方式就是在他后面跟command。
+
+#应用必要的系统更新，输入:
+zypper patch
+
+#获取patch命令帮助：
+zypper helo patch
+
+#选择一个或更多global options 在command之前：
+#运行命令不要任何交互，取决于它自己
+zypper --non-interactive patch
+
+#在命令后选项command-options
+#应用必须的补丁，但不要问我来确定许可，我之前都读过了
+ zypper patch --auto-agree-with-licenses
+ 
+#一些命令需要一个或多个参数
+#安装或更新mplayer
+zypper install mplayer
+
+#一些选项也需要参数
+#根据模式查找
+zypper search -t pattern
+
+#以上所有用法结合
+#安装mplayer和amarok，只使用factory仓库，冗长，详细
+zypper -v install --repo factory mplayer amarok
+
+用户提示
+每当zypper需要你的一些输入时，它会在提示文本旁边的括号中列出可能的答案。
+要选择默认答案，只需按<enter>键（默认答案以大写字母打印（非ascii字符除外））。
+一些提示有帮助可用，在这种情况下有一个问号'？'列为可能的答案。
+要使zypper在没有用户交互的情况下使用默认答案，请使用--non-interactive全局选项。
+
+#列出被定义的仓库
+zypper lr或者zypper repos
+#列出关于5和4的源
+zypper lr 5 4
+
+zypper lr -u       # 还包括uri
+zypper lr -d       # 包含其他的属性例如 服务
+zypper lr -P       # 通过优先级排序，包含优先级
+zypper lr -e my    # 输出所有信息到my文件
+
+#添加仓库
+#addrepo or ar
+zypper ar http://download.videolan.org/pub/vlc/SuSE/11.1 vlc
+其他例子
+zypper ar http://download.opensuse.org/repositories/X11:/XGL/openSUSE_11.1/X11:XGL.repo  # via .repo file
+zypper ar -c ftp://some.download.site myalias   # probe the repository upon adding
+zypper ar my/dir/with/rpms local                # add your local directory with rpm files as repository
+
+#刷新仓库
+#refresh or ref
+zypper refresh
+可以启动自动刷新
+其他例子
+zypper ref packman main  # you can also specify which repositories to refresh
+zypper ref -f upd        # force refresh of the 'upd' repository
+
+#移除仓库
+#removerepo or rr
+zypper rr vlc 1 23 foo  #移除vlc 1  23 foo四个源
+
+#导入导出仓库
+#repos --export or lr -e
+zypper lr --export backups/repos/foo.repo
+zypper ar backups/repos/foo.repo
+
+#通过功能安装
+zypper in eclipse
+zypper in qt
+#按功能体系或版本安装
+zypper in 'zypper<0.12.10'
+zypper in zypper.i586=0.12.11
+通过精确的包名 (--name)
+zypper in -n ftp
+精确的包名和仓库名 (implies --name)
+zypper in factory:zypper
+通过使用通配符的包名
+zypper in yast*ftp*
+通过指定.rpm安装包.路径相对root或者当前工作目录（～）
+ zypper in foo.rpm  
+ zypper in /path/to/somewhere/foo.rpm  
+ 
+#其他例子
+zypper in yast*                     # install all yast modules
+zypper in -t pattern lamp_server    # 安装模式的包
+zypper in emacs pattern:lamp_server # install the emacs package and lamp_server pattern
+zypper in vim -emacs                # install vim and remove emacs in one go
+zypper in amarok packman:libxine1   # install libxine1 from packman and amarok from any repo
+zypper in bitchx-1.1-81.x86_64.rpm  # install bitchx rpm from local directory
+zypper in -f subversion             # force reinstallation of subversion
+
+#移除包
+#remove or rm
+zypper remove sqlite
+
+#源码包与构建依赖
+#source-install or si
+zypper si zypper
+
+#你也可以只构建依赖或者只安装源码包
+zypper si -D zypper    # only the source packages (no build deps)
+zypper si -d zypper    # only the build deps (no source package)
+
+#更新包
+#update or up
+zypper up                           # 尽可能用更新的版本更新所有包
+zypper up libzypp zypper            # update libzypp and zypper
+zypper in sqlite3                   # update sqlite3 or install it if not yet installed
+
+#查找包
+#search or se
+zypper se sqlite
+
+#其他例子
+zypper se -dC --match-words RSI   # look for RSI acronym (case-sensitively), also in summaries and descriptions
+zypper se 'yast*'                 # show all packages starting with 'yast' (beware of shell expansion, quote the strings if unsure!)
+zypper se -r packman              # list all packages from 'packman' repository
+zypper se -i sqlite               # show all installed packages containing 'sqlite' in their name
+zypper se -t pattern -r repo-oss  # list all patterns available in the 'repo-oss' repository
+zypper se -t product              # list all available products
+
+#获取包信息
+#info or if
+zypper info amarok
+
+#其他例子
+zypper info -t patch MozillaFirefox    # show information about 'MozillaFirefox' patch
+zypper patch-info MozillaFirefox       # the same as above
+zypper info -t pattern lamp_server     # show info about 'lamp_server' pattern
+zypper info -t product openSUSE-FTP    # show info about specified product
+
+#包锁
+locks or ll     #列出锁
+addlock or al       #添加锁
+removelock or rl        #移除锁
+cleanlocks or cl            #清除锁
+zypper al nano
+
+#其他例子
+zypper al zypper                   # lock package 'zypper' (exact match)
+zypper al -r repo-oss virtualbox*  # restrict the lock to 'repo-oss' repository (allowing installation from others)
+zypper rl 3                        # remove lock by number
+
+#校验依赖
+#verify or ve
+zypper ve
+
+#安装新的推荐包
+#install-new-recommends or inr
+zypper inr
+
+#检查进程
+#由于最近包更新或移除而删除一些文件，此命令显示使用这些文件的进程
+zypper ps
+
+#列出需要的补丁
+#list-patches or lp
+zypper lp
+
+#发行版更新
+#dist-upgrade or dup
+zypper dup
+
+#指定要是用来更新发行版的源
+ zypper dup -r repo1 -r repo2 ....
+ 
+#在脚本和应用程序中使用zypper
+
+#Non interactive mode
+--non-interactive
+
+#No GPG checks mode
+--no-gpg-checks
+如果某些gpg checks失败，zypper总会选择继续
+
+#Auto-agree with licenses
+--auto-agree-with-licenses
+
+#Quiet output
+--quiet
+显示结果，避免显示太多文本信息，例如进程
+
+#XML output
+--xmlout
+此选项使zypper以XML格式进行通信。
+这允许脚本，图形前端或其他类型的想要使用zypper的应用程序以明确定义的标准方式解析zypper的输出。
+这里和/usr/share/zypper/xml/xmlout.rnc中提供了zypper的XML输出的RNC模式。
+并非所有（但大多数）输出当前都是XML格式;目标是在XML中获得所有可能的输出。
+

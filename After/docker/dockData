@@ -1,0 +1,34 @@
+一个docker容器内所有文件都是被存储在一个可写的容器层。这就是说：
+1 容器不存在后，数据也不会持久化。如果另一个进程需要它，脱离容器外很难获得这样的数据。
+2 容器的可写层紧紧耦合容器运行的主机器，移动这样的数据到别处是不容易的。
+3 写入一个容器可写层需要存储驱动来管理文件系统。存储驱动提供一个使用linux内核的联合系统。
+与使用数据卷(data volumes)直接写到主机文件系统内相比，额外的抽象降低了性能。
+
+在主机器中，docker有两种选择来为容器存储文件，以便文件在容器停止后文件可以持久化：
+volumes, and bind mounts。linux中也可以使用tmpfs mount.
+
+思考数据存在docker主机的哪里是一种容易点的方式来形象化volumes, bind mounts, and tmpfs mounts 的不同。
+types-of-mounts.png
+
+1 Volumes是存储在被docker管理的一部分主机文件系统内。(/var/lib/docker/volumes/ on Linux)
+Non-Docker进程不应该改变这部分文件系统。Volumes是docker中持久化数据最好的方式。
+
+2 Bind mounts可能被存储在主机系统的任何地方。甚至可以是重要的文件系统或者目录。docker主机或者
+docker容器内的Non-Docker进程可以随时改变他们。
+
+3 tmpfs mounts只被存储在主机系统的内存，从来不会被写入到主机系统的文件系统。
+
+Volumes: 
+显示创建卷
+docker volume create
+挂载卷到一个容器，那么这个卷代表的目录就是容器内的目录。这是类似于Bind mounts的，然而它是
+被docker管理并且与主机系统核心功能隔离。
+一个给定的卷可以同时挂载在多个容器内。当没有运行中的容器使用卷时，对docker卷仍然是可用的，
+不会自动被移除。手动移除命令
+docker volume prune
+当挂载卷时，可以命名，也可匿名。docker会保证唯一性。除此之外，匿名卷和命名卷是一致的。
+
+Bind mounts与Volumes相比功能上有限制。被挂载到容器中的目录或文件必须是它在主机系统上的全路径。
+如果不存在，则按需创建。Volumes性能不错，但要依赖于主机系统的有特定目录结构才行。
+请考虑用命名卷替代它。你不能通过docker命令直接管理Bind mounts。
+注意：容器内的进程可以改变主机系统，这可能是个安全隐患。

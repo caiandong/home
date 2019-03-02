@@ -6,7 +6,7 @@
 
 * [官方Wiki](https://en.opensuse.org/) == 存在中文版块 ==
 
-## [安装注意事项](anzhuangzhiqian.md)
+## [安装注意事项](安装前.md)
 ## [安装方式](https://zh.opensuse.org/SDB:DVD_安装方式)
 ## [mariadb数据库](/openSUSE15.0/mariadb.md)
 ## [安装后添加国内镜像源](/openSUSE15.0/安装.md)
@@ -17,3 +17,4 @@
 
 ### 与linux有关的方面
    [骏马金龙的博客](http://www.cnblogs.com/f-ck-need-u)
+   [论坛](https://www.linux.org)

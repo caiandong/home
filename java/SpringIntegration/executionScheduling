@@ -1,0 +1,104 @@
+Spreing提供了内建实现TaskExecutor,与JDK的java.util.concurrent.Executor是一样的：
+    SyncTaskExecutor:同步执行调用，执行发生于调用线程中。用于测试情况。
+    SimpleAsyncTaskExecutor：不复用线程，启动时为每个调用创建新线程。有并发限制，
+    达到并发限制后阻塞这些新调用。
+    ConcurrentTaskExecutor：很少使用，如果ThreadPoolTaskExecutor使用不灵活，可以用它替换。
+    ThreadPoolTaskExecutor：被用最常见。它提供一个bean属性来配置java.util.concurrent.ThreadPoolExecutor，然后包装成TaskExecutor
+    
+Spring3.0引进了TaskScheduler来在一些未来的时间点运行:
+public interface TaskScheduler {
+
+    ScheduledFuture schedule(Runnable task, Trigger trigger);
+
+    ScheduledFuture schedule(Runnable task, Instant startTime);
+
+    ScheduledFuture schedule(Runnable task, Date startTime);
+
+    ScheduledFuture scheduleAtFixedRate(Runnable task, Instant startTime, Duration period);
+
+    ScheduledFuture scheduleAtFixedRate(Runnable task, Date startTime, long period);
+
+    ScheduledFuture scheduleAtFixedRate(Runnable task, Duration period);
+
+    ScheduledFuture scheduleAtFixedRate(Runnable task, long period);
+
+    ScheduledFuture scheduleWithFixedDelay(Runnable task, Instant startTime, Duration delay);
+
+    ScheduledFuture scheduleWithFixedDelay(Runnable task, Date startTime, long delay);
+
+    ScheduledFuture scheduleWithFixedDelay(Runnable task, Duration delay);
+
+    ScheduledFuture scheduleWithFixedDelay(Runnable task, long delay);
+}
+
+Trigger：
+public interface Trigger {
+
+    Date nextExecutionTime(TriggerContext triggerContext);
+}
+
+Trigger实现：
+    CronTrigger：它可以让任务调度执行cron表达式，例如：
+        scheduler.schedule(task, new CronTrigger("0 15 9-17 * * MON-FRI"));
+        他表示，除了周末外十二小时制的9点到5点，每个小时的15分钟执行。
+    PeriodicTrigger：和TaskScheduler有重复
+TriggerContext：
+public interface TriggerContext {
+
+    Date lastScheduledExecutionTime();
+
+    Date lastActualExecutionTime();
+
+    Date lastCompletionTime();
+}
+
+启用Scheduling注解
+@Configuration
+@EnableAsync
+@EnableScheduling
+public class AppConfig {
+}
+@EnableAsync和@EnableScheduling两者可根据情况使用，不必一起出现。如果要细粒度配置
+分别实现SchedulingConfigurer和AsyncConfigurer 
+
+xml情况下使用<task:annotation-driven>元素：
+<task:annotation-driven executor="myExecutor" scheduler="myScheduler"/>
+<task:executor id="myExecutor" pool-size="5"/>          //处理方法上的@Async注解
+<task:scheduler id="myScheduler" pool-size="10"/>           //处理@Scheduled注解
+
+@Scheduled(cron="*/5 * * * * MON-FRI")
+public void doSomething() {
+    // something that should execute on weekdays only
+}
+这样的方法不能有参数不能有返回值，要与容器内bean交互，使用依赖注入。
+
+@Async
+void doSomething() {
+    // this will be executed asynchronously
+}
+可以有参数和返回值，返回值要是Future-typed 类型的。与@Scheduled方法不同，这些方法是正常被调用的，
+而@Scheduled任务是被容器管理的scheduled任务。
+@Async
+Future<String> returnSomething(int i) {
+    // this will be executed asynchronously
+}
+
+指定需要在哪个执行器内执行
+@Async("otherExecutor")
+void doSomething(String s) {
+    // this will be executed asynchronously by "otherExecutor"
+}
+
+对于异常管理：
+带有Future-typed返回值类型的@Async方法，可以在调用Future的get方法执行时被获取。
+
+没有返回值不能捕获异常，但你可以提供AsyncUncaughtExceptionHandler处理异常，例如
+public class MyAsyncUncaughtExceptionHandler implements AsyncUncaughtExceptionHandler {
+
+    @Override
+    public void handleUncaughtException(Throwable ex, Method method, Object... params) {
+        // handle exception
+    }
+默认情况下异常被志记，你可以提供自定义实现通过AsyncConfigurer或者the <task:annotation-driven/> XML元素。     
+
+}
