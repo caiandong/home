@@ -1,0 +1,131 @@
+Message 
+amqp没有定义消息类，basicPublish是把内容作为字节数组参数，额外属性在分割参数中传递。
+spring定义了Message类，封装了body和properties，如下所示：
+public class Message {
+    private final MessageProperties messageProperties;
+    private final byte[] body;
+    public Message(byte[] body, MessageProperties messageProperties) {
+        this.body = body;
+        this.messageProperties = messageProperties;
+    }
+    public byte[] getBody() {
+        return this.body;
+    }
+    public MessageProperties getMessageProperties() {
+        return this.messageProperties;
+    }
+}
+
+Exchange
+Exchange接口表示amqp的交换器，即消息生产者要发送消息去往的地方。在一个broker虚拟主机内，每个交换器都有
+一个独一的名字和其他属性。
+public interface Exchange {
+    String getName();
+    String getExchangeType();
+    boolean isDurable();
+    boolean isAutoDelete();
+    Map<String, Object> getArguments();
+}
+ExchangeTypes：
+    direct:只有条件完全相同才会接收到
+    topic: 只有订阅了或者说特定模式才可以接收到
+    fanout:所有队列无条件，都可以接收到
+    headers:很少使用，不了解
+amqp指定消息中间件需要提供一个default没有名字的direct交换器，所有声明的队列都被绑定到这个Exchagne上，
+用他们的名字作为路由键。
+
+Queue
+一个消息消费者通常要从一个组件中接受消息，Queue就是这样的组件表示。
+public class Queue  {
+    private final String name;
+    private volatile boolean durable;
+    private volatile boolean exclusive;
+    private volatile boolean autoDelete;
+    private volatile Map<String, Object> arguments;
+    /**
+     * The queue is durable, non-exclusive and non auto-delete.
+     *
+     * @param name the name of the queue.
+     */
+    public Queue(String name) {
+        this(name, true, false, false);
+    }
+}
+admin template自动生成的queue的属性exclusive' and 'autoDelete' 是ture的。
+
+Banding
+生产者发送消息到交换器，消费者从队列接受消息。Banding就是队列和交换器的连接。
+固定路由键绑定
+new Binding(someQueue, someDirectExchange, "foo.bar");
+路由键模式绑定
+new Binding(someQueue, someTopicExchange, "foo.*");
+忽略路由键
+new Binding(someQueue, someFanoutExchange);
+流式api
+Binding b = BindingBuilder.bind(someQueue).to(someTopicExchange).with("foo.*");
+
+Banding类自身紧紧持有一个连接数据，换句话说，他不是一个活着的组件。AmqpAdimi类可以使用这个Banding
+实例来实际触发消息中间件的绑定动作。
+
+ConnectionFactory
+这个接口类的实现是为了提供一个org.springframework.amqp.rabbit.connection.Connection实例
+这个实例是com.rabbitmq.client.Connection的一个包装。
+唯一一个实现是CachingConnectionFactory。消息的工作单元实际上是channel，connection创建这些channel
+这些channel可以在程序中共享。这个实现缓存这些channel。
+这个实例的创建有很多参数:hostname,username,password。
+setChannelCacheSize设置channel大小(默认25)
+
+通过rabbit命名空间快速创建
+<rabbit:connection-factory id="connectionFactory"/>
+
+java方式
+CachingConnectionFactory connectionFactory = new CachingConnectionFactory("somehost");
+connectionFactory.setUsername("guest");
+connectionFactory.setPassword("guest");
+Connection connection = connectionFactory.createConnection();
+
+普通xml
+<bean id="connectionFactory"
+      class="org.springframework.amqp.rabbit.connection.CachingConnectionFactory">
+    <constructor-arg value="somehost"/>
+    <property name="username" value="guest"/>
+    <property name="password" value="guest"/>
+</bean>
+
+命名空间方式是推荐的，让框架帮你选择最佳的一个
+<rabbit:connection-factory
+    id="connectionFactory" channel-cache-size="50"/>
+设置channel大小
+
+默认缓存模式是CHANNEL，你可以配置缓存connection
+<rabbit:connection-factory
+    id="connectionFactory" cache-mode="CONNECTION" connection-cache-size="25"/>
+
+设置集群地址 主机 端口
+<rabbit:connection-factory
+    id="connectionFactory" addresses="host1:5672,host2:5672"/>
+<rabbit:connection-factory
+    id="connectionFactory" host="somehost" port="5672"/>
+    
+自定义线程工厂，线程名前缀是rabbitmq-
+<rabbit:connection-factory id="multiHost" virtual-host="/bar" addresses="host1:1234,host2,host3:4567"
+    thread-factory="tf"
+    channel-cache-size="10" username="user" password="password" />
+<bean id="tf" class="org.springframework.scheduling.concurrent.CustomizableThreadFactory">
+    <constructor-arg value="rabbitmq-" />
+</bean>
+
+配置使用的客户端连接工厂
+<rabbit:connection-factory
+      id="connectionFactory" connection-factory="clientConnectionFactory"/>
+<bean id="clientConnectionFactory"
+        class="org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean">
+    <property name="useSSL" value="true" />
+    <property name="sslPropertiesLocation" value="file:/secrets/rabbitSSL.properties"/>
+</bean>
+sslPropertiesLocation是类似于下面这样的
+    keyStore=file:/secret/keycert.p12
+    trustStore=file:/secret/trustStore
+    keyStore.passPhrase=secret
+    trustStore.passPhrase=secret
+RabbitConnectionFactoryBean

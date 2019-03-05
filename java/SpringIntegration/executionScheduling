@@ -1,3 +1,29 @@
+
+TaskScheduler
+    ConcurrentTaskScheduler(只配置@EnableScheduling，默认是用它)
+        DefaultManagedTaskScheduler
+    ThreadPoolTaskScheduler
+
+ScheduledExecutorService(jdk接口)    
+
+TaskScheduler 默认流程
+注解情况下：
+    1.@EnableScheduling利用ScheduledAnnotationBeanPostProcessor默认构造器导入bean后置处理器。
+    2.构造器内部利用ScheduledTaskRegistrar默认构造器初始化registrar。
+        默认构造器不会初始化其taskScheduler属性，而这个属性是真正用来调用@Scheduled方法的类。
+    3.执行bean后置处理器postProcessAfterInitialization方法，处理带有@Scheduled注解的方法bean。
+    4.调用processScheduled方法分别处理@Scheduled属性中的：（initia ldelay，）cron，fixed delay，fixed rate。
+        这些@Scheduled注解的属性对应不同的Task：FixedDelayTask，FixedRateTask，CronTask。
+        主要调用registrar的各种schedulexxx方法，由于第2步中默认构造器并未初始化TaskScheduler，
+        所以在这些方法中对taskScheduler的判断都是空，所有@Scheduled方法无法执行。
+    5.最终在容器发布ContextRefreshedEvent时，ScheduledAnnotationBeanPostProcessor的onApplicationEvent方法
+        被调用，通过finishRegistration方法从容器中查找taskScheduler。配置的SchedulingConfigurer
+        在这个方法中调用;如果不能初始化成功，再初查找ScheduledExecutorService(jdk)。
+        都是调用registrar的setScheduler方法 最终如果都没找到，
+        通过调用fterPropertiesSet->scheduleTasks，采用默认实现，完成初始化并且调用最终所有方法。
+            默认实现：ConcurrentTaskScheduler(Executors.newSingleThreadScheduledExecutor())
+        
+
 Spreing提供了内建实现TaskExecutor,与JDK的java.util.concurrent.Executor是一样的：
     SyncTaskExecutor:同步执行调用，执行发生于调用线程中。用于测试情况。
     SimpleAsyncTaskExecutor：不复用线程，启动时为每个调用创建新线程。有并发限制，
@@ -31,6 +57,7 @@ public interface TaskScheduler {
     ScheduledFuture scheduleWithFixedDelay(Runnable task, long delay);
 }
 
+    
 Trigger：
 public interface Trigger {
 
@@ -62,9 +89,6 @@ public class AppConfig {
 分别实现SchedulingConfigurer和AsyncConfigurer 
 
 xml情况下使用<task:annotation-driven>元素：
-<task:annotation-driven executor="myExecutor" scheduler="myScheduler"/>
-<task:executor id="myExecutor" pool-size="5"/>          //处理方法上的@Async注解
-<task:scheduler id="myScheduler" pool-size="10"/>           //处理@Scheduled注解
 
 @Scheduled(cron="*/5 * * * * MON-FRI")
 public void doSomething() {
@@ -102,3 +126,26 @@ public class MyAsyncUncaughtExceptionHandler implements AsyncUncaughtExceptionHa
 默认情况下异常被志记，你可以提供自定义实现通过AsyncConfigurer或者the <task:annotation-driven/> XML元素。     
 
 }
+
+<task:annotation-driven executor="myExecutor" scheduler="myScheduler"/>
+
+<task:scheduler id="myScheduler" pool-size="10"/>           //处理@Scheduled注解
+
+以上标签创建了一个ThreadPoolTaskScheduler实例，id属性代表线程池中线程的前缀，pool大小是10，默认是1
+
+<task:executor id="myExecutor" pool-size="5"/>          //处理方法上的@Async注解
+
+属性分别是:id，pool-size，queue-capacity,rejection-policy, keep-alive
+
+1.和scheduler类似，但可配制更多。 poo-size配置单个值时，如上表示固定5个线程。还可以用一种min-max形式配置，
+    5-10表示主要(core)5,最大10个线程。
+2.默认情况下queue是无界的，queue-capacity="100"与min-max结合配置，与固定线程数配置不起效果。
+3.rejection-policy默认是AbortPolicy，直接抛出异常。DiscardPolicy or DiscardOldestPolicy和CallerRunsPolicy
+    最后一个是在提交线程请求的调用者线程内执行，有助于executor赶上任务的处理。
+4.keep-alives表示在一个线程执行任务空闲后到最后回收终止时的生存时间，单位是秒。
+
+<task:scheduled-tasks scheduler="myScheduler">
+    <task:scheduled ref="beanA" method="methodA" fixed-delay="5000" initial-delay="1000"/>
+    <task:scheduled ref="beanB" method="methodB" fixed-rate="5000"/>
+    <task:scheduled ref="beanC" method="methodC" cron="*/5 * * * * MON-FRI"/>
+</task:scheduled-tasks>
