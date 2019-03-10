@@ -1,3 +1,11 @@
+# [linux内核](https://www.kernel.org/)
+# [linux论坛](https://www.linux.org/)
+# [gnu linux](http://www.gnu.org/)
+# [红帽系统](https://access.redhat.com/)
+
+# [centos](https://www.centos.org/)
+
+
 # 在对openSUSE感兴趣前，有几个地方帮助大家进一步了解与使用这个发行版
 
 * [openSUSU新手指南](https://opensuse-guide.ustclug.org/)

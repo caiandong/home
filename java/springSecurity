@@ -1,5 +1,5 @@
 Spring Security 安全权限管理手册：http://www.mossle.com/docs/auth/html/index.html
- 
+
 
 Authorization   授权
 Authentication  认证
@@ -8,7 +8,7 @@ principal   主要的
 retrieve    取回
 credentials     证书
 credentials     足够
-leverages       杠杆作用
+leverages       杠杆作用 利用
 
 FilterSecurityInterceptor(处理http资源的安全)
     need：AuthenticationManager，AccessDecisionManager
@@ -63,42 +63,97 @@ String username = principal.toString();
 }
 
 UsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter
-     :ProviderManager extends AuthenticationManager
-       List:DaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements AuthenticationProvider
+     :ProviderManager extends *AuthenticationManager
+       List:DaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements *AuthenticationProvider
+            :PasswordEncoder
             :UserDetailsService
-                PasswordEncoder
                 UserDetails {GrantedAuthority}
                     return:Authentication
-            
-            
+                    //Authentication包含UserDetails GrantedAuthority列表
+                
+1.用户密码认证过滤器有一个认证管理器实现：提供者管理。提供者管理包含一个认证提供者list链。认证工作委托给每一个认证提供者。
+2.认证提供者再委托用户细节来产生具体的用来认证的认证：Authentication。
+3.提供者管理有一个同样类型的父管理，当所有提供者管理返回null，使用父提供者管理来认证。父是全局共享的。
+4.认证管理构建器用来产生认证管理器,直接创建一个认证管理构建器到容器中会让它的认证管理器成为全局共享的父。
+5.通过WebSecurityConfigurerAdapter的configure方法配置的是每一个的本地的认证管理器。
+
+UserDetails常用实现:MutableUser，接口是MutableUserDetails
+UserDetailsService：InMemoryUserDetailsManager里面包含了一个UserDetails的map，key是username。
+
+认证过程：
+    认证提供者调用authenticate方法:先获取用户名。再根据用户名从缓存中查找UserDetails，没有尝试调用由子类实现的retrieveUser方法。
+    retrieveUser方法获得传进来的用户名:先获取配置的UserDetailsService，再调用它的loadUserByUsername方法。它根据传过来的用户名
+        找到已经存在的UserDetails。
+    preAuthenticationChecks进行预先检查，例如帐号是否过期。
+    随后让调用子类实现的additionalAuthenticationChecks进行额外检查。
+        子类实际上是检查密码，从认证对象(authentication)中获取用户输入的密码,利用PasswordEncoder进行密码加密匹配。
+        当然，UserDetails中的密码是事先加密的，5.0版本后需要在加密的密码附加{id}名字，具体文档有说明。
+    再调用postAuthenticationChecks后置检查。
+    最终创建一个检查成功的认证对象，权限也添加，然后返回。
+    
+
+1.访问决定管理器(AccessDecisionManager)委托访问决定投票者(AccessDecisionVoter)链。类似于认证管理器委托认证提供者的关系。
+
 WebSecurity
 
 setFilterChainProxySecurityConfigurer
 >springSecurityFilterChain
 >>
-
-
  WebSecurityConfigurerAdapter implements WebSecurityConfigurer extends SecurityConfigurer
- 
-1.在servletContext启动时: 
-WebApplicationInitializer.onStartup()->ServletContext
-        insertSpringSecurityFilterChain()->ServletContext
-            new DelegatingFilterProxy()->["springSecurityFilterChain"]
-2.调用DelegatingFilterProxy filter的init方法:
-DelegatingFilterProxy.init()->FilterConfig
-    delegate=initFilterBean()
-        initDelegate()->[wac]WebApplicationContext
-    =       wac.getBean()->["springSecurityFilterChain",Filter.class]Class
-3.实例化WebSecurityConfiguration配置类
-WebSecurityConfiguration.setFilterChainProxySecurityConfigurer()->...
-    webSecurity.apply()->[webSecurityConfigurer]SecurityConfigurer<Filter, WebSecurity>
-["springSecurityFilterChain"]Filter=springSecurityFilterChain()
-    webSecurity.build()
-        doBuild()
-            init()      //回调所有WebSecurityConfigurerAdapter的init()方法
-            configure()     //回调所有WebSecurityConfigurerAdapter的configure()
-=           performBuild()  //返回FilterChainProxy
-        
+
+创建DelegatingFilterProxy：
+    1.在servletContext启动时: 
+    WebApplicationInitializer.onStartup()->ServletContext
+            insertSpringSecurityFilterChain()->ServletContext
+                new DelegatingFilterProxy()->["springSecurityFilterChain"]
+    2.调用DelegatingFilterProxy filter的init方法:
+    DelegatingFilterProxy.init()->FilterConfig
+        delegate=initFilterBean()
+            initDelegate()->[wac]WebApplicationContext
+        =       wac.getBean()->["springSecurityFilterChain",Filter.class]Class
+    3.实例化WebSecurityConfiguration配置类
+    WebSecurityConfiguration.setFilterChainProxySecurityConfigurer()->...
+        webSecurity.apply()->[webSecurityConfigurer]SecurityConfigurer<Filter, WebSecurity>
+    ["springSecurityFilterChain"]Filter=springSecurityFilterChain()
+        webSecurity.build()
+            doBuild()
+                init()      //回调所有WebSecurityConfigurerAdapter的init()方法
+                configure()     //回调所有WebSecurityConfigurerAdapter的configure()
+    =           performBuild()  //返回FilterChainProxy
+
+1.委托过滤器链(DelegatingFilterProxy)由服务器触发，作为一个过滤器被注册到当前应用程序上下文。
+    当触发它的初始化方法时，它从已经加载的spring容器中查找名为springSecurityFilterChain的过滤器链代理(FilterChainProxy).
+2.由此触发web安全配置(WebSecurityConfiguration)这个类，这个类由@EnableWebSecurity注解配置(或者由xml名称空间配置相同功能)
+    首先它创建WebSecurity对象，然后此对象的父类方法从容器中加载web安全配置适配器(WebSecurityConfigurerAdapter),即webSecurityConfigurer，
+    也就是我们添加的配置类。
+3.最后调用WebSecurity对象的build-->doBuild-->init,configure,最后两个方法回调我们添加的配置类中的init和configure方法来根据
+    我们的配置创建对应的过滤器。(事实上，每个web安全配置适配器类都是类似一个子FilterChainProxy)最终再由WebSecurity对象的perforBuild
+    方法创建真正的FilterChainProxy对象，springSecurityFilterChain。
+
+初始化我们添加的配置类中的过滤器成为子FilterChainProxy（SecurityFilterChain）的过程：
+    1.我们的配置类被WebSecurity放到它的父类list中。当WebSecurity的bulid方法调用来创建springSecurityFilterChain时，首先调用
+        init无参方法，方法内部从父类中获取我们的每一个配置类，把自身传递给每一个配置类的init函数。
+    2.配置类的init中调用getHttp方法创建HttpSecurity对象（此对象会按照类似的策略创建最终每个配置类对应的过滤器链）。我们从名字
+        可以看出来它和WebSecurity类是本质上似乎相同的，事实上它就是按照WebSecurity的套路来创建的，所以如果说WebSecurity
+        创建了FilterChainProxy，那么HttpSecurity就创建了子FilterChainProxy。在perforBuild创建FilterChainProxy，它回调
+        HttpSecurity方法的build，就像上面第三步它自己的build方法被回调那样。根据我们每个配置类产生的子FilterChainProxy是一个
+        SecurityFilterChain,这个类包含了HttpSecurity所有过滤器。FilterChainProxy接受这样的安全过滤器链(他只有一个唯一实现
+        DefaultSecurityFilterChain)，每个链由每个配置类的各自的所有过滤器组成，这些链是互斥且互不干扰。FilterChainProxy调用时
+        根据每个链的匹配规则去调用其中一个链。
+    3.回到创建安全过滤器链的过程，getHttp方法首先创建HttpSecurity类，少量配置这个类(anonymous，securityContext，csrf等方法的调用)，
+        然后把HttpSecurity对象传递给configure方法(formLogin,authorizeRequests等方法的调用)，
+        这个方法就是我们继承配置类后所调用的configure方法，来产生我们自己想要的配置。这些配置统一是SecurityConfigurerAdapter
+        的子类，分别对应随后要产生的真正过滤器。HttpSecurity调用getOrApply()方法分别把每一个安全配置适配器类添加到它的父类list中，
+        和WebSecurity添加配置类到它的父list中一样。init方法把创建的HttpSecurity交给WebSecurity后退出，在进行下个配置类配置。
+    4.WebSecurity的无参init方法完成后开始调用它的无参cofigure函数，它调用每个，配置类有参configure方法，但它什么也不做。
+    5.所以进行到performBuild步骤。在这个方法，它调用每一个HttpSecurity的build方法，也是build-->doBuild-->init,configure过程，
+        在无参init方法中把自身传递给SecurityConfigurerAdapter，也就是所有的用来产生过滤器的类的有参init方法。
+        在每个SecurityConfigurerAdapter中，构造每一个过滤器，然后调用HttpSecurity的addfilters方法。
+        等待所有过滤器实例化完成后HttpSecurity已经拥有所有过滤器了。confugure再调用每个SecurityConfigurerAdapter类各自的有参
+        configure方法进行过滤器配置。完成后，它的performBuild方法直接把得到的所有有过滤器，包装成最终的DefaultSecurityFilterChain
+        这个链被加入到用来创建FilterChainProxy的list中。最终调用FilterChainProxy构造函数把所有的链拿到后返回了。
+
+
 WebAsyncManagerIntegrationFilter
 *SecurityContextPersistenceFilter
 HeaderWriterFilter
@@ -113,3 +168,7 @@ AnonymousAuthenticationFilter
 SessionManagementFilter
 *ExceptionTranslationFilter
 *FilterSecurityInterceptor
+
+
+GlobalAuthenticationConfigurerAdapter
+GlobalAuthenticationConfigurerAdapter

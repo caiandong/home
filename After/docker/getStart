@@ -1,7 +1,8 @@
 Images and containers
-一个容器(container)通过运行一个镜像(Image)被启动。镜像就是一个包含了运行一个程序所需要的一切的可执行的打包。
-代码，运行时，库，环境变量和配置文件。
-容器是镜像的运行时实例--当被执行时就变成了在内存中的实例。查看运行中的容器使用命令
+一个容器(container)通过运行一个镜像(Image)被启动。镜像就是一个包含了运行一个程序所需要的一切的可执行的打包
+--代码，运行时，库，环境变量和配置文件。镜像是一个生成容器的模板，容器是一个可运行的实例。
+容器是镜像的运行时实例--当被执行时就变成了在内存中的实例。
+查看运行中的容器使用命令
 docker ps;
 
 1查看版本
@@ -11,7 +12,7 @@ docker --version
 docker info 
 或者
 docker version 
-（为了避免许可问题或者频繁使用sudo,添加用户一个docker组）
+（为了避免权限问题或者频繁使用sudo,添加用户一个docker组）
 
 3测试docker helloworld
 docker run hello-world
@@ -46,7 +47,7 @@ docker container ls -aq
 
 6运行
 docker run -p 4000:80 friendlyhello
-运行friendlyhello把本机4000端口映射到容器内80端口
+运行friendlyhello镜像把本机4000端口映射到容器内80端口
 
 7退出
 CTRL+C

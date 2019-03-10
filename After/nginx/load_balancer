@@ -49,4 +49,4 @@ fail_timeout – Sets the time during which the number of failed attempts specif
 默认是1次尝试和10秒。
 如果服务器对于一次请求没有接受或者没有回应，NGINX立即认为此服务器在10秒内是不可用的。
 
-个人总结：当nginx在max_fails次连续尝试某个服务器时得不到响应，它认为此服务在fail_timeout时间内是不可用的。当过了此时间后再继续尝试。
+个人总结：当nginx在max_fails次连续尝试某个服务器时得不到响应，它认为此服务从现在开始到fail_timeout时间内是不可用的。当过了此时间后再继续尝试。

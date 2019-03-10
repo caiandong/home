@@ -8,6 +8,8 @@
 # [git使用](use_git.md)
 # [openSUSE15.0日常使用](/openSUSE15.0/MD.md)
 # java
+    [java文档oracle](https://docs.oracle.com/en/java/) 
+    [或者这一个](https://docs.oracle.com/javase/tutorial/)
    * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
    
    * ## [spring](https://spring.io)
@@ -20,11 +22,6 @@
      * 模板引擎
        * [thymeleaf3.0文档](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html)
    * ## java8
-   
-     [java8 lambda 1，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html) 
-     [java8 lambda 2，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html)
-     [java8 lambda 3，](http://cr.openjdk.java.net/~briangoetz/lambda/lambda-translation.html)
-     [java8 lambda 3](http://zh.lucida.me/blog/java-8-lambdas-insideout-language-features)
 ## Qt
   * [Qt 编程指南](https://qtguide.ustclug.org)
    

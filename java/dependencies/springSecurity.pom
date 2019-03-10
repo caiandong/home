@@ -1,0 +1,48 @@
+ 
+pom
+<dependencyManagement>
+    <dependencies>
+        <!-- ... other dependency elements ... -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-bom</artifactId>
+            <version>5.2.0.BUILD-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <!-- ... other dependency elements ... -->
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+    </dependency>
+</dependencies>
+固定spring依赖解析
+<dependencyManagement>
+    <dependencies>
+        <!-- ... other dependency elements ... -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>5.1.4.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+快照版本添加
+<repositories>
+    <!-- ... possibly other repository elements ... -->
+    <repository>
+        <id>spring-snapshot</id>
+        <name>Spring Snapshot Repository</name>
+        <url>https://repo.spring.io/snapshot</url>
+    </repository>
+</repositories>
