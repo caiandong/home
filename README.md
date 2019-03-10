@@ -8,8 +8,10 @@
 # [git使用](use_git.md)
 # [openSUSE15.0日常使用](/openSUSE15.0/MD.md)
 # java
-    [java文档oracle](https://docs.oracle.com/en/java/) 
-    [或者这一个](https://docs.oracle.com/javase/tutorial/)
+
+[java文档oracle](https://docs.oracle.com/en/java/) 
+[或者这一个](https://docs.oracle.com/javase/tutorial/)
+    
    * ## [java并发编程实战以及其他并发阅读笔记](java/并发.md)
    
    * ## [spring](https://spring.io)
