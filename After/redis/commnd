@@ -1,0 +1,45 @@
+set mykey somevalue 
+    key为mykey，值为字符串"somevalue"
+get mykey
+    获取key对应的value
+mset a 10 b 20 c 30
+    一次存入多个键值对
+mget a b c
+    获取多个键对应的值
+exists mykey
+    检查是否存在键
+del mykey
+    删除键
+type mykey
+    查看键类型
+expire key 5
+    让键在5s后超时
+set key 100 ex 10
+    在创建时指定超时时间
+ttl key
+    查看超时剩余时间
+    
+rpush mylist A
+    从左面把值A压入mylist
+lrange mylist 0 -1
+    提取一定范围的元素，-1表示最后一个元素，
+    比如 -3 -6 表示倒数第三个到倒数第六个元素
+rpush mylist 1 2 3 4 5 "foo bar"
+    一次存入多个值
+rpop mylist
+    从左边删除一个元素，然后返回
+    
+hmset user:1000 username antire
+    key：username
+    value：antire
+    set名字：user:1000 
+    键跟多个键值
+ hget user:1000 username
+    获取key对应的值
+hgetall user:1000
+    获取所有键值对
+    
+sadd myset 1 2 3
+    在myset中添加三个值
+smembers myset
+    返回集合，并不是有序的

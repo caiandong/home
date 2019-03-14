@@ -1,0 +1,2 @@
+appendonly yes
+    在配置文件打开aof

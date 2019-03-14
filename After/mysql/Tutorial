@@ -1,0 +1,19 @@
+可以创建一个文件pet.txt，每行放一个数据记录，null值用 \N 表示，与表的列顺序要一致：
+histler        Gwen    bird    \N      1997-12-09      \N
+在命令行输入
+ LOAD DATA LOCAL INFILE '/path/pet.txt' INTO TABLE pet;
+ 
+ 查看表和数据库信息
+
+ show index from pet
+    显示索引
+show create table pet
+    获取创建表语句
+mysql < batch-file
+把语句放在一个文件中批量执行，它是在命令行上执行的
+mysql> source filename;
+mysql> \. filename
+直接在命令行客户端执行。加入 mysql -t 选项产生和交互式一样的格式输出
+使用mysql -v可以重现执行的语句
+
+    

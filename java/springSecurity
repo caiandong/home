@@ -1,14 +1,14 @@
 Spring Security 安全权限管理手册：http://www.mossle.com/docs/auth/html/index.html
+https://www.cnblogs.com/shijiaqi1066/p/3793894.html     //一个rabc权限模型的博客
 
-
-Authorization   授权
-Authentication  认证
-fundamental 基本的
-principal   主要的
-retrieve    取回
-credentials     证书
-credentials     足够
-leverages       杠杆作用 利用
+        Authorization   授权
+        Authentication  认证
+        fundamental 基本的
+        principal   主要的
+        retrieve    取回
+        credentials     证书
+        credentials     足够
+        leverages       杠杆作用 利用
 
 FilterSecurityInterceptor(处理http资源的安全)
     need：AuthenticationManager，AccessDecisionManager

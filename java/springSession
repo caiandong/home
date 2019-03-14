@@ -1,0 +1,49 @@
+@Override
+public HttpSessionWrapper getSession(boolean create)
+    getCurrentSession:
+        从request域获取HttpSessionWrapper对象，他就是它个httpsession，内部包含包含了session接口的实现。
+        得到httpsession后返回。相当于从持久化存储上拿到内存，类似于缓存，第一次调用是不会返回的。
+    getRequestedSession:返回session接口的实现类
+        使用httpSessionIdResolver来解析与会话相关的客户端带来的cooking，解析器有两个实现，
+        CookieHttpSessionIdResolver和HeaderHttpSessionIdResolver。一个从cooking中找，
+        一个从请求头中找。常用前一个，它使用一个DefaultCookieSerializer即：CookieSerializer。
+        来查找名为"SESSION"的cooking，它把所有可能是sessionId对应的cooking值放到list中返回。
+        所有读写客户端coocking工作都由它完成。
+        对拿到的list进行遍历，从sessionRepository.findById中根据sessionId找到session。返回requestedSession。
+    进行requestedSession存在判断。
+        如果存在，并且从请求域中查找INVALID_SESSION_ID_ATTR为空，设置它的访问时间，把session包装成真正的httpsession，
+        把servletcontext放入。并把httpsession放入request域中进行缓存。
+        不存在，则在请求域中放入INVALID_SESSION_ID_ATTR为true。不太明白这一步。
+    根据create真假判断是否创建会话。
+        sessionRepository.createSession创建session，设置它的访问时间，包装成真正的httpssion。再放入请求域中。
+    最终根据情况返回null或者非空。
+
+private void commitSession() 
+    getCurrentSession:
+        和getsession一样。返回会话对象。
+    根据是否为空判断
+        如果为空，httpSessionIdResolver.expireSession设置响应给客户端，过期cookie。
+        否则获取session，在sessionRepository.save持久化存储上保存session。
+        根据情况重写客户端sessionId，httpSessionIdResolver.setSessionId方法。(个人觉得，直接重写就好，不需要判断。。)
+
+HttpSessionWrapper类重写了invalidate方法。
+    调用基类的invalidate
+    设置requestedSessionInvalidated=true;
+    设置当前会话为null，并从请求域中移除缓存。
+    sessionRepository.deleteById从持久化存储上根据id删除session。
+
+=========================================
+各个类中的结构。
+
+SessionRepositoryFilter<S extends Session>
+    SessionRepository<S>
+    httpSessionIdResolver:CookieHttpSessionIdResolver //默认是它
+    
+下面两个是它的内部类实现
+
+    SessionRepositoryResponseWrapper
+        onResponseCommitted()   //默认调用随后的request.commitSession方法。
+        
+    SessionRepositoryRequestWrapper
+
+RedisSession implements Session
