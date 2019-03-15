@@ -1,0 +1,76 @@
+spring-aop           spring-context-indexer  spring-instrument  spring-orm   spring-webflux  
+*spring-aspects       spring-context-support  spring-jcl         spring-oxm   *spring-webmvc  
+spring-beans         spring-core             *spring-jdbc        spring-test  spring-websocket  
+spring-beans-groovy  spring-expression       spring-jms         *spring-tx  
+*spring-context       spring-framework-bom    spring-messaging   spring-web 
+
+<cache:annotation-driven/>
+@EnableCaching
+
+<tx:annotatiom-driven/>
+@EnableTransactionManagement
+
+<mvc:annotation-driven/>
+@EnableWebmvc
+
+<task:annotation-driven>
+@EnableAsync
+@EnableScheduling
+
+                SpringSecurity依赖
+在父工程加入
+    <dependencyManagement>
+        <dependencies>
+            <!-- ... other dependency elements ... -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId>
+                <version>5.2.0.BUILD-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+使用时添加依赖
+    <dependencies>
+        <!-- ... other dependency elements ... -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+    </dependencies>
+让所有传递依赖都使用spring5.1.4
+    <dependencyManagement>
+        <dependencies>
+            <!-- ... other dependency elements ... -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>5.1.4.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+如果使用的版本maven中还没有，在项目中添加
+    <repositories>
+        <!-- ... possibly other repository elements ... -->
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>https://repo.spring.io/snapshot</url>
+        </repository>
+    </repositories>
+    或者
+    <repositories>
+        <!-- ... possibly other repository elements ... -->
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>

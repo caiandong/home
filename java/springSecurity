@@ -155,19 +155,19 @@ setFilterChainProxySecurityConfigurer
 
 
 WebAsyncManagerIntegrationFilter
-*SecurityContextPersistenceFilter
+    *SecurityContextPersistenceFilter           //每次存取主体在session中
 HeaderWriterFilter
-LogoutFilter
-*UsernamePasswordAuthenticationFilter
-DefaultLoginPageGeneratingFilter
-DefaultLogoutPageGeneratingFilter
+    LogoutFilter                                //处理logout请求，不禁用csrf，处理post，否则全处理
+    *UsernamePasswordAuthenticationFilter       //处理post请求的login路径
+    DefaultLoginPageGeneratingFilter            //拦截get login请求
+    DefaultLogoutPageGeneratingFilter           //本该拦截get logout请求，禁用csrf，则拦截不到，都被logoutFilter处理了
 **BasicAuthenticationFilter
 RequestCacheAwareFilter
 SecurityContextHolderAwareRequestFilter
 AnonymousAuthenticationFilter
 SessionManagementFilter
 *ExceptionTranslationFilter
-*FilterSecurityInterceptor
+    *FilterSecurityInterceptor                  //决定资源是否能被访问
 
 
 GlobalAuthenticationConfigurerAdapter

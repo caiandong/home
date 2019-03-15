@@ -1,0 +1,11 @@
+
+     docker pull redis 
+从docker上拉取redis镜像
+     docker run --name some-redis -d redis
+运行一个名子是 some-reids的容器，后台运行，redis镜像实例
+    $ docker run --name some-app --link some-redis:redis -d application-that-uses-redis
+从其他容器内连接此容器
+    $ docker run -it --link some-redis:redis --rm redis redis-cli -h redis -p 6379
+本地运行一个容器，提供交互式终端，运行redis-cli命令，结束后删除此容器
+    docker run -v /myredis/conf/redis.conf:/usr/local/etc/redis/redis.conf --name myredis redis redis-server /usr/local/etc/redis/redis.conf
+创建一个卷来运行自己的配置文件

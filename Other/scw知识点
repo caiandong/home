@@ -1,0 +1,54 @@
+ JSON.stringify() json转字符串
+ 
+ form 
+    enctype=(默认为)application/x-www-form-urlencoded
+            (文件上传)multipart/form-data
+            (没用过)text/plain
+get乱码
+    tomcat server.xml conector添加URIEncoding="UTF-8"
+服务器内部转发请求，默认情况下过滤器不过滤
+h5规范<html lang="zh-CN"></html>
+页面css样式加载<link rel="",href=""/>
+页面script <script src=""/>
+
+ajax上传文件：
+var dt=new FormData($("#id")[0]);
+$.ajax({
+    url:"http://sss/xxx",
+    type:""post,
+    data:dt,
+    contentType:false,
+    dataType:"json",
+    processData:false,
+    success:function(data){
+        xxx
+    }
+})
+不用刷新界面异步上传
+例子：
+<form id="tf">
+            <input type="file" name="img"/>
+            <input type="text" name="username"/>
+            <input type="button" value="提" onclick="test();"/>
+                        .............
+ </form>
+ 把整个tf节点包装成formData对象，甚至不需要enctype ="multipart/form-data" 
+         function test(){
+            var form = new FormData(document.getElementById("tf"));
+            $.ajax({
+                url:"${pageContext.request.contextPath}/public/testupload",
+                type:"post",
+                data:form,
+                processData:false,
+                contentType:false,
+                success:function(data){
+                    window.clearInterval(timer);
+                    console.log("over..");
+                },
+                error:function(e){
+                    alert("错误！！");
+                    window.clearInterval(timer);
+                }
+            });        
+            get();//此处为上传文件的进度条
+        }

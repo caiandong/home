@@ -1,0 +1,21 @@
+在父工程添加
+    <dependencyManagement>
+        <dependencies>
+            <!-- ... other dependency elements ... -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>5.1.4.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement> 
+
+thymeleaf模板引擎
+    <dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring5</artifactId>
+			<version>3.0.11.RELEASE</version>
+			<scope>compile</scope>
+    </dependency>

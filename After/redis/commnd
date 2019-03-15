@@ -43,3 +43,10 @@ sadd myset 1 2 3
     在myset中添加三个值
 smembers myset
     返回集合，并不是有序的
+    
+    发布订阅
+    
+SUBSCRIBE foo bar
+    客户端订阅 foo bar 两个频道
+PSUBSCRIBE news.*
+    模式匹配订阅
