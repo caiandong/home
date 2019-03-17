@@ -26,3 +26,14 @@
 ### 与linux有关的方面
    [骏马金龙的博客](http://www.cnblogs.com/f-ck-need-u)
    [论坛](https://www.linux.org)
+
+### 一些有趣的网站
+
+[elementaryos中文非官方网站](https://elementaryos.cn/)
+
+- 官方要赞助。这个网站的景象不能uefi。
+
+[很多发行版下载站](https://distrowatch.com/)
+
+[最佳 Linux 发行版汇总](https://www.oschina.net/translate/best-linux-distributions?print)
+
