@@ -1,10 +1,3 @@
-# [linux内核](https://www.kernel.org/)
-# [linux论坛](https://www.linux.org/)
-# [gnu linux](http://www.gnu.org/)
-# [红帽系统](https://access.redhat.com/)
-
-# [centos](https://www.centos.org/)
-
 
 # 在对openSUSE感兴趣前，有几个地方帮助大家进一步了解与使用这个发行版
 
@@ -12,7 +5,7 @@
 
 * [一个中文论坛](https://forum.suse.org.cn/)
 
-* [官方Wiki](https://en.opensuse.org/) == 存在中文版块 ==
+* [官方Wiki](https://en.opensuse.org/)  存在中文版块 ，要花费点心思寻找
 
 ## [安装注意事项](安装前.md)
 ## [安装方式](https://zh.opensuse.org/SDB:DVD_安装方式)
@@ -22,18 +15,39 @@
 ## [网络操作](网络方面.md)
 ## [引导救援](jiuyuan.md)
 
-
 ### 与linux有关的方面
-   [骏马金龙的博客](http://www.cnblogs.com/f-ck-need-u)
-   [论坛](https://www.linux.org)
 
-### 一些有趣的网站
+[linux内核](https://www.kernel.org/)
 
-[elementaryos中文非官方网站](https://elementaryos.cn/)
+[linux论坛](https://www.linux.org/)
 
-- 官方要赞助。这个网站的景象不能uefi。
+[gnu linux](http://www.gnu.org/)
 
 [很多发行版下载站](https://distrowatch.com/)
 
-[最佳 Linux 发行版汇总](https://www.oschina.net/translate/best-linux-distributions?print)
+​        [一位linux运维的博客](http://www.cnblogs.com/f-ck-need-u)
+
+​	[最佳 Linux 发行版汇总](https://www.oschina.net/translate/best-linux-distributions?print)
+
+​	[折腾过很多linux发行版的人](https://www.lulinux.com)
+
+### 其他发行版
+
+[红帽](https://access.redhat.com/)
+
+- 企业用的最多版本，提供收费服务
+
+[centos](https://www.centos.org/)
+
+- 企业使用最多版本，免费
+
+[elementaryos中文非官方网站](https://elementaryos.cn/)
+
+- 官方要赞助。
+
+[manjaro](<https://manjaro.org/>)
+
+- opensuse虽然稳定，但是安装的太全面，我的笔记本太老打开sts都好费劲，所以暂时我用它来写java
+
+[archlinux](https://www.archlinux.org)
 

@@ -1,0 +1,45 @@
+
+
+### 切换国内源(我选的中科大的)
+
+- 查找国内源
+
+  - sudo pacman-mirrors -i -c China -m rank
+
+- 选择源完成后刷新
+
+  - sudo pacman -Syy
+
+- 然后添加 ArchLinuxCN 的源，编辑`/etc/pacman.conf`，在文件末尾添加如下内容：
+
+  - ```
+    [archlinuxcn]
+    SigLevel = Optional TrustedOnly
+    Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+    ```
+
+- 刷新,签名认证什么的
+
+  - sudo pacman -Syy && sudo pacman -S archlinuxcn-keyring && sudo pacman -Syy
+
+- 安装搜狗,搜狗不兼容qt5,所以qt4要有,不能卸载.
+
+  - sudo pacman -S fcitx-im
+  - sudo pacman -S fcitx-configtool
+  - sudo pacman -S fcitx-sogoupinyin  //有一步不能用root,忘记是哪一个了
+
+- 要设置开机启动，我们还需要在/etc/profile中添加如下内容：
+
+  - ```
+    export GTK_IM_MODULE=fcitx
+    export QT_IM_MODULE=fcitx
+    export XMODIFIERS=@im=fcitx
+    ```
+
+## 官网
+
+[archlinux维基](https://wiki.archlinux.org)
+
+
+
+
