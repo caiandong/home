@@ -1,0 +1,20 @@
+ 
+<!-- https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity5 -->
+<dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+    <version>3.0.4.RELEASE</version>
+</dependency>
+
+<bean id="templateEngine" class="org.thymeleaf.spring5.SpringTemplateEngine">
+      ...
+      <property name="additionalDialects">
+        <set>
+          <!-- Note the package would change to 'springsecurity[3|4]' if you are using that version -->
+          <bean class="org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect"/>
+        </set>
+      </property>
+	  ...
+    </bean>
+    
+	<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">

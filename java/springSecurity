@@ -1,6 +1,13 @@
 Spring Security 安全权限管理手册：http://www.mossle.com/docs/auth/html/index.html
 https://www.cnblogs.com/shijiaqi1066/p/3793894.html     //一个rabc权限模型的博客
 
+How Are Roles Different From Groups?
+There is a superficial similarity between RBAC roles and traditional groups.  As normally implemented, a group is a collection of users, rather than a collection of permissions, and permissions can be associated with both users and the groups to which they belong. The ability to tie permissions directly to users in a group-based mechanism can be regarded as a "loophole" that makes it difficult to control user-permission relationships. RBAC requires all access through roles, and permissions are connected only to roles, not directly to users.  Another aspect of RBAC that distinguishes it from traditional group mechanisms is the concept of a session, which allows activation of a subset of roles assigned to a user.  Core RBAC includes those systems with a robust group/ACL mechanism that supports the construction of a many-to-many relation among users and permissions.
+角色如何不同于组？
+RBAC角色和传统组之间有一个不痛不痒的类似。一般的实现是，一个组是用户的集合，而不是权限许可的集合，并且权限是与用户和用户所属组有关联的。直接绑定权限到用户的能力在一个基于组的机制中被认为是
+一个漏洞，它会很难控制用户-权限关系。RBAC需要通过角色访问，以及只被连接到角色的权限，并不是直接针对用户。另一方面，区分RBAC与传统组机制是session概念，它允许只激活被分配给一个用户的角色的子集。
+核心RBAC包括这样一些系统，它有一个强大的group/ACL机制支持在用户和权限之间构造多对多关系。
+
         Authorization   授权
         Authentication  认证
         fundamental 基本的
@@ -153,13 +160,23 @@ setFilterChainProxySecurityConfigurer
         configure方法进行过滤器配置。完成后，它的performBuild方法直接把得到的所有有过滤器，包装成最终的DefaultSecurityFilterChain
         这个链被加入到用来创建FilterChainProxy的list中。最终调用FilterChainProxy构造函数把所有的链拿到后返回了。
 
+AbstractRememberMeServices implements RememberMeServices ,LogoutHandler
+    配置RememberMeConfigurer过程中，它会从http对象中找到LogoutConfigurer，然后logoutConfigurer把RememberMeServices添加成登出处理器
+    配置FormLoginConfigurer过程中，configure方法从http中查找共享对象RememberMeServices，然后设置RememberMeServices
+    配置RememberMeConfigurer过程中，他从http查找共享对象AuthenticationManager，并设置。
+他的两个实现:
+TokenBasedRememberMeServices:会在cooke中存储用户名，过期时间，签名值(相当于密码)
+PersistentTokenBasedRememberMeServices:它再cooke中存储 串，令牌值(相当于密码)
+他们的过期时间都是从父类AbstractRememberMeServices中获取的，然而
+TokenBasedRememberMeServices存储令牌创建日期，PersistentTokenBasedRememberMeServices存储到期日期
 
 WebAsyncManagerIntegrationFilter
     *SecurityContextPersistenceFilter           //每次存取主体在session中
 HeaderWriterFilter
     LogoutFilter                                //处理logout请求，不禁用csrf，处理post，否则全处理
     *UsernamePasswordAuthenticationFilter       //处理post请求的login路径
-    DefaultLoginPageGeneratingFilter            //拦截get login请求
+    RememberMeAuthenticationFilter
+    DefaultLoginPageGeneratingFilter            //拦截get login请求,如果自己配置登录页面，这个过滤器就不会被配置
     DefaultLogoutPageGeneratingFilter           //本该拦截get logout请求，禁用csrf，则拦截不到，都被logoutFilter处理了
 **BasicAuthenticationFilter
 RequestCacheAwareFilter
@@ -172,3 +189,7 @@ SessionManagementFilter
 
 GlobalAuthenticationConfigurerAdapter
 GlobalAuthenticationConfigurerAdapter
+
+ConsensusBased      //赞成大于否定票就赞成，相等看配置，小于则否定
+AffirmativeBased    //有一个投赞成票，就赞成 忽略弃权投票
+UnanimousBased      //全部投赞成票才赞成  忽略弃权票

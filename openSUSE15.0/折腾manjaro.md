@@ -10,6 +10,10 @@
 
   - sudo pacman -Syy
 
+- 安装bash命令补全
+
+  - sudo pacman -Syy bash-completion
+
 - 然后添加 ArchLinuxCN 的源，编辑`/etc/pacman.conf`，在文件末尾添加如下内容：
 
   - ```
@@ -35,6 +39,15 @@
     export QT_IM_MODULE=fcitx
     export XMODIFIERS=@im=fcitx
     ```
+
+- 安装mariadb(我瞎了，没看到安装输出信息，结果踩坑了)
+
+  - sudo pacman -S mariadb
+  - sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+
+  > 随后安装mysql workbench，要安装以下东西，不然无法连接
+
+  - sudo pacman -S gnome-keyring
 
 ## 官网
 

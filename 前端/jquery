@@ -1,15 +1,17 @@
-var file=new FormData("#form_select")[0]
+var file=new FormData($("#form_select")[0])
 $.ajax({
     url:"",
     data:file,
     type:"post",
-    contentType:false,
-    processData:false,
-    dataType:"application/json"
+    contentType:false,              //默认: "application/x-www-form-urlencoded"，发送给服务器的编码类型
+    processData:false,          //默认: true 会把data转换成查询字符串
+    dataType:"application/json"     //预期服务器返回的类型
     success:function(){
     
     }
 })
+
+JSON.stringify(article)
 
 .html() – Get or set the HTML contents.
 .text() – Get or set the text contents; HTML will be stripped.

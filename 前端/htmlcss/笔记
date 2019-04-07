@@ -1,0 +1,125 @@
+外部样式表
+    <head>
+    <link rel="stylesheet" type="text/css" href="mystyle.css" />
+    </head>
+内部样式表
+    <head>
+    <style type="text/css">
+    hr {color: sienna;}
+    p {margin-left: 20px;}
+    body {background-image: url("images/back40.gif");}
+    </style>
+    </head>
+内联样式表
+    <p style="color: sienna; margin-left: 20px">
+    This is a paragraph
+    </p>
+同时存在三种采取继承与覆盖原则：外部 内部 内联 ，后一种继承与覆盖前一种。    
+
+背景色
+p {background-color: gray;}
+背景图片
+body {background-image: url(/i/eg_bg_04.gif);}
+背景定位
+body
+  { 
+    background-image:url('/i/eg_bg_03.gif');
+    background-repeat:no-repeat; // 背景重复background-repeat: repeat-yx x和y轴伸展开
+    background-position:center;
+  }
+背景关联：图像不会滚动，会一直待在背景
+body 
+  {
+  background-image:url(/i/eg_bg_02.gif);
+  background-repeat:no-repeat;
+  background-attachment:fixed
+  }
+  
+文本缩进
+p {text-indent: 5em;}
+p {text-indent: 20%;}
+水平对齐
+text-align:center (eft、right 和 center)
+字符间隔
+p.spread {word-spacing: 30px;}
+p.tight {word-spacing: -0.5em;}  负数把字重叠了
+字符转换
+h1 {text-transform: uppercase}  (none uppercase lowercase capitalize)
+
+字体大小
+h1 {font-size:60px;}   注意：如果您没有规定字体大小，普通文本（比如段落）的默认大小是 16 像素 (16px=1em)。
+也可以结合百分比
+body {font-size:100%;}
+
+设置列表类型
+ul {list-style-type : square}  列表前面的是小方块
+
+表格边框
+table, th, td
+  {
+  border: 1px solid blue;
+  }     双边框，因为table th td都有边框
+表格文本对齐
+td
+  {
+  text-align:right;
+  }
+  
+  元素框的最内部分是实际的内容，直接包围内容的是内边距。内边距呈现了元素的背景。内边距的边缘是边框。边框以外是外边距，外边距默认是透明的，因此不会遮挡其后的任何元素。
+  
+  假设框的每个边上有 10 个像素的外边距和 5 个像素的内边距。如果希望这个元素框达到 100 个像素，就需要将内容的宽度设置为 70 像素
+  #box {
+  width: 70px;
+  margin: 10px;
+  padding: 5px;
+}
+
+您还可以按照上、右、下、左的顺序分别设置各边的内边距，各边均可以使用不同的单位或百分比值：
+h1 {padding: 10px 0.25em 2ex 20%;}
+或者
+h1 {
+  padding-top: 10px;
+  padding-right: 0.25em;
+  padding-bottom: 2ex;
+  padding-left: 20%;
+  }
+  百分数值是相对于其父元素的 width 计算的
+  
+如果没有样式，将根本没有边框。
+您可以为一个边框定义多个样式，例如：
+p.aside {border-style: solid dotted dashed double;}
+
+边框宽度
+p {border-style: solid; border-width: 5px;}
+
+如果您希望边框出现，就必须声明一个边框样式。
+
+外边距
+h1 {margin : 10px 0px 15px 5px;}
+
+值复制
+如果缺少左外边距的值，则使用右外边距的值。
+如果缺少下外边距的值，则使用上外边距的值。
+如果缺少右外边距的值，则使用上外边距的值。
+
+父元素设置 边框，内边距，或者随便放置一个元素在开始处，那么就无法发生外边距合并，
+这就是父子元素的外边距合并不会发生。
+
+常见块元素
+    <h1>, <p>, <ul>, <table>,<li> 
+常见内联元素
+    <b>, <td>, <a>, <img> <span> <strong>
+<div> 元素的常见的用途是文档布局，设置样式。   //块元素
+<span> 元素是内联元素，可用作文本的容器         //内联元素
+ display 
+    block //使元素表现成块
+    none    //让元素没有框，元素不被显示
+把文本放进块级元素，文本会自动变成块级元素。
+
+继承的属性没有特殊性，通配符选择器有0特殊性，它优先于继承。
+边框，背景色，边距等有些属性不会被继承。
+
+垂直外边距合并
+    一个块级元素下外边距和一个块级元素的上外边距，如果都大于0或都小于0，则取两者中绝对值较大者；
+    要是一正一负，取他们的和。
+    一个块级元素下外边距和其父块级元素下外边距之间也是一样的。

@@ -41,9 +41,11 @@
 
 - 企业使用最多版本，免费
 
-[elementaryos中文非官方网站](https://elementaryos.cn/)
+[elementary](<https://elementary.io/>)
 
-- 官方要赞助。
+- [elementaryos中文非官方网站](https://elementaryos.cn/)
+
+- 界面美观的发行版，下载时没钱输入0。
 
 [manjaro](<https://manjaro.org/>)
 
@@ -51,3 +53,4 @@
 
 [archlinux](https://www.archlinux.org)
 
+- 可定制，需要折腾。
