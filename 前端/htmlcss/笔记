@@ -16,6 +16,23 @@
     </p>
 同时存在三种采取继承与覆盖原则：外部 内部 内联 ，后一种继承与覆盖前一种。    
 
+伪类和伪元素是由用户代理所添加，然后处理的。用户代理做了 添加 和 处理 两件事
+
+伪类
+    :active
+    :first-child        //表示作为父元素的第一个子元素，并不是元素的第一个子元素
+    :focus
+    :hover
+    :lang(语言)
+    :link           //带有有href属性的 尚未访问的a标签链接
+    :visited        //已访问的链接，与上一个互斥，不能同时出现在同一个选择器
+
+伪元素
+    :first-letter
+    :first-line
+    :before     //在元素内容的前面，不是元素之外的前面。如果<p></p>元素应用before，则它在p里面
+    :after      //在元素内容后面
+    所有伪元素都必须放在出现该伪元素的选择器的最后面。
 背景色
 p {background-color: gray;}
 背景图片
@@ -123,3 +140,34 @@ h1 {margin : 10px 0px 15px 5px;}
     一个块级元素下外边距和一个块级元素的上外边距，如果都大于0或都小于0，则取两者中绝对值较大者；
     要是一正一负，取他们的和。
     一个块级元素下外边距和其父块级元素下外边距之间也是一样的。
+
+表
+    table中出现的非table元素，在谷歌代理上，会被剔除到table元素外，在它前面。
+    但修改非html已定义的元素的display属性，按照实际显示来格式化。
+    也就是说:
+    <system style="display:table">
+        <hang style="display:table-row">
+            <td>asdsa打算</td>    //这两个td标签则会被丢弃，但内容照常显示
+            <td>asdsa打算</td>
+        </hang>
+       <hs style="display:table-cell">as大大发发安抚声道</hs>
+     </system>
+     按照表的数学进行显示。
+     table -> table-row -> table-cell
+    border-collapse:collapse|separate|inherit
+        css2中 collapse是默认
+        现在是separate
+列表
+    list-style 是以下三个属性的简写
+        list-style-type
+        list-style-image
+        list-style-position
+    顺序可以任意，例如
+        list-style:url(xxx) square outside;
+    list-item定义为块级框
+    包含list-item的列表元素也是块级框
+生成内容
+    生成内容处于元素内部，并且display值不能超过关联元素。
+    除了列表标志可以放在元素外面，无法控制它。
+    并且不能对生成内容应用定位与浮动。
+    生成元素继承关联元素

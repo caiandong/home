@@ -1,0 +1,100 @@
+ClientRegistration
+    -表示已经在oauth2.0或OpenID Connect 1.0的provider注册的客户端
+
+ClientRegistrationRepository
+    -作为一个ClientRegistration(s)仓库。可以获取在授权服务器上的部分已注册客户端信息
+    
+    -springboot自动配置绑定在spring.security.oauth2.client.registration.[registrationId]下的每一个属性
+     到一个ClientRegistration实例上，然后组合成ClientRegistrationRepository中的每一个ClientRegistration实例
+     
+    -例如
+        ClientRegistration googleRegistration =
+            this.clientRegistrationRepository.findByRegistrationId("google");
+     获取一个ClientRegistration
+     
+OAuth2AuthorizedClient
+    -表示一个已授权的客户端。一个客户端被认为是已授权的，当资源拥有者已经授予它权限访问受保护的资源
+    
+    -OAuth2AuthorizedClient目的是关联OAuth2AccessToken(和可选的OAuth2RefreshToken)到一个
+     ClientRegistration和资源拥有者
+     
+OAuth2AuthorizedClientRepository
+    -OAuth2AuthorizedClientRepository负责在web请求间持久化OAuth2AuthorizedClient(s)。
+     
+    -从开发者角度，OAuth2AuthorizedClientRepository提供了查找与某个客户端关联的OAuth2AccessToken
+     的能力，以便OAuth2AccessToken可以被用来发起对一个受保护资源的请求
+     
+OAuth2AuthorizedClientService
+    -OAuth2AuthorizedClientService利用OAuth2AuthorizedClientRepository来提供开发者在应用程序层面上
+     的对OAuth2AuthorizedClient(s)的管理
+     
+@RegisteredOAuth2AuthorizedClient
+    -此注解可以直接在方法参数上解析一个OAuth2AuthorizedClient。他比通过OAuth2AuthorizedClientService访问
+     更加方便
+     
+    -需要提供一个registrationId参数
+    
+    -此注解被OAuth2AuthorizedClientArgumentResolver处理，它提供了以下能力：
+     OAuth2AccessToken会自动被请求，如果客户端还没有被授权
+     -对于授权码模式，它触发一个授权请求重定向来发起一个授权流程
+     -对于客户端模式，balabala....
+
+AuthorizationRequestRepository
+    -AuthorizationRequestRepository负责持久化OAuth2AuthorizationRequest，从授权请求被发起，
+     到响应被收到(callback)这段时间。
+    :由于中间重定向资源拥有者到授权服务器获取授权，所以要把之前的请求保存起来，等响应收到时再继续之前请求
+    :OAuth2AuthorizationRequest被用来关联校验授权响应
+    
+    -HttpSessionOAuth2AuthorizationRequestRepository是默认实现，它存储OAuth2AuthorizationRequest
+     在HttpSession中。
+     
+    -你可以自定义实现存储在Cookie中:
+        @EnableWebSecurity
+        public class OAuth2ClientSecurityConfig extends WebSecurityConfigurerAdapter {
+
+            @Override
+            protected void configure(HttpSecurity http) throws Exception {
+                http
+                    .oauth2Client()
+                        .authorizationCodeGrant()
+                            .authorizationRequestRepository(this.cookieAuthorizationRequestRepository())
+                            ...
+            }
+
+            private AuthorizationRequestRepository<OAuth2AuthorizationRequest> cookieAuthorizationRequestRepository() {
+                return new HttpCookieOAuth2AuthorizationRequestRepository();
+            }
+        }
+        
+OAuth2AuthorizationRequestResolver
+    -他的主要角色是从被提供的web请求中解析OAuth2AuthorizationRequest。
+     他还可以实现自定义Authorization Request，增加额外的在标准oauth2.0框架不存在的参数
+     
+    -默认实现是DefaultOAuth2AuthorizationRequestResolver，它匹配默认路径是
+     /oauth2/authorization/{registrationId}。它提取registrationId，并且使用它构造OAuth2AuthorizationRequest
+     并且OAuth2AuthorizationRequest关联了它各自的ClientRegistration
+     
+    -添加额外参数，甚至构造替换uri，可以在springsecurity文档中查看
+    
+OAuth2AccessTokenResponseClient
+    -在授权码模式中，它的主要角色是交换授权码来得到授权服务器上的访问令牌
+    
+    -授权码模式，即authorization_code，中默认实现是DefaultAuthorizationCodeTokenResponseClient，
+     它使用RestOperations交换授权码得到访问令牌
+     
+    -DefaultAuthorizationCodeTokenResponseClient相当灵活，因为它允许你自定义在令牌请求(Token Request)之前处理某些情况，
+     和令牌响应后(Token Response)的一些处理
+     
+    -如果你需要自定义令牌请求之前处理，你可以提供DefaultAuthorizationCodeTokenResponseClient.setRequestEntityConverter()方法
+     一个自定义Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>，他的默认实现
+     OAuth2AuthorizationCodeGrantRequestEntityConverter构造一个表示标准oauth2.0访问令牌请求的
+     RequestEntity。提供自定义Converter允许你扩展标准请求添加自定义参数
+    :自定义Converter必须返回一个合法的表示标准请求的RequestEntity，它必须被有意的oauth2.0提供商理解
+    
+    -另一方面，如果你需要对令牌响应做后处理，你需要提供DefaultAuthorizationCodeTokenResponseClient.setRestOperations()
+     方法的一个自定义配置的RestOperations。默认RestOperations如下所示：
+        RestTemplate restTemplate = new RestTemplate(Arrays.asList(
+            new FormHttpMessageConverter(),
+            new OAuth2AccessTokenResponseHttpMessageConverter()));
+
+        estTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());

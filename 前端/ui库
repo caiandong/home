@@ -17,14 +17,22 @@ Semantic UI     https://semantic-ui.com/
 Pure        https://purecss.io/
 
 
-http://x.xuebingsi.com/  https://gitee.com/daniuit/X-admin.git   基于layui模板
+    http://x.xuebingsi.com/  https://gitee.com/daniuit/X-admin.git   基于layui模板
 
-AdminLTE    https://adminlte.io/
+    AdminLTE    https://adminlte.io/
 
-https://gitee.com/lovetime/WeAdmin.git      基于Layui的后台管理系统前端模板
+    https://gitee.com/lovetime/WeAdmin.git      基于Layui的后台管理系统前端模板
 
-https://github.com/bopoda/ace.git           ace
+    https://github.com/bopoda/ace.git           ace
 
-https://gitee.com/jqcool/jqadmin.git        jqadmin 
+    https://gitee.com/jqcool/jqadmin.git        jqadmin 
 
-https://gitee.com/kitteam/kit_admin.git         kit_admin
+    https://gitee.com/kitteam/kit_admin.git         kit_admin
+
+html播放
+
+    https://github.com/sampotts/plyr        plyr 播放插件
+
+    https://videojs.com/        videojs
+    
+    https://github.com/paypal/accessible-html5-video-player     accessible-html5-video-player
