@@ -1,0 +1,7 @@
+指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
+
+对象语法
+我们可以传给 v-bind:class 一个对象，以动态地切换 class：
+
+<div v-bind:class="{ active: isActive }"></div>
+上面的语法表示 active 这个 class 存在与否将取决于数据属性 isActive 的 truthiness。

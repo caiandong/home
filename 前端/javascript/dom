@@ -1,0 +1,36 @@
+文件（File）接口提供有关文件的信息，并允许网页中的 JavaScript 访问其内容。
+
+    >>如何得到file对象
+
+    通常情况下， File 对象是来自用户在一个 <input> 元素上选择文件后返回的 FileList 对象,
+    也可以是来自由拖放操作生成的 DataTransfer 对象，
+    或者来自 HTMLCanvasElement 上的 mozGetAsFile() API。
+    
+    >>file可以用在哪里
+    
+    File 对象是特殊类型的 Blob，且可以用在任意的 Blob 类型的 context 中。
+    比如说， FileReader, URL.createObjectURL(), createImageBitmap(), 及 XMLHttpRequest.send() 都能处理 Blob 和 File。
+    
+    >>每个 File 对象包含了下列信息 
+
+    name: 文件名.
+    lastModified: UNIX timestamp 形式的最后修改时间.
+    lastModifiedDate:  Date 形式的最后修改时间.
+    size: 文件的字节大小.
+    type: DOMString 文件的 MIME 类型.
+
+<input id="fileinput" type="file">
+
+    file的value值是：
+    
+    Value	DOMString 选择文件的路径
+    
+    文件输入的 value 属性包括了一个 value 表示选择文件的路径DOMString。
+    如果用户选择了多个文件，则该值表示他们选择的文件列表中的第一个文件。 
+    可以使用输入的HTMLInputElement.files属性标识其他文件:
+    var fileinput = document.getElementById("fileinput");
+    var filelist=fileinput.files;   //这是真正的filelist对象,包含所有选择的file对象
+    ....
+    //根据file对象创建对象url直接使用在img的src上
+    var img = document.createElement("img");
+    img.src = window.URL.createObjectURL(filelist[i]);

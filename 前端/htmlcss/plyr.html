@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.5.2/plyr.css" />
+
+    <style type="text/css">
+    .container {
+	margin: 50px auto;
+	max-width: 800px;
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <video id="play" >
+        <source src="haha.mkv" type="video/mp4" >
+    </video>
+</div>
+<div class="">
+
+</div>
+
+<script src="https://cdn.plyr.io/3.5.2/plyr.polyfilled.js"></script>
+<script type="text/javascript">
+    var p=new Plyr("#play",{
+            title:'好啊是',
+            controls: [
+                'play-large', // The large play button in the center
+                'restart', // Restart playback
+                'rewind', // Rewind by the seek time (default 10 seconds)
+                'play', // Play/pause playback
+                'fast-forward', // Fast forward by the seek time (default 10 seconds)
+                'progress', // The progress bar and scrubber for playback and buffering
+                'current-time', // The current time of playback
+                'duration', // The full duration of the media
+                'mute', // Toggle mute
+                'volume', // Volume control
+                'captions', // Toggle captions
+                'settings', // Settings menu
+                'pip', // Picture-in-picture (currently Safari only)
+                'airplay', // Airplay (currently Safari only)
+                'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
+                'fullscreen', // Toggle fullscreen
+                ],
+            //debug:true,
+            settings:['captions', 'quality', 'speed', 'loop'],
+           // disableContextMenu:false,         //禁用视频上的鼠标右键菜单
+            global:true
+        });
+//         p.on('play pause',event => {
+//             const instance = event.detail.plyr;
+//             alert(instance);
+//         });
+</script>
+</body>
+</html> 

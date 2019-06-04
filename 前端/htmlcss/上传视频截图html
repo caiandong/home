@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>截图系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv=”X-UA-Compatible” content=”IE=edge,chrome=1″/>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+</head>
+<body style="width: 100%;height: 100%">
+<div align="center">
+<video style="width: 1920px;height: 1080px" id="video" controls>Your browser can't support HTML5 Audio</video>
+<p><input type="file" id="file" onchange="onInputFileChange()"><input class="cut" type="button" value="截图"  id="buttons_cut" onclick="cut()"></p>
+<canvas id="canvas"></canvas>
+<img id="img"></img>
+</div>
+<script type="text/javascript">
+    // 打开本地视频
+    function onInputFileChange() {
+        var file = document.getElementById('file').files[0];
+        var url = URL.createObjectURL(file);
+        console.log(url);
+        document.getElementById("video").src = url;
+    }
+
+
+
+    // 使用canvas对视频进行截图
+    function cut(){
+       var canvas = document.getElementById('canvas');
+       var video = document.getElementById('video');
+       console.log('视频尺寸：'+video.style.width+'*'+video.style.height);
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+       console.log(canvas.width);
+       console.log(canvas.height);
+       var ctx = canvas.getContext('2d');
+       ctx.drawImage(video, 0, 0,1920,1080);
+       var base64 = canvas.toDataURL('images/png');
+//        upload(base64);
+        var img=document.getElementById('img');
+        img.src=base64;
+   }
+
+   // 上传图片
+
+    function upload(image) {
+        var imgFile=dataURLtoFile(image,"img.png");
+        var xhr=new XMLHttpRequest();
+        var fd=new FormData();
+        xhr.open('POST','/springStudy/user/multifiles');
+        fd.append("multipartFile",imgFile);
+        xhr.send(fd);
+        console.log('上传json！')
+    }
+
+    //将图片Base64 转成文件
+
+    function dataURLtoFile(dataurl, filename) {
+        console.log("转文件")
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type:mime});
+    }
+
+
+
+
+</script>
+
+</body>
+</html>

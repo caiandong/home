@@ -1,0 +1,144 @@
+ 
+应用canvas获取video的缩略图
+h5播放器    html5  视频  canvas  6k 次阅读  ·  读完需要 15 分钟
+发布视频时候，经常需要上传同时上传视频的缩略图，近日，应产品经理的的要求，需要做一个发布视频动态的功能，我第一反应就想到了H5的标签vidio和canvas，在这里记录下我完成该功能的过程：
+首先，整体思路是创建一个vidio，然后创建一个canvas和一个画笔，调用画笔的drawImage方法，将vidio作为参数，就会画出该视频的缩略图。
+
+二话不说撸代码：
+
+function creatImg() {
+  const video = document.getElementById('videoPreview');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const imgHeight = video.videoHeight;
+  const imgWidth = video.videoWidth;
+  ctx.drawImage(video, 0, 0, imgWidth, imgHeight);
+
+  const imgSrc = canvas.toDataURL('image/png');
+
+  console.log(imgSrc);
+}
+该方法是在上传视频发送ajax成功的回调函数中调用的，
+
+  // 上传视频
+  $('#video').on('change', (e) => {
+    const video = e.currentTarget.files[0];
+    const formData = new FormData();
+    formData.append('file', video);
+    
+    $.ajax({
+      url: videourl,
+      crossDomain: true,
+      data: formData,
+      dataType: 'json',
+      method: 'POST',
+      contentType: false,
+      processData: false,
+      timeout: 0,
+    }).done((jsonData) => {
+      //设置video标签的src操作
+      setTimeout(() => {
+        creatImg();
+      }, 500);
+    }).fail(() => {
+      layer.alert('上传失败', { shift: 5 });
+    })
+  });
+这样就完成这个功能了......开玩笑，怎么能让你好过？运行后报了如下bug：
+
+图片描述
+
+这个bug的意思是：脏的canvas不会被引入，出现这个问题的原因是canvas中引用的视频对象跨域了，从而污染了canvas，解决问题的方法是在canvas中引入本地的视频对象，其实做法很简单，改变一下creatImage引用的位置，在类型为file的input标签数组中取到video对象，这里的video对象是本地的，从而不会出现跨域的现象，如下面代码所示：
+
+  $('#video').on('change', (e) => {
+    const video = e.currentTarget.files[0];
+    creatImg(video);
+
+    // const videoName = video.name;
+    const formData = new FormData();
+    formData.append('file', video);
+
+    const index = layer.load(2);
+
+    $.ajax({
+      url: `${upload_url}/toServer`,
+      crossDomain: true,
+      data: formData,
+      dataType: 'json',
+      method: 'POST',
+      contentType: false,
+      processData: false,
+      timeout: 0,
+    }).done((jsonData) => {
+      //这是video的src属性值的相关操作
+    }).fail(() => {
+      layer.alert('上传失败', { shift: 5 });
+    })
+  });
+const video = e.currentTarget.files[0];这里的video是本地的video对象，接下来，我们优化一下creatImg函数，如下代码所示：
+
+function creatImg(stream) {
+  const video = document.createElement('video');
+
+  video.addEventListener('loadedmetadata', function loadedmetadata() {
+    setTimeout(() => {
+      const canvas = document.createElement('canvas');
+      canvas.width = this.videoWidth;
+      canvas.height = this.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(this, 0, 0);
+
+      const image = new Image();
+      image.src = canvas.toDataURL('image/png');
+      image.onload(() => {
+        const formData = new FormData();
+        formData.append('file', dataURItoBlob(canvas.toDataURL('image/png')), `${+new Date()}.png`);
+
+        $.ajax({
+          url: upload_url,
+          crossDomain: true,
+          data: formData,
+          dataType: 'json',
+          method: 'POST',
+          contentType: false,
+          processData: false,
+        }).done((jsonData) => {
+          //.....
+          //将值存储在id为thumbnail的input标签当中的value属性当中
+          const body = jsonData.body;
+          $('#thumbnail').val(body);
+        }).fail(() => {
+          layer.alert('上传失败');
+        });
+      });
+    }, 300);
+  }, false);
+
+  video.src = URL.createObjectURL(stream);
+  video.play();
+}
+创建canvas，创建画笔，将video对象传入画出图片，这一系列操作都是在video加载之后完成的，所以，所有操作都在video监听的loademetadata的回调函数当中完成的，在图片画好以后需要将该图片上传到服务器，通过FormData对象来生成用于ajax向服务器发送的name：value的键值对，在给FormData添加键值对是调用append方法，append方法的第一个参数字段名，第二个参数是字段值，这里的字段值是一个Blob对象，第三个参数是文件名称，这里创建Blob的方法是 dataURItoBlob方法，如下面代码所示，因为canvas.toDataURL的方法返回的是图片的Base64的编码，所以这个函数的作用就是将Base64的编码转换成Blob对象，具体过程如代码所示：
+
+function dataURItoBlob(dataURI) {
+  const binary = atob(dataURI.split(',')[1]);
+  const array = [];
+  for (let i = 0; i < binary.length; i += 1) {
+    array.push(binary.charCodeAt(i));
+  }
+  return new Blob([new Uint8Array(array)], { type: 'image/png' });
+}
+这里首先调用window的atob的方法，将被编译成的Base64的数据解码成二进制的数据，接下来调用binary对象的charCodeAt方法来将制定位置上的二进制数据进行unicode编码，并把所有的编码后的数据存储在数组当中，最后根据这个数组创建一个Unit8Array的对象，该对象是无符号8位整数，因为初始化Blob时的第一个参数必须是数组，所以要把这个8位无符号整数存放在数组当中。
+
+总结：在完成这个功能的过程中涉及道几个重要的知识点，罗列在下面，我将在后面的相关文章当中逐一具体介绍：
+1、canvas的video必须是同域的，如果video跨域了，那么将会污染canvas
+2、在向服务器发送图片的时候，需要用到几个重要的对象和方法
+
+FormData对象：可以让XMLHttpRequest发送键值对组成的对象
+
+window.atob方法：将Base64的数据解码成二进制的数据
+
+binary.charCodeAt方法：将二进制的数据进行unicode编码
+
+Uint8Array对象：通过传入的数组创建一个无符号的八位整数
+
+Blob对象：不可变的，原始数据的类似文件对象

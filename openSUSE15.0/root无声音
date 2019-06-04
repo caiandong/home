@@ -1,0 +1,52 @@
+ 
+直接地址 http://www.mamicode.com/info-detail-1570253.html
+ 
+ opensuse 42 root切换后无声音
+
+
+
+刚切换到opensuse42上，个人偏爱root；但是切换到root下声卡不能正常工作，这个东西纠结了一晚上，不得已开始各种爬帖子。
+
+
+
+问题：yast上检测声卡，测试能通过，且能播放测试音频                           过
+
+
+
+开始问题猜想：  
+
+                        1. 驱动不对    于是切换到普通用户下发现声卡工作正常；
+
+                        2. 可能是root安全问题，声卡未能正常加载。 root下切换到yast上检测声卡，测试能通                             过
+
+                        3. 检查音频软件包   这一步才终于解决
+
+问题原因： opensuse42 采用pulseausio管理音频 但是pulseaudio不能运行在root下，也就是说在root下
+
+                 pulseaudio不启动，需要手动启动                    
+
+
+
+解决方法：
+
+                将root加到pulse和pulse-access组：
+
+        sudo usermod -a -G pulse-access root
+        gpasswd -a root pulse
+        gpasswd -a root pulse-access
+
+        pulseaudio --start
+
+        这样就ok了，也可以将pulseaudio --start建立一个开机启动脚本。
+
+
+
+                        
+
+本文出自 “如此，安好” 博客，请务必保留此出处http://hji116.blog.51cto.com/3417806/1861554
+
+opensuse 42 root切换后无声音 完美处理
+
+标签：root切换后无声音
+
+原文地址：http://hji116.blog.51cto.com/3417806/1861554

@@ -1,0 +1,25 @@
+ <input id="fileItem" type="file">
+下面的一行代码演示如何获取到一个FileList对象中的第一个文件(File 对象): 
+
+var file = document.getElementById('fileItem').files[0];
+          |            FileList                     |0|
+          |             File                          |
+          
+FileList 对象由DOM提供，列出了所有用户选择的文件，每一个代表了一个 File 对象。
+files 是一个 FileList 对象(类似于NodeList对象)
+
+name size type 是它的三个常用属性
+
+
+var objectURL = URL.createObjectURL(blob);
+等价
+var objectURL = window.URL.createObjectURL(fileObj);
+
+    创建一个 DOMString,这个URL 对象表示指定的 File 对象或 Blob 对象。
+    
+File 对象是特殊类型的 Blob，且可以用在任意的 Blob 类型的 context 中。比如说， 
+FileReader, URL.createObjectURL(), createImageBitmap(), 及 XMLHttpRequest.send() 
+都能处理 Blob 和 File。    
+
+    
+使用案例 https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
