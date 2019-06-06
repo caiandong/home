@@ -25,8 +25,9 @@ OAuth2AuthorizedClientRepository
      的能力，以便OAuth2AccessToken可以被用来发起对一个受保护资源的请求
      
 OAuth2AuthorizedClientService
-    -OAuth2AuthorizedClientService利用OAuth2AuthorizedClientRepository来提供开发者在应用程序层面上
-     的对OAuth2AuthorizedClient(s)的管理
+    -spring默认实现的OAuth2AuthorizedClientRepository中，利用OAuth2AuthorizedClientService来管理
+     OAuth2AuthorizedClient(s)。
+    -OAuth2AuthorizedClientService提供开发者在应用程序层面上的对OAuth2AuthorizedClient(s)的管理
      
 @RegisteredOAuth2AuthorizedClient
     -此注解可以直接在方法参数上解析一个OAuth2AuthorizedClient。他比通过OAuth2AuthorizedClientService访问
@@ -98,3 +99,12 @@ OAuth2AccessTokenResponseClient
             new OAuth2AccessTokenResponseHttpMessageConverter()));
 
         estTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+
+springboot自动配置类
+    -package org.springframework.boot.autoconfigure.security.oauth2.client
+        -class
+            -OAuth2ClientProperties
+    -package org.springframework.boot.autoconfigure.security.oauth2.client.servlet;
+        -class 
+            -OAuth2ClientRegistrationRepositoryConfiguration
+            -OAuth2WebSecurityConfiguration
