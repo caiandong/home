@@ -49,7 +49,7 @@
     #据说含义相同
     ```
 
-  > 注意manjaro18.0.4更新后，官方软件源没有fcitx-qt4，去aur，到软件信息上找到一个评论，下载本地安装
+  > 注意manjaro18.0.4更新后，官方软件源没有fcitx-qt4，去aur，到软件信息上找到一个[评论](https://aur.archlinux.org/packages/fcitx-sogoupinyin/),[这是链接](https://archive.archlinux.org/repos/2019/03/31/community/os/x86_64/fcitx-qt4-4.2.9.6-1-x86_64.pkg.tar.xz)，下载本地安装
 
 - 安装mariadb(mariadb)，我瞎了，没看到安装输出信息，结果踩坑了
 
@@ -142,4 +142,4 @@
   MacBreeze Shadowless
   ```
 
-  
+  [Arch Linux 安装手册/傻瓜书/教程/指南](https://www.jianshu.com/p/6fe59c24b3df)

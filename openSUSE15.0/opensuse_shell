@@ -1,79 +1,97 @@
 
 ###################shell脚本#############
 命令替换
-`command`或$(command) 是波浪键不是单引号
-表示先执行命令，并且随后可提取命令输出赋值给变量
-（命令会在子shell中执行，以./×××的脚本也是在子shell中执行）
+    `command`或$(command) 是波浪键不是单引号
+    表示先执行命令，并且随后可提取命令输出赋值给变量
+    （命令会在子shell中执行，以./×××的脚本也是在子shell中执行）
 重定向输入输出
-一般程序内部存在 标准输入，标准输出，标准错误输出。
-并且默认情况下，这些都是从控制台接受输入或者产生输出到控制台。
-我们可以把标准输入输出重定向到文件。
+    一般程序内部存在 标准输入，标准输出，标准错误输出。
+    并且默认情况下，这些都是从控制台接受输入或者产生输出到控制台。
+    我们可以把标准输入输出重定向到文件。
 管道
-有些命令从标准输入读取，有些命令输出到标准输出。
-所以,命令间可以用管道连接 command | command
+    有些命令从标准输入读取，有些命令输出到标准输出。
+    所以,命令间可以用管道连接 command | command
 执行整数间数学运算表达式
-expr 5 + 6;
-计算表达式，中间要有空格
-expr 5 * 6;
-执行报错，*是bash中特殊字符(通配符)，需要转译 \*
-bash提供方括号替代原本expr命令,并且不用关心转译问题
-即 $[5*6] 
+    expr 5 + 6;
+    计算表达式，中间要有空格
+    expr 5 * 6;
+    执行报错，*是bash中特殊字符(通配符)，需要转译 \*
+    bash提供方括号替代原本expr命令,并且不用关心转译问题
+    即 $[5*6] 
+    
 echo $? 可以查看上次命令退出状态码
-exit 5 表示以5为状态码退出，状态码最大255
-exit $var 也可以使用变量，输出为与256的模运算结果
 
-if-then
+脚本退出
+    exit 5 表示以5为状态码退出，状态码最大255
+    exit $var 也可以使用变量，输出为与256的模运算结果
 
-if command
-then
-    commands
-fi
-if后命令以0返回，则执行then后到fi结尾内所有命令
-变体
-if command; then
-    commands
-fi
+条件语句
+    if-then
 
-if-then-else
-类似if-then
-if command
-then
-    commands
-else
-    commands
-fi
-状态码为0执行第一commands，否则执行第二个commands
+    if command
+    then
+        commands
+    fi
+    注意:if后接受命令，它测试的是命令的返回值，而不是一个返回bool值的表达式。
+        如果命令以0返回，则执行then后到fi结尾内所有命令。
+    变体
+    if command; then
+        commands
+    fi
 
-if-then 分支选择
-if command1
-then
-    commands
-elif command2
-then
-    more commands
-fi
+    if-then-else
+    类似if-then
+    if command
+    then
+        commands
+    else
+        commands
+    fi
+    状态码为0执行第一commands，否则执行第二个commands
+
+    if-then 分支选择
+    if command1
+    then
+        commands
+    elif command2
+    then
+        more commands
+    fi
 if后只能接命令
-test命令提供if后测试除状态码为0的其他条件
-if test condition
-condition可以有三类条件 数值比较，字符串比较，文件比较
-bash提供test命令简单方式 方括号
-[ condition ] 
-condition与方括号前后分别有空格
 
+test命令提供if后测试除状态码为0的其他条件
+    -test 后接变量，可以测试变量是否存在，存在则执行if语句
+    注意:test后什么也不跟，则返回非0，也就是不执行if语句
+    -这是语法:
+    if test condition
+    condition可以有三类条件 
+        -数值比较，
+        -字符串比较，
+        -文件比较
+bash提供test命令简单方式 方括号
+    [ condition ] 
+    condition与方括号前后分别有空格
+    数值比较，比较的符号不是原来的符号，例如=写成[ 5 -eq 5]
+    字符串比较可以写成原先的符号,但> <要转义,\> \>
+    
+    [-n string] 测试字符串长度是否为非0
+
+    [-z string] 测试字符串长度是否为0
+    
 复合条件测试
-[ condition1 ] && [ condition2 ] 第一个成功执行第二个
-[ condition1 ] || [ condition2 ] 第一个失败执行第二个
-[ condition1 ] && [ condition2 ] || [ condition3 ]
-与
- A ? B:C 一样
+    [ condition1 ] && [ condition2 ] 第一个成功执行第二个
+    [ condition1 ] || [ condition2 ] 第一个失败执行第二个
+    [ condition1 ] && [ condition2 ] || [ condition3 ]
+    与
+    A ? B:C 一样
  
  bash提供双括号表达式(可用在test后测试)
- ((表达式))
- 用在测试语句中，表达式结果为0,测试失败，否则为成功
- 括号内支持高级运算 ++ -- ，并且无视转义字符
+    ((表达式))
+    用在测试语句中，表达式结果为0,测试失败，否则为成功
+    括号内支持高级运算 ++ -- ，并且无视转义字符
  双方括号[[]] 
- 提供字符串比较高级特性，比如模式匹配，即正则表达式
- 有些bash不支持双方括号
+    提供字符串比较高级特性，比如模式匹配，即正则表达式
+    有些bash不支持双方括号
  
  case var in 
  pattern | pattern2)
