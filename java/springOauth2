@@ -72,8 +72,9 @@ OAuth2AuthorizationRequestResolver
      他还可以实现自定义Authorization Request，增加额外的在标准oauth2.0框架不存在的参数
      
     -默认实现是DefaultOAuth2AuthorizationRequestResolver，它匹配默认路径是
-     /oauth2/authorization/{registrationId}。它提取registrationId，并且使用它构造OAuth2AuthorizationRequest
-     并且OAuth2AuthorizationRequest关联了它各自的ClientRegistration
+     /oauth2/authorization/{registrationId}。它提取registrationId，并且根据用它
+     查找各个提供商的对应信息，来构造各自OAuth2AuthorizationRequest
+     因此OAuth2AuthorizationRequest关联了它各自的ClientRegistration
      
     -添加额外参数，甚至构造替换uri，可以在springsecurity文档中查看
     
@@ -86,7 +87,7 @@ OAuth2AccessTokenResponseClient
     -DefaultAuthorizationCodeTokenResponseClient相当灵活，因为它允许你自定义在令牌请求(Token Request)之前处理某些情况，
      和令牌响应后(Token Response)的一些处理
      
-    -如果你需要自定义令牌请求之前处理，你可以提供DefaultAuthorizationCodeTokenResponseClient.setRequestEntityConverter()方法
+    -如果你需要自定义令牌请求之前处理，你可以提供DefaultAuthorizationCodeTokenResponseClient.setRequestEntityConverter()方法的
      一个自定义Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>，他的默认实现
      OAuth2AuthorizationCodeGrantRequestEntityConverter构造一个表示标准oauth2.0访问令牌请求的
      RequestEntity。提供自定义Converter允许你扩展标准请求添加自定义参数
@@ -98,8 +99,51 @@ OAuth2AccessTokenResponseClient
             new FormHttpMessageConverter(),
             new OAuth2AccessTokenResponseHttpMessageConverter()));
 
-        estTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+        RestTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
 
+Oauth2Login更多配置
+    -
+      http
+            .oauth2Login()
+                //存储客户端注册信息的源
+                .clientRegistrationRepository(this.clientRegistrationRepository())
+                //被OAuth2LoginAuthenticationFilter过滤器用来持久化已经授权的客户端
+                .authorizedClientRepository(this.authorizedClientRepository())
+                //用来构建上面的authorizedClientRepository
+                .authorizedClientService(this.authorizedClientService())
+                //配置任意的显示的页面，需要放行过滤器然后自己构建一个页面渲染
+                .loginPage("/login")   
+                //此配置项被用来配置客户端.客户端通过资源拥有者的浏览器用户代理获取授权
+                .authorizationEndpoint() 
+                    //也可以任意，但要和页面中某个登录的href一致
+                    ///login/oauth2/callback/{registrationId} 前面的部分才是基本uri
+                    .baseUri(this.authorizationRequestBaseUri())    
+                    //用来持久化授权开始到结束之间的请求
+                    .authorizationRequestRepository(this.authorizationRequestRepository())
+                    //解析是否是授权请求，需要配置客户源(ClientRepository)
+                    .authorizationRequestResolver(this.authorizationRequestResolver())  
+                    .and()
+                //授权服务器将会返回一个重定向端点，配置此项来和授权服务器对应
+                .redirectionEndpoint()
+                    //ClientRegistration.redirectUriTemplate需要和此处配置的uri匹配
+                    //注意，github中的callback在没有传递重定向uri时才会使用，它也必须匹配此处uri
+                    //例如 callback localhost:8080/a,则重定向uri /a/b/c 
+                    .baseUri(this.authorizationResponseBaseUri())   //
+                    .and()
+                //和oauth2Client中的accessTokenResponseClient是一致的，它被客户端用来交换访问令牌
+                .tokenEndpoint()
+                    .accessTokenResponseClient(this.accessTokenResponseClient())
+                    .and()
+                //是被认证的端用户的受保护的资源表示，客户端通过访问令牌请求它，然后获得名值对的json对象的表示
+                .userInfoEndpoint()
+                    //配置授权服务的用户权限如何映射成客户端的权限
+                    .userAuthoritiesMapper(this.userAuthoritiesMapper())
+                    //用来加载OAuth2User对象，可以访问到OAuth2UserRequest OAuth2User
+                    .userService(this.oauth2UserService())
+                    .oidcUserService(this.oidcUserService())
+                    //配置自定义的用户类型，将被this.restOperations.exchange(request, customUserType)使用
+                    .customUserType(GitHubOAuth2User.class, "github");
+        
 springboot自动配置类
     -package org.springframework.boot.autoconfigure.security.oauth2.client
         -class

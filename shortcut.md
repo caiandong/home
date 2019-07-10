@@ -14,6 +14,8 @@
 
 - [部署ss](https://github.com/gfw-breaker/ssr-accounts)
 
+- [hosts文件](https://github.com/googlehosts/hosts)
+
   #### web文档
 
 - [IBM开发者](https://www.ibm.com/developerworks/cn/)
