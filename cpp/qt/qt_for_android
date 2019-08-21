@@ -1,0 +1,11 @@
+安卓环境搭建。
+    注意:我使用openSUSE，源里的qt5.9可能没有安装安卓环境，(根据编译错误来看像是没有安装gradle，新版本sdk工具没有包含，而且发行版打包的qt里也没有安装)
+    只能去官网重新下载qt5.13进行安装，选择了arm 64 86什么的，两个都选了。
+    下述部分来自qt官方文档
+1.这个网站打不开http://developer.android.com/sdk/index.html，只能去https://developer.android.google.cn/studio?hl=en下载Android Studio。
+2.安装好Android Studio后，需要设置。 sdkmanager set 选择里面的 sdk ndk啊什么的
+    参考https://developer.android.google.cn/ndk/guides?hl=zh_cn
+编译出错
+    error-cannot-find-lc
+        这个问题论坛里有讨论，貌似是qt版本问题，其中一种解决方式是在工程文件中添加 QMAKE_LINK += -nostdlib++
+        这是链接https://forum.qt.io/topic/103713/error-cannot-find-lc-qt-5-12-android/15
