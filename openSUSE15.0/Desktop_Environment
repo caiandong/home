@@ -1,0 +1,9 @@
+ openSUSE
+    安装镜像自带流行桌面环境,例如默认的kde,gnome.
+    安装国产deepin桌面环境dde:
+    可以直接去
+    http://download.opensuse.org/repositories/X11:/Deepin:/Factory/openSUSE_Leap_15.1/      X11:Deepin:Factory
+    http://download.opensuse.org/repositories/X11:/Deepin:/Go/openSUSE_Leap_15.1/       X11:Deepin:Go
+    添加以上两个软件源,然后安装第一个里面所有包(yast中的图形界面安装软件,里头有按照软件仓库来选择安装).第二个仓库里的会由于依赖自动安装部分包.
+    注意:遇到冲突的包不要安装,如果你知道自己在做什么,可以自己决定.
+    ps:我使用的openSUSE15.1 (2019/8/23)开始没注意,有依赖冲突还是选择了全部安装,结果dde的launcher点击秒退,后来找到这个libkwin-xcb0,把它以及相关依赖卸载后,才正常.

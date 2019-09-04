@@ -1,0 +1,256 @@
+常用rpm命令
+    rpm -ql  [PackageName]  查询某个包的文件
+    
+    rpm --eval %{_MACRO}      计算某个宏
+    rpm --showrc            显示所以宏.注意输出非常多
+    rpmdev-setuptree        生成rpm工作空间目录布局
+    rpmdev-newspec          新建一个模板spec文件
+
+    /etc/rpm/               主要宏所在目录
+    /usr/lib/rpm/macros.d/      部分宏所在目录
+    rpm -q --specfile foo.spec --qf "$(grep -i ^Source foo.spec)\n"     查询某个spec文件中的宏.在%prep执行前生成的宏,例如%{name},%{source0},都可以查到
+        https://en.opensuse.org/openSUSE:Specfile_guidelines   
+        https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/Packagers_Guide/chap-Packagers_Guide-Spec_File_Reference-Preamble.html
+        有对某些宏的说明
+    以下是rpm在％prep，％build和％install的开头隐式重新导出一些宏作为shell变量.
+        %___build_pre   \
+        RPM_SOURCE_DIR=\"%{u2p:%{_sourcedir}}\"\
+        RPM_BUILD_DIR=\"%{u2p:%{_builddir}}\"\
+        RPM_OPT_FLAGS=\"%{optflags}\"\
+        RPM_ARCH=\"%{_arch}\"\
+        RPM_OS=\"%{_os}\"\
+        RPM_DOC_DIR=\"%{_docdir}\"\
+        RPM_PACKAGE_NAME=\"%{name}\"\
+        RPM_PACKAGE_VERSION=\"%{version}\"\
+        RPM_PACKAGE_RELEASE=\"%{release}\"\
+        LANG=C\
+        unset CDPATH DISPLAY ||:\
+        %{?buildroot:RPM_BUILD_ROOT=\"%{u2p:%{buildroot}}\"\
+        %{?_javaclasspath:CLASSPATH=\"%{_javaclasspath}\"\
+        PKG_CONFIG_PATH=\"${PKG_CONFIG_PATH}:%{_libdir}/pkgconfig:%{_datadir}/pkgconfig\"\
+
+    软件包文件应该安装在下列 常用目录:
+
+    /etc 	系统关键配置文件
+    /usr/bin 	二进制文件
+    /usr/lib 	库
+    /usr/include 	头文件
+    /usr/lib/{pkg} 	模块，插件等
+    /usr/share/doc/{pkg} 	应用程序文档
+    /usr/share/info 	GNU Info 系统文件
+    /usr/share/man 	手册
+    /usr/share/{pkg} 	程序数据
+    /var/lib/{pkg} 	应用持久数据
+    /etc/{pkg} 	{pkg}的配置文件
+    /opt/{pkg} 	大的独立程序，例如 Java         
+ldd 
+    找出需要的链接库,例如
+    ldd myapp
+spec文件内各个不同条目
+
+    Comments — Human-readable notes ignored by RPM.
+        注释,给人看的,rpm会忽略
+
+    Tags — Define data.
+        定义数据
+
+    Scripts — Contain commands to be executed at specific times.
+        包含在特定时刻要被执行的命令
+        
+    Macros — A method of executing multiple commands easily.
+        容易执行多条命令的方法
+
+    The %files list — A list of files to be included in the package.
+        需要被包含在此包内的文件列表
+
+    Directives — Used in the %files list to direct RPM to handle certain files in a specific way.
+        被用在%file列表中,来指示rpm以特定方式处理某些文件
+
+    Conditionals — Permit operating system- or architecture-specific preprocessing of the spec file.
+        
+包名标签(Package Naming Tags)
+    包名最终会以下面方式产生
+    <name>-<version>-<release>
+    名字标签,指定包名
+        Name: cdplayer
+    版本标签
+        Version: 1.2
+    发布标签
+        Release: 5
+描述标签
+    %description
+    It slices!  It dices!  It's a CD player app that can't be beat.  By using
+    the resonant frequency of the CD itself, it is able to simulate 20X
+    oversampling.
+    摘要标签,被用来定义一行描述
+        Summary: A CD player app that rocks!
+    协议标签
+        License: GPL
+    厂商标签
+        Vendor: White Socks Software, Inc.
+    url标签
+        URL: http://www.gnomovision.com/cdplayer.html
+    组标签
+        Group: Applications/Editors
+    打包者标签
+        Packager: Fred Foonly <fred@gnomovision.com>
+依赖标签
+    提供标签
+        Provides: mail-reader
+    需求标签,程序运行的需求
+        Requires: playmidi = 2.3
+    冲突标签
+        Conflicts: playmidi = 2.3-1
+    前缀标签,重新定位的包目录
+        Prefix: /opt
+    源标签,rpm根据最后的文件名到SOURCES中查找对应的源码文件,有多个可以写成Source0,Sources1....
+        Source: ftp://ftp.gnomovision.com/pub/cdplayer-1.0.tgz
+    补丁标签,也是放到SOURCES中的文件名,也可以写多个,添加数字递增后缀
+        Patch: cdp-0.33-fsstnd.patch
+scriptlet,几乎都可以包含shell命令
+1.%prep     
+        在执行前,它会检查spec中的Source标签是否指向实际的文件;进入预定的目录.
+        之后它做4件事
+            1.创建顶级的构建目录
+            2.解压缩原始文件进入构建目录
+            3.如果必要,应用补丁(Patch)到Source上
+            4.执行其他动作(Perform any other actions required to get the sources in a ready-to-build state.)
+可用的宏:        
+    1.%setup    解压原始源(sources),准备构建,用在%prep,例如
+        %setup
+        当解压后的文件夹名称不是<name>-<version>时,也即和压缩包名称不同时,使用下面的-n选项指定解压目录名
+        %setup -n cd-player
+        -q选项表示安静模式输出过程
+        -c选项表示创建一个顶级目录盛放解压后的文件.通常是由于打包的时候没有把源码放到一个文件夹打包,解压后的文件会充满当前文件夹,所以在解压前指定创建一个解压目录
+        -D选项阻止删除已存在的顶级目录.这通常是存在多个%setup,第二个就不必把之前的目录删除了.脚本默认每次执行前先执行rm -p删除目录命令
+        -b与-T.-T禁止默认的解压默认源码包的操作.-b后跟Sources5等标签的后缀数字,表示解压某个源码包.这两个组合使用就可以解压Sources5而不解压Sources0.没有-T,则都解压.并且-b(即before)是在改变目录之前解压
+        -a.在改变目录之后解压某个SourcesN,-a(after)和-b相反
+    2.%patch    一般用在%prep,应用Patch标签中的文件,同理,%patch2应用Patch2
+        下面两者是等价的
+        %patch -P 2
+        %patch2
+        -p选项后跟数字,表示移除文件名之前指定数量的斜杠,这可能是由于Patch标签使用了携带目录的文件名,或者进入了某个子目录
+        -s表示不显示信息
+2.%build    
+        在%prep脚本执行之后执行,它没什么宏可应用,在构建目录中,通常会调用make命令
+3.%install
+        它的执行环境和上面一样,在构建目录中调用诸如make install ,以及创建目录,复制文件什么的
+4.%check
+        通常检查测试已构建的软件
+5.%clean
+        清理构建产生的不需要的文件
+安装删除scriptlet
+%pre    安装之前执行
+%post   安装之后执行
+%preun      删除之前执行
+%postun     删除之后执行
+
+%files列表
+%files表明哪些文件应该被打包,目录也可以,每行写一个文件
+    1.它辨认文档与配置文件
+    2.确保文件有正确的权限以及所属关系
+    3.
+    %doc README     文档
+    %config /etc/fstab      配置文件
+    %defattr(<file mode>, <user>, <group>, <dir mode>)
+        例如 %defattr(644, root, root)    设置文件默认属性.权限是644,拥有者是root,组也是root,目录模式省略.它通常用于%file的第一行
+    
+    %docdir dir 用来标识某个目录作为doc目录,并且在下一行还要再次写下dir,指示rpm把文件放进这个目录
+    %ghost 某些文件不需要打包
+4.%dir /usr/blather       指示rpm仅仅打包目录自身,不管包被创建时目录内的文件.比如有些构建日志文件,文档文件.他们不能这样被打包
+
+Built-in macros
+The following macros are built into RPM and can help allow you to place your files in the right locations:
+%_prefix /usr
+%_exec_prefix %{_prefix}
+%_bindir %{_exec_prefix}/bin
+%_sbindir %{_exec_prefix}/sbin
+%_libexecdir %{_exec_prefix}/libexec    在 openSUSE 上被重定义到/usr/lib
+%_datadir %{_prefix}/share
+%_sysconfdir %{_prefix}/etc
+%_sharedstatedir %{_prefix}/com
+%_localstatedir %{_prefix}/var
+%_libdir %{_exec_prefix}/lib
+%_includedir %{_prefix}/include
+%_oldincludedir /usr/include
+%_infodir %{_prefix}/info
+%_mandir %{_prefix}/man 
+
+%prep
+%setup -q 
+    解压文件,-q 安静模式
+%build 
+ ./configure CXXFLAGS=-O3 --prefix=$RPM_BUILD_ROOT/usr
+ make 
+ 运行前一个脚本,然后执行make构建软件
+ 
+ %build
+ ./configure
+ make 
+ 用下面替代
+%build
+%configure
+ make 
+ 
+%install
+ rm -fr $RPM_BUILD_ROOT
+ make install 
+ 删除构建根目录,然后安装
+ 
+%clean
+ rm -rf $RPM_BUILD_ROOT 
+    清除构建过程产生的不需要的文件
+    
+     %files
+%defattr(-,root,root)
+ /usr/bin/jikes
+ %doc /usr/doc/jikes-%{version}/license.htm
+ %doc /usr/man/man1/jikes.1* 
+ 列出放在二进制rpm的文件
+ 
+构建rpm包的命令
+    rpmbuild -bBuildStage spec_file 
+
+bBuildStage有如下选择
+
+-ba
+	Build all, both a binary and source RPM
+-bb
+	Build a binary RPM
+-bc
+	Build (compile) the program but do not make the full RPM, stopping just after the %build section
+-bp
+	Prepare for building a binary RPM, and stop just after the %prep section
+-bi
+	Create a binary RPM and stop just after the %install section
+-bl
+	Check the listing of files for the RPM and generate errors if the buildroot is missing any of the files to be installed
+-bs
+	Build a source RPM only 
+
+
+查询不同宏的含义
+    If you see an unfamiliar macro, you can evaluate it with:
+
+    $ rpm --eval %{_MACRO}
+
+    For example:
+
+    $ rpm --eval %{_bindir}
+    /usr/bin
+
+    $ rpm --eval %{_libexecdir}
+    /usr/libexec
+
+spec 文件应该用 %{name}.spec 格式命名
+
+设定权限
+    %files
+    %defattr(-,root,root)
+    
+遇到的宏含义
+    %__mkdir   /usr/bin/mkdir
+    %{__mv}     /usr/bin/mv
+    %{__rm}     /usr/bin/rm
+    %{_tmppath}     /var/tmp
+
