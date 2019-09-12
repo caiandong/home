@@ -1,11 +1,39 @@
+osc命令行
+    osc checkout home:username      //在当前目录建立个人仓库,此仓库对应服务器个人仓库名
+    
+    cd home:username        
+    osc mkpac  packagename   //建立包仓库,此处的名字就是用来搜索的软件包名字,和sogou,netease-cloud-music等软件名一样
+    cd mkpac    
+    
+    此处目录添加压缩文件以及一个.spec文件.这两个文件基础名应该一样,这是规范,否则有警告
+    
+    osc add * //添加当前包仓库内的文件
+    osc rm xxx  //移除报仓库文件
+    osc status //查看当前包仓库
+    osc build       //让服务器构建
+    osc commit      //提交到service instance,也就是服务器,它会自动构建
+    osc build --local-package   //本地构建
+    osc build --local-package openSUSE_Tumbleweed x86_64 *.spec //构建不同发行版,也可以openSUSE_Leap_15.1
+    osc buildlog openSUSE_Tumbleweed x86_64     //查看构建日志
+    osc diff        //生成一个和远程obs工程的对比
+    osc repourls        //打印自己的安装仓库url
+    sudo zypper addrepo https://download.opensuse.org/repositories/home:/username/openSUSE_Tumbleweed/home:username.repo     //增加源之后就可以安装了
+    sudo zypper install packagename      //安装
+
+
 常用rpm命令
     rpm -ql  [PackageName]  查询某个包的文件
+    rpm -qi  [PackageName]  查询包信息
+    rpm -qf  filename  查询文件所在包
+    rpm -qR [PackageName]   查询包依赖性
+    rpm -qRp zip-3.0-11.el7.x86_64.rpm  -p查看某个rpm安装包的依赖性
     
     rpm --eval %{_MACRO}      计算某个宏
     rpm --showrc            显示所以宏.注意输出非常多
     rpmdev-setuptree        生成rpm工作空间目录布局
     rpmdev-newspec          新建一个模板spec文件
 
+    /usr/lib/rpm/macros预定义宏所在目录
     /etc/rpm/               主要宏所在目录
     /usr/lib/rpm/macros.d/      部分宏所在目录
     rpm -q --specfile foo.spec --qf "$(grep -i ^Source foo.spec)\n"     查询某个spec文件中的宏.在%prep执行前生成的宏,例如%{name},%{source0},都可以查到
@@ -118,13 +146,13 @@ scriptlet,几乎都可以包含shell命令
 可用的宏:        
     1.%setup    解压原始源(sources),准备构建,用在%prep,例如
         %setup
-        当解压后的文件夹名称不是<name>-<version>时,也即和压缩包名称不同时,使用下面的-n选项指定解压目录名
+        -n当解压后的文件夹名称不是<name>-<version>时,也即和压缩包名称不同时,使用下面的-n选项指定解压目录名
         %setup -n cd-player
         -q选项表示安静模式输出过程
         -c选项表示创建一个顶级目录盛放解压后的文件.通常是由于打包的时候没有把源码放到一个文件夹打包,解压后的文件会充满当前文件夹,所以在解压前指定创建一个解压目录
         -D选项阻止删除已存在的顶级目录.这通常是存在多个%setup,第二个就不必把之前的目录删除了.脚本默认每次执行前先执行rm -p删除目录命令
-        -b与-T.-T禁止默认的解压默认源码包的操作.-b后跟Sources5等标签的后缀数字,表示解压某个源码包.这两个组合使用就可以解压Sources5而不解压Sources0.没有-T,则都解压.并且-b(即before)是在改变目录之前解压
-        -a.在改变目录之后解压某个SourcesN,-a(after)和-b相反
+        -b与-T.-T禁止默认的解压默认源码包的操作.-b后跟Sources5等标签的后缀数字,-b <n>,表示在改变目录前解压第n个源码包.这两个组合使用就可以解压Sources5而不解压Sources0.没有-T,则都解压.并且-b(即before)是在改变目录之前解压
+        -a在改变目录之后解压某个SourcesN,-a(after)和-b相反,-a <n>
     2.%patch    一般用在%prep,应用Patch标签中的文件,同理,%patch2应用Patch2
         下面两者是等价的
         %patch -P 2
@@ -159,22 +187,7 @@ scriptlet,几乎都可以包含shell命令
     %ghost 某些文件不需要打包
 4.%dir /usr/blather       指示rpm仅仅打包目录自身,不管包被创建时目录内的文件.比如有些构建日志文件,文档文件.他们不能这样被打包
 
-Built-in macros
-The following macros are built into RPM and can help allow you to place your files in the right locations:
-%_prefix /usr
-%_exec_prefix %{_prefix}
-%_bindir %{_exec_prefix}/bin
-%_sbindir %{_exec_prefix}/sbin
-%_libexecdir %{_exec_prefix}/libexec    在 openSUSE 上被重定义到/usr/lib
-%_datadir %{_prefix}/share
-%_sysconfdir %{_prefix}/etc
-%_sharedstatedir %{_prefix}/com
-%_localstatedir %{_prefix}/var
-%_libdir %{_exec_prefix}/lib
-%_includedir %{_prefix}/include
-%_oldincludedir /usr/include
-%_infodir %{_prefix}/info
-%_mandir %{_prefix}/man 
+ 
 
 %prep
 %setup -q 
@@ -248,9 +261,39 @@ spec 文件应该用 %{name}.spec 格式命名
     %files
     %defattr(-,root,root)
     
-遇到的宏含义
+內建宏(Built-in macros)
+The following macros are built into RPM and can help allow you to place your files in the right locations:
+%_prefix /usr
+%_exec_prefix %{_prefix}
+%_bindir %{_exec_prefix}/bin
+%_sbindir %{_exec_prefix}/sbin
+%_libexecdir %{_exec_prefix}/libexec    在 openSUSE 上被重定义到/usr/lib
+%_datadir %{_prefix}/share
+%_sysconfdir %{_prefix}/etc
+%_sharedstatedir %{_prefix}/com
+%_localstatedir %{_prefix}/var
+%_libdir %{_exec_prefix}/lib
+%_includedir %{_prefix}/include
+%_oldincludedir /usr/include
+%_infodir %{_prefix}/info
+%_mandir %{_prefix}/man
+
+遇到的宏含义(openSUSE15.1)
     %__mkdir   /usr/bin/mkdir
+    %{__mkdir_p}        /usr/bin/mkdir -p
     %{__mv}     /usr/bin/mv
     %{__rm}     /usr/bin/rm
+    %{__cp}     /usr/bin/cp
     %{_tmppath}     /var/tmp
+    %{__install}        /usr/bin/install
+        install - 复制文件并设置属性.它拒绝复制文件为其自身
+        -m mode 默认0755,即rwxr_xr_x
+        -o owner    拥有者,默认root
+    %{__ln_s}       ln -s
+        ln -s t=dir target      //指定创建符号链接,dir表示链接所在目录
+    注意:下面三个是,qt宏(位于openSUSE15.1 /etc/rpm/macros.qt5),用于%build与%install
+    %qmake5     //用于%build中
+    %make_jobs      //用于%build中
+    %qmake5_install     //用于%install中
 
+    %fdupes检查重复文件使用硬链接替换
