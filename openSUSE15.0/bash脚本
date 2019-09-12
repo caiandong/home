@@ -1,4 +1,6 @@
- $[number]
+###################shell脚本#############
+
+$[number]
     $0      $1          $2...分别表示
     第0个，第一个，第二个。。。命令行变量。
     $0表示输入的整个程序名，可以用basename命令得到不包含路径的程序名
@@ -12,8 +14,74 @@ $*和$@
    $*变量会将这些参数视为一个整体,而不是多个个体。
     $@变量会将命令行上提供的所有参数当作同一字符串中的多个独立的单词。
 
+命令替换
+    `command`或$(command) 是波浪键不是单引号
+    表示先执行命令，并且随后可提取命令输出赋值给变量
+    （命令会在子shell中执行，以./×××的脚本也是在子shell中执行）
+重定向输入输出
+    一般程序内部存在 标准输入，标准输出，标准错误输出。
+    并且默认情况下，这些都是从控制台接受输入或者产生输出到控制台。
+    我们可以把标准输入输出重定向到文件。
+管道
+    有些命令从标准输入读取，有些命令输出到标准输出。
+    所以,命令间可以用管道连接 command | command
+执行整数间数学运算表达式
+    expr 5 + 6;
+    计算表达式，中间要有空格
+    expr 5 * 6;
+    执行报错，*是bash中特殊字符(通配符)，需要转译 \*
+bash提供方括号替代原本expr命令,并且不用关心转译问题
+    即 $[5*6] 
+    
+echo $? 可以查看上次命令退出状态码
 
-test(也即方括号测试表达式 [ a > b ] 语法)命令常用比较名称含义
+脚本退出
+    exit 5 表示以5为状态码退出，状态码最大255
+    exit $var 也可以使用变量，输出为与256的模运算结果
+
+条件语句
+    if-then
+
+    if command
+    then
+        commands
+    fi
+    注意:if后接受命令，它测试的是命令的返回值，而不是一个返回bool值的表达式。
+        如果命令以0返回，则执行then后到fi结尾内所有命令。
+    变体
+    if command; then
+        commands
+    fi
+
+    if-then-else
+    类似if-then
+    if command
+    then
+        commands
+    else
+        commands
+    fi
+    状态码为0执行第一commands，否则执行第二个commands
+
+    if-then 分支选择
+    if command1
+    then
+        commands
+    elif command2
+    then
+        more commands
+    fi
+if后只能接命令
+
+test命令提供if后测试,除状态码为0的其他条件
+    -test 后接变量，可以测试变量是否存在，存在则执行if语句
+        注意:test后什么也不跟，则返回非0，也就是不执行if语句
+    -这是语法:
+        if test condition
+        condition可以有三类条件 
+            -数值比较，
+            -字符串比较，
+            -文件比较
     ：注意须知
         test命令和测试表达式使用标准的数学比较符号来表示字符串比较,而用文本代码来表
         示数值比较。这个细微的特性被很多程序员理解反了。如果你对数值使用了数学运算符
@@ -37,6 +105,7 @@ test(也即方括号测试表达式 [ a > b ] 语法)命令常用比较名称含
         str1 != str2    检查str1 是否和str2 不同
         str1 < str2     检查str1 是否比str2 小
         str1 > str2     检查str1 是否比str2 大
+      -n和-z可以检查一个变量是否含有数据,没有定义的变量长度也为0
         -n str1         检查str1 的长度是否非0
         -z str1         检查str1 的长度是否为0
         ：注意由于> < 与重定向符号一样，所以需要转义，例如 str1 \< str2
@@ -63,14 +132,241 @@ test(也即方括号测试表达式 [ a > b ] 语法)命令常用比较名称含
             ：new then 和下面一样，比较的是文件的日期
         file1 -ot file2     检查file1是否比file2旧
             ：old then
+bash提供test命令简单替代方式 方括号.换句话说,只需要把所有test使用的地方换做方括号表达式就成立了
+    [ condition ] 
+    condition与方括号前后分别有空格
+    数值比较，比较的符号不是原来的符号，例如=写成[ 5 -eq 5]
+    字符串比较可以写成原先的符号,但> <要转义,\> \>
+    
+    [-n string] 测试字符串长度是否为非0
+
+    [-z string] 测试字符串长度是否为0
+    
+复合条件测试
+    [ condition1 ] && [ condition2 ] 第一个成功执行第二个
+    [ condition1 ] || [ condition2 ] 第一个失败执行第二个
+    [ condition1 ] && [ condition2 ] || [ condition3 ]
+    与
+    A ? B:C 一样
+ 
+ bash提供双括号表达式(可用在test中测试,继而用在if语句)
+    ((表达式))
+    用在测试语句中，表达式结果为0,测试失败，否则为成功
+    括号内支持高级运算 ++ -- ，并且无视转义字符
+ 双方括号[[]] 
+    提供字符串比较高级特性，比如模式匹配，即正则表达式
+    有些bash不支持双方括号
+ 
+ case var in 
+ pattern | pattern2)
+    commands1 ;;
+ pattern3)
+    commands2 ;;
+ *)
+    commands3 ;;
+ esac
+
+ read 命令从标准输入读取一行进入某些fields
+ -p带有提示
+ -t 超时时间
+            
+
 复合测试
     [ condition1 ] && [ condition2 ]
     [ condition1 ] || [ condition2 ]
 
-双括号和双方括号
-    (( expression )) 
-        1.注意，两边有空格 双括号允许使用高级数学表达式语法比较数值
-        2.可以使用于常规变量赋值，(( val2 = $val1 ** 2 ))，括号内不需要转义任何字符
-    [[ expression ]]
+bash shell提供了两项可在if-then语句中使用的高级特性:
+
+     用于数学表达式的双括号:(( expression )) 
+        注意:两边有空格 双括号允许使用高级数学表达式语法比较数值
+    可以在if语句中用双括号命令,也可以在脚本中的普通命令里使用来赋值:
+        使用于常规变量赋值，(( val2 = $val1 ** 2 ))，括号内不需要转义任何字符
+            
+    val++       后增
+    val--       后减
+    ++val       先增
+    --val       先减
+    !       逻辑求反
+    ~       位求反
+    **      幂运算
+    <<      左位移
+    >>      右位移
+    &       位布尔和
+    |       位布尔或
+    &&      逻辑和
+    ||      逻辑或
+            
+     用于高级字符串处理功能的双方括号:[[ expression ]]
+        双方括号命令提供了针对字符串比较的高级特性.
+            双方括号里的 expression使用了test命令中采用的标准字符串比较
+            增加了模式匹配，[[ $USER == r* ]]，支持正则表达式
         ：注意， 双方括号在bash shell中工作良好。不过要小心,不是所有的shell都支持双方括号。
-        增加了模式匹配，[[ $USER == r* ]]，支持正则表达式
+
+        
+循环语句
+    for var in list
+    do
+        commands
+    done
+    说明 只要你愿意,也可以和if else一样将do语句和for语句放在同一行,但必须用分号将其同列表中的值分开:for var in list; do
+    list不是真正的变量名,它只是在此处站位表示一系列数值
+    
+    有几种不同的方式来指定列表中的值.
+    1.直接在in后定义一系列值:
+            for test in Alabama Alaska Arizona Arkansas California Colorado
+            do
+                echo The next state is $test
+            done
+        将会输出:
+            The next state is Alabama
+            The next state is Alaska
+            The next state is Arizona
+            The next state is Arkansas
+            The next state is California
+            The next state is Colorado
+        test的值从声明处到结束一直不变,并且在for循环结束后,它将保持在for中得到的值,除非你后来修改了它.也就是从声明时,它就和一般变量没什么不同
+        对于以下场景会出问题
+            for test in I don't know if this'll work
+            do
+                echo "word:$test"
+            done
+        将会输出:
+            word:I
+            word:dont know if thisll
+            word:work
+        通过转义字符\或者把''包在""中
+            for test in I don\'t know if "this'll" work
+            do
+            echo "word:$test"
+            done
+        for循环假定每个值都是用空格分割的,如果在单独的数据值中有空格,就必须用双引号将这些值圈起来
+    2.从变量中读取
+        没什么特别的,看个例子
+            list="Alabama Alaska Arizona Arkansas Colorado"
+            list=$list" Connecticut"
+            for state in $list
+            do
+                echo "Have you ever visited $state?"
+            done
+        它还展示了变量也可以进行拼接后再使用.它的输出和你所想的一样普通,没什么期待的
+    3.从命令读取值
+        可以用命令替换来执行任何能产生输出的命令,然后在for命令中使用该命令的输出
+            file="states"
+            for state in $(cat $file)
+            do
+                echo "Visit beautiful $state"
+            done
+        先来看一下$file文件中的内容
+            $ cat states        //$是命令提示符
+            Alabama
+            Alaska
+            Arizona
+            Arkansas
+            Colorado
+            Connecticut
+            Delaware
+            Florida
+            Georgia
+        下面是输出
+            Visit beautiful Alabama
+            Visit beautiful Alaska
+            Visit beautiful Arizona
+            Visit beautiful Arkansas
+            Visit beautiful Colorado
+            Visit beautiful Connecticut
+            Visit beautiful Delaware
+            Visit beautiful Florida
+            Visit beautiful Georgia
+        看上去似乎是以行为分隔进行读取,不过要是存在以行有多个空格,那么它还会把一行数据分断为多个值进行输出
+    造成这个问题的原因是特殊的环境变量IFS,默认情况下,bash shell会将下列字符当作字段分隔符:
+         空格
+         制表符
+         换行符
+    如果你想修改IFS的值,使其只能识别换行符,那就必须这么做:
+        IFS=$'\n'
+        
+        警告在处理代码量较大的脚本时,可能在一个地方需要修改IFS的值,然后忽略这次修改,在
+        脚本的其他地方继续沿用IFS的默认值。一个可参考的安全实践是在改变IFS 之前保存原
+        来的IFS值,之后再恢复它。
+        这种技术可以这样实现:
+        IFS.OLD=$IFS
+        IFS=$'\n'
+        <在代码中使用新的IFS值>
+        IFS=$IFS.OLD
+        这就保证了在脚本的后续操作中使用的是IFS的默认值。
+    
+    如果要指定多个IFS字符,只要将它们在赋值行串起来就行:
+        IFS=$'\n':;"
+    这个赋值会将换行符、冒号、分号和双引号作为字段分隔符
+        注意,$'\n'表示换行符,不能分割,他们是一个整体
+
+    最后,可以用for命令来自动遍历目录中的文件.进行此操作时,必须在文件名或路径名中使用通配符.
+    它会强制shell使用文件扩展匹配.文件扩展匹配是生成匹配指定通配符的文件名或路径名的过程,下面是一个例子:
+        for file in /home/rich/test/*
+        do
+        if [ -d "$file" ]
+        then
+            echo "$file is a directory"
+        elif [ -f "$file" ]
+        then
+            echo "$file is a file"
+        fi
+        done
+        注意,if [ -d "$file" ]是为了防止文件或目录名含有空格
+    也可以在for命令中列出多个目录通配符,将目录查找和列表合并进同一个for语句。
+        for file in /home/rich/.b* /home/rich/badtest
+        do
+            if [ -d "$file" ]
+            then
+                echo "$file is a directory"
+            elif [ -f "$file" ]
+            then
+                echo "$file is a file"
+            else
+                echo "$file doesn't exist"
+            fi
+        done
+        没什么特别,它会分别对提供的多个目录进行遍历,然后按顺序合并输出
+
+while 命令
+while命令的格式是:
+    while test command
+    do
+        other commands
+    done
+    while命令中定义的test command和 if-then语句(参见第12章)中的格式一模一样.可以使用任何普通的bash shell命令,或者用test命令进行条件测试,比如测试变量值.
+    可以在test command中使用多个测试命令
+        var1=10
+        while echo $var1
+            [ $var1 -ge 0 ]
+        do
+            echo "This is inside the loop"
+            var1=$[ $var1 - 1 ]
+        done
+    这说明在含有多个命令的while语句中,在每次迭代中所有的测试命令都会被执行.还要注意,测试命令是不在同一行的,每个命令分别写一行
+
+bash也存在控制循环的两个命令
+     break命令
+     continue命令
+    
+    break可以跳出多级循环
+        break n
+    其中n 指定了要跳出的循环层级。默认情况下,n为1 ,表明跳出的是当前的循环
+    
+    continue 命令也没什么特别的,提前结束本轮循环,直接进入下步循环而已
+    和break命令一样,continue命令也允许通过命令行参数指定要继续执行哪一级循环:
+        continue n
+    其中n 定义了要继续的循环层级
+
+最后,在shell脚本中,你可以对循环的输出使用管道或进行重定向.这可以通过在 done命令之后添加一个处理命令来实现
+        for file in /home/rich/*
+        do
+            if [ -d "$file" ]
+            then
+                echo "$file is a directory"
+            elif
+                echo "$file is a file"
+            fi
+        done > output.txt
+    shell会将 for命令的结果重定向到文件output.txt中,而不是显示在屏幕上.这种方法同样适用于将循环的结果管接给另一个命令
+        done > sort
