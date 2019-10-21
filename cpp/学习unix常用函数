@@ -1,0 +1,216 @@
+1.strtok()      #include <string.h>
+    原型
+        char *strtok(char *str, const char *delim);     //线程不安全
+        char *strtok_r(char *str, const char *delim, char **saveptr);       //是strtok的可重入版本
+    描述
+        strtok把字符串打乱成零个或多个非空tokens.第一次调用时,要被解析的字符串传递str,随后解析相同字符串时,str应该被设为NULL
+        delim指定一些字节的集合用来分隔str中的tokens,这些字符的顺序不重要.例如": +-"表示冒号,空格,加号,减号都可以作为分隔符
+        当没有更多的tokens时,函数返回NULL
+        函数会改变str.
+2.strspn()      #include <string.h>
+    原型
+        size_t strspn(const char *s, const char *accept);
+    描述
+        计算字符串s的从开始到某处的长度并返回.从s开始处向后查找,一直找到某个字符不在accept中为止,然后计算从开始到这里的整个长度.
+        
+3.分配动态空间
+    原型  
+        void *malloc(size_t size);
+        void free(void *ptr);
+        void *calloc(size_t nmemb, size_t size);
+        void *realloc(void *ptr, size_t size);
+        void *reallocarray(void *ptr, size_t nmemb, size_t size);
+    描述
+        malloc分配size字节的未初始化的内存块,成功返回内存块开始的指针,否则返回NULL;
+        calloc分配nmemb个元素内存块,且每个元素大小为size字节,因此一共nmemb*size字节大小.此块内存被初始化为0.
+            如果nmemb或者size为0,则返回NULL或者一个可以传递给free()函数的指针.
+        free用于释放malloc,calloc,realloc分配的内存.ptr是指向此块内存的指针,对同一块内存调用两次,行为是未定义的,对NULL调用,什么也不做.
+        realloc改变ptr指向的内存块为size大小.从开始,到旧的size和新的size之间取较小的一个的位置,之间的内容不被改变.
+            如果新size大于旧size,新增加的内存不会被初始化.
+            如果ptr是NULL,则调用相当于malloc(size).
+            如果size等于0,ptr不等于NULL,那么相当于调用free(ptr).
+            ptr必须是调用malloc(),  calloc(),  realloc()返回后的指针
+4.extern char ** environ
+    描述
+        环境列表.是一个指针的数组,每个指针元素都是key=value类型的指针.
+5.getenv
+    原型
+        char *getenv(const char *name);         //stdlib
+    描述
+        获取环境列表中,键name对应的值的字符串,没有则返回NULL.
+    注意
+        多次调用getenv要小心,某些实现为返回的字符串分配的静态缓冲区,每次调用都会重写缓冲区.这种情况下,应当复制到另一个独立缓冲区,或者再次调用getenv.
+6.exit _exit _Exit atexit
+    原型
+        void exit(int status);      //stdlib
+        void _Exit(int status);     
+        int atexit(void (*function)(void));     
+        void _exit(int status);     //unistd
+    描述
+        atexit注册程序在正常终止时调用的函数,要么是调用exit时,要么是从main函数返回.调用顺序与注册顺序相反
+        在任何时候调用exit退出程序.它刷新未刷新的流,然后关闭流.
+        _Exit退出程序,但不调用注册的函数.
+7.getpid getppid
+    原型
+        pid_t getpid(void);         //unistd
+        pid_t getppid(void);        
+    描述
+        返回值都是一个无符号整数,可以转为long,如果进程id很大
+8.getuid getgid
+    原型
+        uid_t getuid(void);         //unistd
+        uid_t geteuid(void);
+        gid_t getgid(void);
+        gid_t getegid(void);
+    描述
+        getuid返回调用进程的真正(real)用户 id
+        geteuid返回调用进程有效(effective)id
+        后两个含义类似
+        这四个函数总会返回成功
+9.fork
+    原型
+        pid_t fork(void);      //unistd
+    描述
+        fork创建一个新的进程,调用进程是新进程的父进程,新进程成为调用进程的子进程.fork复制父进程的内存映像.
+        两个进程在fork函数调用后都各自在自己的内存映像内继续执行(子进程从返回0处继续执行)
+        fork函数对子进程返回0,对父进程返回子进程id
+        创建失败时返回-1,设置errno,并且不会创建子进程
+    总结
+        子进程会继承父进程优先级和调度属性
+        fork的一个特性是所有由父进程打开的描述符都被复制到子进程中。父、子进程每个相同的打开描述符共享一个文件表项
+        不是父进程的每个属性都被继承.
+            子进程cpu使用时间重置为0
+            子进程没有获得父进程持有的锁
+            父进程设置的警报到时的时候,不会通知子进程
+            执行fork时,父进程挂机起的信号,子进程不带有挂起信号
+        
+10.wait
+    原型
+        pid_t wait(int *wstatus);       // sys/wait.h    sys/wait.h
+        pid_t waitpid(pid_t pid, int *wstatus, int options);
+    描述
+        wait等待其子进程状态改变
+        wait唯一出错是调用进程没有子进程,返回-1.wait(wstatus)相当于waitpid(-1,wstatus,NULL)
+        waitpid第一个参数有四种选择:
+            等于-1  等待任意子进程,然后返回
+            大于0     等待子进程.pid所指定的子进程
+            等于0     等待与调用线程相同进程组的任意子进程
+            小于-1    等待任意子进程,子进程的进程组绝对值等于pid
+        第三个参数options,可以使用or(|)操作符与下列常量运算:
+            WNOHANG     如果没有子进程退出,不阻塞,立即返回
+            WUNTRACED       //不太明白
+            WCONTINUED      //linux内核2.6.10新增
+
+信号
+    在头文件<signal.h>中
+        SIGABRT     终止信号,一般调用abort()产生.
+        SIGALRM     闹钟信号.alarm函数设置的时间超过后产生此信号
+        SIGINT      中断信号.一般在用户按某些终端键时会产生
+        SIGSTOP     不可忽略.停止进程信号.系统默认暂停进程
+        SIGKILL     不可忽略.杀死进程.默认终止
+        SIGCHLD     子进程结束或停止信号.系统默认忽略此信号
+        SIGCONT     作业信号,使暂停进程继续.默认继续或者忽略
+    系统在某个信号出现时有三种操作:
+        1.忽略此信号
+        2.捕捉信号
+        3.执行系统默认动作
+    原型
+        typedef void (*sighandler_t)(int);      //<signal.h>
+        sighandler_t signal(int signum, sighandler_t handler);
+        以前的格式:
+        void ( * signal( int signo,void (*func) (int ) ) ) ( int ) ;    //难以理解的原始方式
+    描述
+        signo参数是信号名
+        func参数可以使用两个预定义的默认值:SIG_IGN和SIG_DFL,分别对应忽略信号和执行系统默认动作.以及可以自定义的函数指针
+        指定自己的函数时,我们称作捕捉信号,称函数为信号处理程序
+        signal函数返回值是指向以前信号处理程序的指针
+    当执行一个程序时,所有信号的状态都是系统默认或忽略.。通常所有信号都被设置为系统默认动作,除非调用ex e c的进程忽略该信号。
+        比较特殊的是,exec函数将原先设置为要捕捉的信号都更改为默认动作,其他信号的状态则不变(一个进程原先要捕捉的信号,当其执行一个新程序后,
+        就自然地不能再捕捉了,因为信号捕捉函数的地址很可能在所执行的新程序文件中已无意义)
+        
+    当一个进程调用 fork时,其子进程继承父进程的信号处理方式。因为子进程在开始时复制了父进程存储图像,所以信号捕捉函数的地址在子进程中是有意义的。
+    
+    在早期的UNIX版本中(例如V7),信号是不可靠的。不可靠在这里指的是,信号可能会被丢失——一个信号发生了,但进程却决不会知道这一点
+    
+        早期版本中的一个问题是在进程每次处理信号时,随即将信号动作复置为默认值.在信号发生之后到信号处理程序中调用 signal函数之间有一个时间窗口。
+            在此段时间中,可能发生另一次中断信号。第二个信号会造成执行默认动作,而对中断信号则是终止该进程。这种类型的程序段在大多数情况下会正常工作,使得我们认为它们正确,而实际上却并不是如此
+        
+        这些早期版本的另一个问题是:在进程不希望某种信号发生时,它不能关闭该信号
+        
+        还有时希望通知系统"阻止下列信号发生,如果它们确实产生了,请记住它们".有时候信号会丢失,因为不是原子操作,在测试某个变量后,突然信号处理程序改变了此变量,但当回去继续执行时这个改变已经丢失了.
+    
+    进程捕捉到信号并继续执行时,它首先执行该信号处理程序中的指令.如果从信号处理程序返回(例如没有调用exit或longjmp),则继续执行在捕捉到信号时进程正在执行的正常指令序列(这类似于硬件中断发生时所做的)
+    
+    作为一个通用的规则,当在信号处理程序中调用表10-3中列出的函数时,应当在其前保存,在其后恢复errno(要了解经常被捕捉到的信号是SIGCHLD,其信号处理程序通常要调用
+        一种wait函数,而各种wait函数都能改变errno)
+dup函数
+    下面两个函数都可用来复制一个现存的文件描述符
+    原型
+        int dup(int oldfd);          //<unistd.h>
+        int dup2(int oldfd, int newfd);
+    描述
+        由dup返回的新文件描述符一定是当前可用文件描述符中的最小数值
+        用dup2则可以用newfd参数指定新描述符的数值。dup2是一个原子操作.如果newfd已经打开,则先将其关闭。如若oldfd等于newfd,则dup2返回newfd,而不关闭它
+        这些两个函数返回的新文件描述符与参数oldfd共享同一个文件表项.们共享同一文件状态标志(读、写、添写等 )以及同一当前文件位移量
+            文件表项
+                文件状态标志      //一般是open指定的.例如,打开方式,阻塞等
+                当前文件位移量     //调用write或read后,或者lseek等
+                v节点指针           //指向硬盘中的节点?
+        每个文件描述符都有它自己的一套文件描述符标志,因此不会共享,即新描述符的执行时关闭(close-on-exec)文件描述符标志总是由dup函数清除
+fcntl函数
+    fcntl函数可以改变已经打开文件的性质
+    原型
+        int fcntl(int fd, int cmd, ... /* arg */ );         //<fcntl.h> <unistd.h>
+    描述
+        第三个参数总是一个整数或是指向一个结构的指针,与上面所示函数原型中的注释部分相对应
+            fcntl函数有五种功能:
+                • 复制一个现存的描述符(cmd=F_DUPFD)。
+                • 获得/设置文件描述符标记(c md =F_GETF D或F_SETF D)。
+                • 获得/设置文件状态标志(cmd =F_GETFL或F_ SETFL)。
+                • 获得/设置异步I/O有权(cm d=F_ GETOW N或F_SETOWN)。
+                • 获得/设置记录锁(cmd=F_GETLK,F _SETLK或F_ SETLKW)。
+            F_DUPFD 复制文件描述符fd,新文件描述符作为函数值返回。它是尚未打开的各
+                描述符中大于或等于第三个参数值(取为整型值)中各值的最小值。新描述符与fd共享同一文件表项。
+                但是,新描述符有它自己的一套文件描述符标志,其FD_CLOEXEC文件描述符标志则被清除(这表示该描述符在exec时仍保持开放,我们将在第 8章对此进行讨论)。
+            F_GETFD 对应于fd的文件描述符标志作为函数值返回。当前只定义了一个文件描述符标志FD_CLOEXEC
+            F_SETFD 对于fd设置文件描述符标志。新标志值按第三个参数(取为整型值)设置。
+                应当了解很多现存的涉及文件描述符标志的程序并不使用常数FD_CLOEXEC,而是将此标志设置为0 (系统默认,在exec时不关闭)或1(在exec时关闭)。
+            F_GETFL 对应于fd的文件状态标志作为函数值返回。在说明open函数时,已说明了文件状态标志
+                文件状态标志                          说明
+                O_RDONLY                       只读打开
+                O_WRONLY                       只写打开
+                O_RDWR                         读/写打开
+                O_APPEND                       写时都添加至文件尾
+                O_NONBLOCK                     非阻塞方式
+                O_SYNC                         等待写完成
+                O_ASYNC                        异步I/ O(仅4 .3+ BSD)
+                不幸的是,三个存取方式标志(O_RDONLY,O_WRONLY,以及O_RDWR)并不各占1位。(正如前述,这三种标志的值各是 0、1和2,由于历史原因。
+                    这三种值互斥 — 一个文件只能有这三种值之一。)因此首先必须用屏蔽字O_ACCMODE取得存取方式位,然后将结果与这三种值相比较。
+                        例如:
+                            int val=fcntl(fd,F_GETFL,0);
+                            int relmode=val&O_ACCMODE;
+                            随后使用val进行比较O_RDONLY,O_WRONLY,以及O_RDWR
+            F_SETFL 将文件状态标志设置为第三个参数的值 (取为整型值)。可以更改的几个标志是:O_APPEND,O_NONBLOCK,O_SYNC和O_ASYNC
+            F_GETOWN 取当前接收SIGIO和SIGURG信号的进程ID或进程组ID
+            F_SETOWN 设置接收SIGIO和SIGURG信号的进程ID或进程组ID。正的arg指定一个进程ID,负的arg表示等于arg绝对值的一个进程组ID
+        fcntl的返回值与命令有关。如果出错,所有命令都返回-1,如果成功则返回某个其他值。下列三个命令有特定返回值:
+                F_DUPFD,F_GETFD,F_GETFL以及F_GETOWN。
+            第一个返回新的文件描述符,第二个返回相应标志,最后一个返回一个正的进程ID或负的进程组ID。
+                注意:前两个作为整体,所以说成3个
+        一般使用方式需要注意,不能直接调用,例如:
+                fcntl(fd,F_SETFL,flag);     //设置位
+            相反,应该
+                int val=fcntl(fd,F_GETFL,0);
+                val=val | flag;     //或者 val|=flag;
+                fcntl(fd,F_SETFL,flag);
+            清空位改为val=val & (~flag);或者 val &=~flag.
+
+
+
+
+
+
+
+
+
+        

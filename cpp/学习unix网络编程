@@ -1,0 +1,162 @@
+SYN常用选项:
+    MSS:每个分节最大大小.告诉对端自己重组缓冲区大小的实际值,试图避免分片
+    窗口规模:最大65536.目前可以达到2的30次方字节
+    时间戳:编程人员一般不用考虑
+TCP建立连接需要3个分节,终止需要四个
+
+TCP连接整个声明周期存在11种状态:
+    TIME_WAIT:2MSL时间
+        MSL:最大分节生命周期
+        TIME_WAIT存在有两个理由
+            1.可靠地实现TCP全双工连接的终止.防止最终的ACK丢失,它可以重传
+            2.允许老的重复分节在网络中消逝.如果两台机器第一次连接后还未完全终止,也就是仍处在最后的TIME_WAIT期间时,网络中肯定还存在
+                某些不需要的重复分节仍在传递.假设在此期间这两台机器采用同样的ip与端口再次连接,称作前一个连接的化身,则老的分节会被当做新连接的分节,产生错误.因此
+                TCP协议在此阶段不会分配,新的,但ip和端口与之前相同(化身)的连接
+当某个应用进程调用write时,内核从该应用进程缓冲区中复制所有数据到所写套接字的发送缓冲区.如果该套接字发送缓冲区容不下所有数据(要么是应用进程缓冲区大于套接字发送缓冲区,
+    或者套接字发送缓冲区已有其他数据),该进程会睡眠,这里假设套接字是阻塞的.write函数系统调用,写一个TCP套接字返回成功,仅仅代表可以重新使用原来的应用进程缓冲区,并不代表对端收到数据.
+    对端必须确认收到的数据,也就是回送ACK确认.伴随来自对端的ACK不断到达,本端TCP才能从套接字发送缓冲区丢弃已经确认的数据,TCP必须为已发送的数据保留一个副本,
+    直到它被确认为止.
+    本端TCP以MSS大小或更小的块传递数据给IP.MSS是对端通告的值,或者536(对端没有发送MSS)
+
+=====================来自豆瓣的提示============
+虽然书比较厚，但对于IT码农，主要是tcp/udp编程，所以只要重点关注其中部分章节即可，主要有：第2、3、4、5、6、7、8、11、14、15、16、26、30.
+
+因为本人在看这本书之前已经看过不少网络编程的代码，也自己实验过一些程序，所以一两周利用上下班坐车的时间就看完了。重点是了解原理，比如tcp的握手原理、非阻塞等。其次就是跟一些选项啊、函数啊什么的，这些大概知道有哪些能干哪些事情就好了，等用到、看到的时候能够想到google 什么关键字即可。
+
+买一本存着，偶尔写代码写到某个地方，不确定概念的时候可以翻翻。
+===================end=======================
+
+套接字基本编程简介
+    基本上每个协议的套接字地址结构都以sockaddr_开头,并以对应协议的唯一后缀结尾.
+    ip4套接字地址结构也称为"网际套接字地址结构",它以sockaddr_in命名.
+        typedef uint32_t in_addr_t;
+        typedef uint16_t in_port_t;
+        struct in_addr
+        {
+            in_addr_t s_addr;
+        };
+    
+    我们把某个给定系统所用的字节序称为'主机字节序'.将低序字节存储在起始地址称作'小端字节序',另一种将高序字节存储在起始地址称为'大端字节序'.
+    
+    网络协议也必须指定一个'网络字节序'.编程人员需要清楚不同字节序之间的差异,例如,16位的端口号和32位的ip4地址.发送协议栈和接收协议栈必须就这些多字节字段
+        各个字节的传送顺序达成一致.'网际协议'使用大端字节序传送这些多字节整数.
+        主机字节序与网络字节序之间有4个转换函数:
+            原型
+                uint32_t htonl(uint32_t hostlong);      //<arpa/inet.h>
+                uint16_t htons(uint16_t hostshort);
+                uint32_t ntohl(uint32_t netlong);
+                uint16_t ntohs(uint16_t netshort);
+            描述
+                上面两个均返回网络字节序的值.下面两个返回主机字节序的值
+    字节操纵函数bzero
+        原型
+            void bzero(void *s, size_t n);      //<string.h>
+            void bcopy(const void *src, void *dest, size_t n);
+            int bcmp(const void *s1, const void *s2, size_t n);
+        描述
+            bzero() 函数 把 字符串 s 的 前 n 个 字节 置成 零
+            bcopy将指定n个字节,从src复制到dest
+            bcmp比较任意两个字节序列s1和s2的n个字节长度,相同或者n等于0则返回0,否则其他情况返回非0
+        其他
+            unix网络编程解释它的参数较少,所以使用它,我的机器man文档上推荐不要使用这几个函数:
+            4.3BSD.  建议 不要 用 这个 函数 -- 请 在 新的 程序中 用 memset 函数.
+        ANSIC函数
+            原型
+                void *memset(void *s, int c, size_t n);
+                void *memcpy(void *dest, const void *src, size_t n);
+                int memcmp(const void *s1, const void *s2, size_t n);
+            描述
+                memset把s字节序列的前n个字节都填充为c
+                memcpy和bcopy前两个参数相反,含义一样的,复制src中前n个字节到dest中.
+                    但当src字节串与dest字节串重叠时,bcopy可以正确处理,而memcpy结果未定义,这时应该使用memmove
+                memcmp比较s1和s2前n个字节内存区域,这些字节被解释成无符号char.
+    地址转换函数.它们在ASCII字符串与网络字节序的二进制值之间转换网际地址
+        inet_aton,inet_addr和inet_ntoa在点分十进制数串(192.168.0.0)与它长度为32位的网络字节序二进制值之间转换ip4地址.
+        两个较新的函数inet_pton和inet_ntop同时适用ip4和ip6.
+        inet_aton,inet_addr和inet_ntoa
+            原型
+                int inet_aton(const char *cp, struct in_addr *inp);         //<arpa/inet.h>可能也需要<netinet/in.h> <sys/socket.h>
+                in_addr_t inet_addr(const char *cp);
+                char *inet_ntoa(struct in_addr in);
+            描述
+                inet_aton将字符串cp转为32位网络字节序二进制值,存储在inp结构体中.如果合法,返回非0,但不合法返回0.即使inp为NULL,但cp合法,也会执行有效性检查
+                in_addr返回32位的网络字节序二进制值,由cp字符串指定.当出错时函数返回INADDR_NONE(通常是-1),但-1是合法的地址(255.255.255.255).此函数已废弃,使用inet_aton等替代
+                inet_ntoa转换in结构体中的网络字节序二进制ip4地址成为相应的点分十进制字符串数串,由该函数返回的字符串驻留在静态内存中,这意味着该函数不可重入的.注意的是参数是结构值而非指向结构的指针.
+        inet_pton和inet_ntop.p和n分别代表表达(presentation)和数值(numeric).地址的表达格式通常是ASCII字符串,数值格式是存放到套接字地址结构中的二进制值
+            原型
+                int inet_pton(int af, const char *src, void *dst);          //<arpa/inet.h>
+                const char *inet_ntop(int af, const void *src,char *dst, socklen_t size);
+                
+            描述
+                这两个af既可以是AF_INET也可以是AF_INET6.如果af不合法,则返回错误,并且设置errno为EAFNOSUPPORT
+                第一个函数尝试转换src字符串,通过dst指针指向的内存(提供一个真正的结构地址,而非仅仅结构指针)存放二进制结果.对指定的af而言,成功返回1,不成功返回0.
+                第二个函数执行相反的转换,从src转换到dst,size指定字符串长度,避免内存溢出.为了指定这个大小,<netinet/in.h>定义了两个常量
+                    #define INET_ADDRSTRLEN 16      //ip4点分十进制
+                    #define INET6_ADDRSTRLEN 46     //ip6十六进制字符串
+                size是为dst指定的长度,如果size太小,返回NULL指针,并且设置errno为ENOSPC.并且dst不能为NULL
+
+基本TCP套接字编程
+    socket函数
+        为了执行网络io,一个进程要做的第一件事就是调用socket函数,指定期望的通信协议类型.
+            原型
+                int socket(int domain, int type, int protocol);         //<sys/socket.h>
+            描述
+                domain是协议族或者协议域
+                    AF_UNIX, AF_LOCAL   Local communication              
+                    AF_INET             IPv4 Internet protocols          
+                    AF_INET6            IPv6 Internet protocols
+                    注意:书中还有两个AF_ROUTE和AF_KEY,在man手册里没有,并且新增了很多其他的,这里就先认为只有这三个常用的,公共的
+                type指明套接字类型
+                    SOCK_STREAM     Provides sequenced, reliable, two-way, connection-based byte  streams.   An
+                                    out-of-band data transmission mechanism may be supported.
+                    SOCK_DGRAM      Supports  datagrams (connectionless, unreliable messages of a fixed maximum
+                                    length).
+                    SOCK_SEQPACKET  Provides a sequenced, reliable, two-way connection-based data  transmission
+                                    path  for datagrams of fixed maximum length; a consumer is required to read
+                                    an entire packet with each input system call.
+                    SOCK_RAW        Provides raw network protocol access
+                    注意:man手册还有不止共有的这些.
+                protocol指定某个协议类型值或者为0.如果为0,则协议由domain与type组合的默认值决定,也就是说可以使用0而不管其他.
+                    但并不所有组合都会产生协议类型,这种情况下需要指定.
+                socket函数执行成功会返回一个小的非负整数,它与文件描述符类似,我们称它为'套接字描述符'
+        AF_xxx与PF_XXX
+    connect函数
+        tcp客户端使用connect函数来建立与tcp服务的连接
+            原型
+                int connect(int sockfd, const struct sockaddr *addr,socklen_t addrlen);         //<sys/socket.h>
+            描述
+                sockfd是socket函数返回的套接字描述符,第二第三个函数分别是一个指向套接字地址结构的指针和该结构的大小.套接字地址结构必须含有服务器地址和端口号
+                如果是TCP套接字,调用connect函数将激发TCP三路握手过程,仅在连接成功返回0或出错才返回-1,有几种错误情况:
+                    注意:此处采用man手册中的描述,书上直接是返回错误码
+                    1.TCP客户端没有收到SYN的分节响应,会多次尝试,规定时间内未收到响应,则设置errno为ETIMEDOUT
+                    2.对客户端返回RST,客户端设置errno为ECONNREFUSED.一般是TCP服务器没有监听对应的端口
+                    3.如果客户端发送的SYN在某个路由上引发目的地不可到达,客户端会尝试多次继续发送SYN,若规定时间内仍未收到响应,则设置errno为ENETUNREACH
+    bind函数
+        bind函数把本地协议地址赋予一个套接字,对于网际网协议,协议地址是32位的ip4地址或128位的ip6地址与16位的tcp或udp端口号组合
+            原型
+                int bind(int sockfd, struct sockaddr *my_addr, socklen_t addrlen);      //<sys/socket.h>
+            描述
+                第二个参数是一个指向特定协议的地址结构的指针,第三个是该地址结构的长度
+    listen函数
+        listen函数仅由服务器调用 
+            原型
+                int listen(int s, int backlog);         //<sys/socket.h>
+            描述
+                当socket函数创建一个套接字时,它被假设为一个主动套接字,也就是说,它是一个将调用connect函数发起连接的客户端套接字.listen函数把一个未连接的套接字
+                    转换成一个被动套接字,指示内核应该接受指向该套接字的连接请求.根据TCP状态转换图,调用listen导致套接字从CLOSED状态转换为LISTEN状态
+                第二个函数规定内核应该为相应套接字排队的最大连接个数
+                此函数应该在socket函数和bind函数调用后,并且在accept函数之前调用
+                内核为任何给定监听套接字维护两个队列
+                    1.未完成连接队列.这些套接字处于SYN_RCVD状态.服务器刚收到SYN分节,并且等待完成TCP三路握手的时候
+                    2.已完成连接队列.这些套接字处于ESTABLISHED状态.每个已完成TCP三路握手的客户端对应一项
+                注意:man手册中,在TCP套接字中backlog的含义在Linux2.2中已经改变.它指定了已经完成连接正等待应用程序接收的套接字队列的长度,而不是未完成连接的数目
+    accept函数
+        由TCP服务器调用,从已完成连接队列队头返回已完成连接,如果队列为空NULL,那么进程会睡眠(假定套接字为默认的阻塞方式).
+            原型
+                int accept(int s, struct sockaddr *addr, socklen_t *addrlen);       //<sys/socket.h>
+            描述
+                第一个参数为监听套接字描述符,由socket创建然后用作bind和listen的第一个参数的描述符.称它的返回值为已连接套接字描述符.
+                    区分这两个套接字很重要,一个服务器通常只创建一个监听套接字,它在该服务器的生命周期内一直存在.内核为每个由服务器进程接受的客户连接
+                    创建一个已连接套接字,当服务器完成对某个给定客户的服务时,相应的已连接套接字就会被关闭
+                addr中保存客户进程协议地址,addrlen是协议实际大小,返回值要么是一个套接字描述符,要么出错返回-1.addr和addrlen可以传NULL
+                

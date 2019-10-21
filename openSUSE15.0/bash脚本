@@ -9,11 +9,91 @@ $[number]
     返回命令行参数个数，不包括脚本名
 ${!#}
     实际上应该是${$#},但只能用!替换得到，即返回最后一个参数
-$*和$@
-   $* 变量会将命令行上提供的所有参数当作一个单词保存
-   $*变量会将这些参数视为一个整体,而不是多个个体。
-    $@变量会将命令行上提供的所有参数当作同一字符串中的多个独立的单词。
 
+$*和$@
+    $* 变量会将命令行上提供的所有参数当作一个单词保存
+    $*变量会将这些参数视为一个整体,而不是多个个体。
+    $@变量会将命令行上提供的所有参数当作同一字符串中的多个独立的单词。
+   也就是说,$*在for循环中作为一整个不可分割的参数,$@被看待成多个参数
+
+shift命令会根据它们的相对位置来移动命令行参数.默认情况下它会将每个参数变量向左移动一个位置,
+所以,变量$3的值会移到$2中,变量$2 的值会移到$1中,而变量$1的值则会被删除(注意,变量$0的值,也就是程序名,不会改变)
+    这是遍历命令行参数的另一个好方法,如果某个参数被移出,它的值就被丢弃了,无法再恢复
+    你也可以一次性移动多个位置,只需要给shift命令提供一个参数
+        shift 2
+read命令从标准输入或者文件描述符读取一整行输入,然后根据分隔符(默认是空格)分别赋值给多个变量中,
+并且剩下未分配的数据都会放到最后一个变量中,如果没有提供任何变量,它将默认保存到REPLY环境变量中
+        read name   //读取输入到name中
+    也可以提供一个提示信息,使用-p
+        read -p "Please enter your age: " age
+    使用-t指定超时时间,当计时器过期后,read命令会返回一个非零退出状态码
+         read -t 5 -p "Please enter your name: " name
+    使用-n指定读取一定字符数结束
+        read -n1 -p "Do you want to continue [Y/N]? " answer
+    使用-s选项,则不会回显输入
+        read -s -p "Enter your password: " pass
+    将文件中的数据传给read命令。最常见的方法是对文件使用cat命令,将结果通过管道直接传给含有read命令的while命令
+        cat test | while read line
+            do
+                echo "Line $count: $line"
+                count=$[ $count + 1]
+            done
+
+STDIN(0)
+许多bash命令能接受STDIN的输入,尤其是没有在命令行上指定文件的话.
+        $ cat
+        this is a test
+        this is a test
+        this is a second test.
+        this is a second test.
+    当在命令行上只输入cat命令时,它会从STDIN 接受输入
+    你也可以通过STDIN 重定向符号强制cat命令接受来自另一个非STDIN文件的输入
+        $ cat <testfile
+        This is the first line.
+        This is the second line.
+        This isthe third line.
+        $
+
+STDOUT(1)
+默认情况下,大多数bash命令会将输出导向STDOUT文件描述符.你可以用输出重定向来改变
+        $ ls -l > test2
+        $ cat test2
+    你也可以将数据追加到某个文件。这可以用>>符号来完成。
+        $ who >> test2
+        $ cat test2
+
+STDERR(2)
+默认情况下, STDERR文件描述符会和STDOUT文件描述符指向同样的地方
+    将文件描述符值放在重定向符号前,表示把ls的,标准错误输出文件描述符2,用>,重定向到test4:
+        ls -al badfile 2> test4
+    多个重定向分别重定向到不同输出文件:
+        $ ls -al test test2 test3 badtest 2> test6 1> test7
+    如果愿意,也可以将 STDERR和STDOUT的输出重定向到同一个输出文件,为此bash shell提供了特殊的重定向符号&>:
+         ls -al test test2 test3 badtest &> test7
+与上述把STDERR文件描述符重定向到其他文件相反,也可以使用输出重定向符来将输出信息重定向到STDERR文件描述符:
+        echo "This is an error message" >&2
+    在重定向到文件描述符时,你必须在文件描述符数字之前加一个&
+
+永久重定向
+你可以用exec命令告诉shell在脚本执行期间重定向某个特定文件描述符:
+        $ cat test10
+        #!/bin/bash
+        # redirecting all output to a file
+        exec 1>testout
+        echo "This is a test of redirecting all output"
+        echo "from a script to another file."
+        echo "without having to redirect every individual line"
+    也可以在脚本执行过程中重定向STDOUT:
+        $ cat test11
+        #!/bin/bash
+        # redirecting output to different locations
+        exec 2>testerror        //先把错误输出描述符2重定向到testerror文件中
+        echo "This is the start of the script"      //然后正常输出两行到标准输出,也就是到终端
+        echo "now redirecting all output to another location"       //也输出到终端
+        exec 1>testout      //又把标准输出描述符1重定向到testout
+        echo "This output should go to the testout file"        //输出会到testout
+        echo "but this should go to the testerror file" >&2     //把标准输出重定向到标准错误输出,由于标准错误输出已经被重定向到文件testerror,所以最后一句将会输出到此文件中
+   
 命令替换
     `command`或$(command) 是波浪键不是单引号
     表示先执行命令，并且随后可提取命令输出赋值给变量
