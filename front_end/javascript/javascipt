@@ -1,7 +1,10 @@
 
 this关键字
     https://dmitripavlutin.com/gentle-explanation-of-this-in-javascript/
-
+    
+    1.箭头函数没有this
+    2.对象方法this指向对象
+    3.闭包默认this指向全局对象,例如window
  
 函数有两个内置对象，this和arguments
     this代表当前函数的执行环境，默认指向全局window。
@@ -19,7 +22,8 @@ apply()和 call()是函数的方法。
     通过构造函数原型来访问，当把构造函数原型指向新的对象实例时，已经创建的对象仍然指向原来的原型对象。
     也就是说，构造函数原型会指向一个原型对象实例，通过这个构造函数创建的对象会隐含指向同一个原型实例，
     当修改构造函数原型指向其他实例时，已经创建的对象隐含指向的原型是没有改变的。
- Object.getPrototypeOf()可以返回对象内部的原型。
+    
+Object.getPrototypeOf()可以返回对象内部的原型。
 
  
  全局->全局执行环境->变量对象
@@ -30,6 +34,41 @@ apply()和 call()是函数的方法。
 当创建一个函数时,它会把当前所在执行环境的作用域链引用保存到内部属性[[scope]].
 当函数执行时,它会创建自己的作用域链,首先把[[scope]]指向的作用域链而非引用复制进去,然后创建当前活动对象放到自己作用域的最前端,完成作用域链的创建.
         
+寄生式原型继承
+    function initial(subtype,supertype){
+        var prototypeobject=Object.create(supertype.prototype);
+        //for super method.connect to baseclass,decide baseclass type
+        subtype.prototype=prototypeobject;
+        //for itself method.register prototype type
+        prototypeobject.constructor=subtype;
+    }
+
+    //initial(Animal,Animal);
+    function Animal(){
+        this.message="这是动物的基类";
+    }
+    Animal.prototype.basename=function(){
+        console.log(this.message);
+    }
+    //函数声明提升,所以放在前面没问题
+    initial(Human,Animal);
+    function Human(name,age){
+        Animal.call(this);
+        this.name=name;
+        this.age=age;
+    }
+    Human.prototype.fuck=()=>{
+        console.log("fuck you");
+    }
+
+    initial(Women,Human);
+    function Women(dress,name="一般",age=18){
+        Human.call(this,name,age);
+        this.dress=dress;
+    }
+    Women.prototype.looking=function(){
+        console.log("穿了:"+this.dress);
+    }
 
         
 最新的 ECMAScript 标准定义了 7 种数据类型:
