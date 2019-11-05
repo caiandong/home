@@ -1,1 +1,25 @@
- 
+ 在qml中导入JavaScript资源
+    1.从QML文档中导入JavaScript资源
+            import "ResourceURL" as Qualifier
+        例如
+            import "jsfile.js" as Logic
+        之后所有标识符,例如函数或变量都可以通过前缀Qualifier来使用,例如
+            Qualifier.functionName(params)
+    2.在JavaScript内导入资源
+        有三点约束,这里先不关注.
+        从一个JavaScript资源中导入其他JavaScript资源
+            .import "filename.js" as Qualifier
+        下面是ecma标准模块导入语法,我用不上来,不知道该怎么用,代码不能正确导入
+            import * as MathFunctions from "factorial.mjs";
+            
+            约束:
+                1.如果某个JavaScript资源存在导入(import),那么当它被QML文档导入时,它将不会继承已存在与QML文档中的导入.
+                2.如果JavaScript资源不存导入,那么和上述,是可以继承在QML中已有的导入.
+                3.共享脚本(.pragma开头的导入),无论如何都不会继承导入它的QML文档中的导入.
+                第一种情况主要是防止两者中的导入会同时导入同一个资源,而产生问题,无法决定使用哪个资源.
+    3.在JavaScript资源中导入QML模块
+            .import TypeNamespace MajorVersion.MinorVersion as Qualifier
+        例如
+             .import Qt.test 1.0 as JsQtTest
+             通常这种情况可以访问QML模块中的注册的单例对象
+    注意:

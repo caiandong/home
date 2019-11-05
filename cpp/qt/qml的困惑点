@@ -1,0 +1,26 @@
+组件的创建上下文(Creation Context)是:在qml文档内,也就是对象声明中,使用Component类型创建组件对象,组件对象所在的上下文.
+> 原文:The creation context of a Component corresponds to the context where the Component was declared
+    例如:
+      Item {
+            property string mytext: "haha"
+            Component {
+                id: comp1
+                Rectangle { color: internalSettings.color; width: 400; height: 50 }
+            }
+      }
+    如果Item是根元素,当comp组件实例被ListView和Loader创建时,当前的上下文作为父上下文,因此,可以访问到mytext.但如果自己上下文内有mytext,则优先访问.
+    
+组件作用域位于一个QML声明文档中.文档中所有id和根对象属性共同组成组件作用域,不论是文档中组件的孩子或孙子,曾孙子组件.
+
+组件实例层次结构
+    当在某个组件中使用了某个QML文档类型的对象,在当前组件中的属性可以被那个类型访问到.于是可以在某个QML文档声明中使用未来的其他组件作用域中的属性,当此组件在
+    那里被使用时,它就可以解析到对应的属性.当然,自己的组件作用域内属性优先.于是形成组件实例层次结构.
+
+注意:上下文和上下文对象是不同的东西,具体参见QQmlContext. QQmlContext是上下文.可以使用它的setContextObject()函数在其中放置一个对象,这个对象被称为上下文对象.
+    上下文对象是qml可识别的对象,或者注册进去的对象.上下文中的属性可以被组件访问到,当然,通过成员函数setContextProperty()放置的上下文中的属性先被访问.
+
+QML中,作用域和上下文感觉指的是同一个东西.
+
+    QML类型Component会造成很多困惑.
+        特别是在ListView的委托属性和Loader中使用
+            Loader会把自身设置到它所加载组件的上下文中,作为上下文对象,所以它的属性可被组件访问到.

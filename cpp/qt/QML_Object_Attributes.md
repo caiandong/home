@@ -121,7 +121,7 @@ Rectangle {
   <propertyName> : <value>
 ```
 
-初始化赋值可以与在对象声明中的属性定义结合起来，如果想要这样做的话。在那种情况下，属性定义的语法变成:
+如果你想的话,初始化赋值可以与在对象声明中的属性定义结合起来。在那种情况下，属性定义的语法变成:
 
 ```qml
   [default] property <propertyType> <propertyName> : <value>
@@ -802,7 +802,7 @@ QML类型实现可以选择在c++中使用特殊的属性和信号创建附带�
 
 如上所示,枚举类型(TextType)和它的值(Normal)必须以大写字母开头.
 
-值可以通过 <Type>.<EnumerationType>.<Value> 指向,或者<Type>.<Value>.
+值可以通过 \<Type>.\<EnumerationType>.\<Value> 指向,或者\<Type>.\<Value>.
 
 ```QML
   // MyText.qml
