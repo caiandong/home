@@ -1,3 +1,11 @@
+gdb
+    https://www.cnblogs.com/azraelly/archive/2012/12/22/2829256.html
+gcc
+    https://www.cnblogs.com/azraelly/archive/2012/07/07/2580839.html
+makefile
+    https://www.cnblogs.com/azraelly/archive/2012/12/23/2830096.html
+
+==========================================================
 编译c++源文件需要g++命令,而非gcc
 
 -lxxx
@@ -22,8 +30,12 @@
     将产生对象文件bb.o
         g++ a.cpp -o ccc
     将产生可执行文件ccc
+-g
+    在程序中增加调试信息.
+    
 -v
     打印编译阶段执行的命令
+    
 -std=
     指定语言标准,当前只支持编译c或c++
     例如,-std=c++11 -std=gnu11

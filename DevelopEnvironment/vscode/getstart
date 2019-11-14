@@ -4,3 +4,5 @@
     Ctrl+Shift+P打开全局命令行，搜索"display"
 主题
     Ctrl+K Ctrl+T 打开主题选择
+变量说明
+    https://code.visualstudio.com/docs/editor/variables-reference

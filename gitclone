@@ -1,9 +1,0 @@
-#hosts文件添加以下
-151.101.76.249 global-ssl.fastly.net
-#这个也许不需要
-192.30.255.113 github.com
-
-#把下面两行加到host文件末尾
-
-151.101.72.249 global.ssl.fastly.net
-192.30.253.112 github.com
