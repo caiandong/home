@@ -1,0 +1,8 @@
+1. 于openSUSE-TW上编译deepin-music.我一开始是从obs上deepinfactory中下载的源码包,但缺少一个.pro文件,所以要直接去github上拉取:
+        https://github.com/linuxdeepin/deepin-music.git
+2.编译过程缺少dtkcore模块,位于deepin官网wiki上:https://wiki.deepin.org/wiki/Dtk,下面是github地址
+        https://github.com/linuxdeepin/deepin-tool-kit
+    由于模块被分成三个子模块,dtkwidget,dtkcore和dtkwm,需要各自编译.依次编译dtkcore,dtkwidget(此项目只需要这两个),根据readme部分编译安装.
+    dtkwidget依赖dtkcore,dtkcore的安装成功了.但deepin-music依赖dtkwidget,dtkwidget安装后,依赖仍缺少它,不知道咋回事.
+    
+===fuck,我忽然从软件仓库中搜索到dtk=====

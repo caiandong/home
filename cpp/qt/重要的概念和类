@@ -1,0 +1,84 @@
+模型和视图
+        ListView - 把元素安排在水平或垂直的列表中
+        GridView - 在可用的空间内,把元素安排在栅格中
+        PathView - 把元素安排在某个指定路径
+    它们有重要的model和delegate属性.
+    1.delegate是一个Component类型的对象,或者是匿名的某个对象.(Component对象是用来生成对应的可使用的对象)
+        在delegate对象中可访问到model中的数据项,除了对应的角色属性,还可以访问以下数据,拿ListView举例.
+        1.index.表示在ListView中model属性中对应的下标索引.如果是-1,说明此项已被移除
+        2.ListView.view.附带属性,表示当前的视图对象,可以访问其所有属性.包括model.
+            还有ListView.isCurrentItem附带属性等等,可去对应文档查找
+        3.model.这个model不是上面视图中的model属性,而是代表每一个委托被分配得到的单个项数据.是用来防止角色名字与已有的属性名有歧义
+        4.modelData.如果得到的数据项没有角色或者只有一个角色,可以通过此属性访问
+        
+===============下面这些基本类型由qml模块导出,并不是原生的qml语言支持的基本类型========================
+    date基本类型的小坑.
+        当赋值给date类型时,字符串形式必须遵循以下,官方文档中的格式,错一点都不行,翻译如下
+        为了创建一个date类型,指定"YYYY-MM-DDThh:mm:ss.zzzZ"格式的字符串日期.
+            T是固定字符,
+            YYYY是完整的年数字，
+            MM和DD是月和日数字，
+            hh、MM和ss是小时、分钟和秒,
+            .zzz是毫秒,Z是时区偏移量,
+                T和之后跟随的时间是可选的
+                    如果省略T和之后的这些日期，则该日期将作为UTC日期的开始处理，该日期将对应落在某些时区的其他日期上。
+                包含T时，可以省略：ss.zzz或只省略.zzz部分.
+                无论前面是否省略,都可以省略区域偏移,在这种情况下使用本地时间。
+        后来踩坑过程中使用了YYYY/MM/DDThh:mm:ss.zzzZ形式也可以正确初始化,但官方没提到,因此不要这样做.
+        即:2000/01/01 0:0
+        正确的做法,例如
+            2020-12-31T23:59:00.556
+            2017-07-24T15:46:29
+            2000-01-01 0:0      //官方这样写的
+            2020-12-31 23:59
+    point类型
+        初始化方式:"0,20"或者Qt.point(0, 20)
+    rect类型
+        初始化方式:"50,50,100x100"或者Qt.rect(50, 50, 100, 100)
+    size类型
+        初始化方式:"150x50"或者Qt.size(150, 50)
+        
+=============下面是QML模块对象类型========
+Date 
+    扩展的js Date,提供了格式化日期字符串的函数,这些函数属于Date对象的属性,因此需要
+            string fromLocaleDateString(locale, dateString, format)
+            string fromLocaleString(locale, dateTimeString, format)
+            string fromLocaleTimeString(locale, timeString, format)
+            string timeZoneUpdated()
+        以上四个可以算作是在JavaScript中Date对象本身的属性,属性是函数类型.例如:Date.fromLocaleDateString(dateString)
+            string toLocaleDateString(locale, format)
+            string toLocaleString(locale, format)
+            string toLocaleTimeString(locale, format) 
+        这三个作为Date构造函数创建的对象的方法来调用.例如:new Date().toLocaleString(Qt.locale("de_DE"))
+    疑问:令人奇怪的是,new Date()的对象类型和date基本类型是一致的,即它们含有相同的方法.
+Number
+    也是扩展js Number对象,提供区域格式化函数
+        Number对象本身的方法
+            string fromLocaleString(locale, number)
+        构造函数创建的对象的方法
+            string toLocaleCurrencyString(locale, symbol)
+            string toLocaleString(locale, format, precision) 
+    同样的疑问:int类型也具有这些方法.
+String
+    扩展的js String对象,只增加一个arg()函数
+        构造函数创建的对象的方法
+            string arg(value)
+    字面量没有任何方法,不能混淆.即不能 "str".arg() 这样调用,必须使用var或let声明一个变量,但它可以使用字面量字符串初始化.
+    疑问一致:string类型也拥有这个方法.
+Locale
+    此对象只能通过Qt.locale()函数创建,不能直接创建.在js中没有对应的Locale对象.好像这个对象是一个js对象,所以它只能使用var声明.
+        这个类很奇怪,应该把它作为一个js对象来使用,而不能在QML文档中直接声明,进而不能作为根对象来定义新类型.
+
+Binding
+Component
+Connections
+
+
+ququick
+    Item类型
+        当挂锚时,即对anchors组属性赋值时,可以赋予在qt的关于Item类型帮助文档中没有提到的属性,这些属性可以被认为是对象不可见的锚点属性.left,horizontalCenter, right, top, verticalCenter, baseline,bottom七个属性
+        Qt Quick also provides a way to layout items using the concept of anchors. Each item can be thought of as having a set of 7 invisible "anchor lines": left, horizontalCenter, right, top, verticalCenter, baseline, and bottom.
+        因此在赋值时是这样的
+              Rectangle { id: rect1; ... }
+              Rectangle { id: rect2; anchors.left: rect1.right; ... }
+            直接使用id前缀访问这7个属性.
