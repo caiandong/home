@@ -1,0 +1,113 @@
+1.SOURCES 
+    :有关源码文件的变量.
+    可采用SOURCES=或SOURCES+=,如:
+          SOURCES = hello.cpp \
+                    main.cpp
+2.HEADERS
+    :头文件变量
+    例如:
+        HEADERS += hello.h
+3.TARGET
+    :表示生成的可执行文件名,不同的平台产生不同后缀,默认情况下自动根据.pro文件生成.hello.exe或hello
+    例如:
+        TARGET = helloworld
+以下是部分变量:
+    CONFIG      General project configuration options.
+        一般工程配置选项
+    DESTDIR     The directory in which the executable or binary file will be placed.
+        可执行的或二进制的文件放置的目录
+    FORMS       A list of UI files to be processed by the user interface compiler (uic).
+        被uic处理的UI发文件列表
+    HEADERS     A list of filenames of header (.h) files used when building the project.
+        用来构建工程时的头文件列表
+    QT      A list of Qt modules used in the project.
+        工程中使用的Qt模块列表
+    RESOURCES   A list of resource (.qrc) files to be included in the final project. See the The Qt Resource System for more information about these files.
+        被包含在最终工程中的资源(.qrc)列表.
+    SOURCES     A list of source code files to be used when building the project.
+        构建工程时的源代码文件列表
+    TEMPLATE    The template to use for the project. This determines whether the output of the build process will be an application, a library, or a plugin.
+        用于工程的模板.此选项决定是否构建过程的输出将会是,应用程序,库,或插件.
+变量的内容可以通过在变量上前缀$$获取.于是可以赋值一个变量的内容给其他变量,如:
+    TEMP_SOURCES = $$SOURCES
+$$操作符也被扩展与操作字符串和值列表的内建函数一起使用.更多信息,参见qmake language.
+
+空白
+    空白通常用于在一个变量的赋值中分割数值.如果需要赋一个包含空白字符的值,需要使用双引号把那个值包围起来:
+        DEST = "Program Files"
+    例如用于文件路径中
+        win32:INCLUDEPATH += "C:/mylibs/extra headers"
+        unix:INCLUDEPATH += "/home/user/extra headers"
+内建函数
+    include()
+        include(other.pro)
+        此函数把参数名指定的文件内容,包含在函数出现的位置,于是,上述调用,把函数替换成other.pro文件的包含的内容
+    scopes支持类似条件的结构,行为就像编程语言中的if语句:
+        win32 {
+            SOURCES += paintwidget_win.cpp
+        }
+        以上花括号中的语句只在 win32 CONFIG 被设置时才生效.这在Windows平台自动生效.
+    注意,开始的花括号必须跟在条件后面同一行.
+TEMPLATE变量    
+    Template        qmake Output
+    app(default)    Makefile to build an application.
+                    生成用于构建应用程序的Makefile文件
+    lib             Makefile to build a library.
+                    构建库的Makefile
+    aux             Makefile to build nothing. Use this if no compiler needs to be invoked to create the target, for instance because your project is written in an interpreted language.
+                    Note: This template type is only available for Makefile-based generators. In particular, it will not work with the vcxproj and Xcode generators.
+                    生成的Makefile文件啥都不构建.如果没有编译器被调用创建某个目标,例如,你的工程是被用解释语言所写,使用此选项.
+                    注意:这种模板类型只是对于基于Makefile的生成工具可用.特别是,它不会与vcxproj和Xcode生成工具.
+    subdirs         Makefile containing rules for the subdirectories specified using the SUBDIRS variable. Each subdirectory must contain its own project file.
+                    生成的Makefile文件包含子目录的规则,子目录列表使用SUBDIRS的变量指定.每个子目录必须包含自己的工程文件.默认工程文件名是:目录名.pro
+    vcapp           Visual Studio Project file to build an application.
+    vclib           Visual Studio Project file to build a library.
+    vcsubdirs       Visual Studio Solution file to build projects in sub-directories.
+    
+    SUBDIRS变量被用来包含要被处理的所有子目录列表
+CONFIG
+    此变量指定工程应该配置的选项与特性.
+    
+    Option      Description
+    qt          The project is a Qt application and should link against the Qt library. 
+                You can use the QT variable to control any additional Qt modules that are required by your application. 
+                This value is added by default, but you can remove it to use qmake for a non-Qt project.
+                此工程时一个Qt应用程序,应该链接Qt库.
+                你可以使用QT变量控制你的应用程序需要的额外的Qt模块.
+                默认情况此选项时被添加的,对于非Qt项目,你可以移除它来使用qmake
+    x11         The project is an X11 application or library. This value is not needed if the target uses Qt.
+声明Qt库
+    如果CONFIG变量包含了qt选项值(这是默认情况),qmake就会启用对Qt应用程序的支持.这让我们能够微调被你的应用程序使用的Qt模块.使用QT变量声明需要的扩展模块.
+        QT += network xml
+    注意:QT变量默认包含了core和gui模块,所以以上声明添加了network和xml模块到默认列表中.
+    下面声明忽略了默认模块,当应用程序源码被编译时会导致错误:
+        QT = network xml # This will omit the core and gui modules.
+    如果你不需要gui模块,你可使用-=方式不包含它:
+        QT -= gui # Only the core module is used.
+声明其他库
+        LIBS += -L/usr/local/lib -lmath
+    可以使用INCLUDEPATH变量添加额外包含头文件的路径
+        INCLUDEPATH = c:/msdev/include d:/stl/include
+    以上语法没有使用+=,而且如果路径有空白,需要双引号包围那一个的整个值
+
+构建一个应用程序
+    模板变量设为app,告诉qmake生成构建一个应用程序的Makefile.
+    
+    HEADERS - A list of header files for the application.
+                头文件列表
+    SOURCES - A list of C++ source files for the application.
+                源文件列表
+    FORMS - A list of UI files for the application (created using Qt Designer).
+            UI文件列表(用qt设计师创建的)
+    LEXSOURCES - A list of Lex source files for the application.
+    YACCSOURCES - A list of Yacc source files for the application.
+    TARGET - Name of the executable for the application. This defaults to the name of the project file. (The extension, if any, is added automatically).
+    DESTDIR - The directory in which the target executable is placed.
+    DEFINES - A list of any additional pre-processor defines needed for the application.
+            任何额外预处理器列表
+    INCLUDEPATH - A list of any additional include paths needed for the application.
+            任何额外包含的头文件路径
+    DEPENDPATH - The dependency search path for the application.
+            应用程序的依赖查找路径
+    VPATH - The search path to find supplied files.
+    DEF_FILE - Windows only: A .def file to be linked against for the application.

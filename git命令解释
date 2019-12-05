@@ -1,0 +1,78 @@
+HEAD^       表示HEAD的父
+HEAD^^      表示HEAD的父的父亲(爷爷)
+HEAD~4      表示表示HEAD的父的父的父的父亲(祖宗)
+有时候合并操作后有多个祖先
+HEAD^1      第一个父
+HEAD^2      第二个父
+形如 xx..yy表示范围,可以用于git show,git log等命令,例如:
+    v2.5..v2.6 
+    xx yy可以是:标签名,分支名,提交,HEAD等等
+git add
+    1 git add <files>
+    当对一个文件第一次使用此命令时,它会把此文件添加到index对象树中,表明已跟踪了.随后对这个文件进行修改,那么这些变化也要使用
+        git add命令暂存到index中.files可以是目录和多个空格分开的文件列表或者通配符.最常用的是.,即当前目录.
+git diff
+    1   git diff
+    查看当前暂存区,也称作"index",索引区,的变化,而与当前工作目录(work directory)变化无关.
+        使用git add新跟踪的文件也不算在内.一般来说,修改已暂存的文件的变化会展示出来
+    2   git diff --cached [<commit>]
+    这样使用时,是假如当前使用git commit命令进行提交时,它与已提交的对象,commit,的变化.默认情况(即不存在commit参数)下,相对于HEAD
+        当我们修改一个已暂存的对象时,使用命令1可以查看对应改变.然后git commit后,再用当前命令,之前的改变才会出现.
+        此命令是索引区(index)相对于已提交对象的变化,因此,使用git add新跟踪的文件,这样的变化也会显示
+    commit对象        index对象     修改的index对象      工作空间目录
+        |                 |                 |                     |
+        ---带--cached参数-|----裸diff命令---|
+git commit
+    1   git commit
+    提交当前index中的对象,之后会提示使用已设置的编辑器(例如:vim,默认根据平台安装的编辑器设置,也可手动设置)来输入提交信息.
+        关于提交信息的编写,那会是一个重大的仔细考虑的问题.
+    2   git commit -a
+    直接使用git commit命令会提交通过git add命令所暂存的或已跟踪的index对象.-a选项相当于先对所有存在于index中的修改使用
+        了git add 命令,于是只用这一条命令就可以直接提交已跟踪但未暂存修改的文件.当然,同样的与当前工作目录中的新文件无关.
+    3   git commit -m<message>
+    -m选项可以在一行内提供提交信息,而不需要在编辑器内写提交信息,例如:
+        git commit -a -m"第二次提交"
+git log
+    1   git log
+    提供简短的提交记录,包含作者,日期以及一个提交者提交信息的简要描述.
+git branch
+    1   git branch  [<branchname>]
+    当初始化一个仓库后自动生成一个master分支.以上命令创建一个新分支,名为给定的branchname.此命令默认情况下列出所有分支名的列表.
+    2   git branch  -d|D  <branchname>
+    删除branchname分支,它检查是否branchname分支的内容已合并到当前分支上,否则不允许删除,需要先合并.-D会强制删除分支,而不管是否那个分支上改变会丢失
+git switch(新命令) 
+    1   git switch  <branchname>
+    切换到branchname分支.此命令是新命令
+git merge
+    1   git merge   <commit>
+    合并commit指向的对象到当前所在的分支对应的已提交对象
+git tag
+    1   git tag <tagname> <commit>
+    给某个提交对象一个标签名,即打标签.
+查找某个提交点
+git bisect
+    以下命令在你认为的好的提交点和坏的提交之间查找状态产生变化的提交id,可认为是changecommit,类似二分查找.
+    git默认你提供的good的提交是changecommit之前,并且bad提交是changecommit之后:
+            good---------------------changecommit------------------bad
+        git bisect start    //表明开始进入查找状态,准备修改HEAD
+        git bisect good v2.6.18         //告诉git一个好的提交点
+        git bisect bad master           //再告诉它一个坏的提交点
+        ..          //当前HEAD会被修改,于是处于两个提交中间的某个提交,然后由你自己决定下面的查询方向.
+                    //于是当前可以查看分支啊,log啊等等,然后由你自己判断这个提交点是不是你想要的changecommit
+        git bisect good      //你输入这个,表明这个提交是好的,然后git会向着坏的提交减少一半的提交的方向进行搜索.然后等待你再次决定
+        git bisect bad     //你输入这个,表明这个提交是坏的,git走过头了,于是它折回剩下的一半的提交点.再次等待你的决策.
+        ..          //最终会只剩下一个提交点,那就是你要寻找的
+        git bisect reset        //然后退出查找,把HEAD恢复到原始状态
+    每次输入good或bad,git的输出类似下面:
+        Bisecting: 1769 revisions left to test after this
+        [7ef82c8b1511017ae605f0c99ac275a7e21b867] i2c-core: Drop useless bitmasking
+    当还剩下1个recisions(我们的上述例子还有1769个待测试的提交点的范围)时,这就是你的结果.
+    git bisect所能做的和上述描述不太符合,事实上那个changecommit点是一个产生变化的点(我们的例子中,它被隐含地作为引进bug的提交点),
+    不应该以good和bad来区分,这两个术语有些令人困惑.于是,我们使用old和new:
+            old----------------------changecommit-------------------new
+    于是上面的good=>old,bad=>new,各自替换.
+    1   git bisect terms
+        输出当前使用的术语,例如一下输出:
+            您当前针对旧状态的术语是 good，对新状态的术语是 bad
+    2   git bisect log
+        输出此次查找会话的已进行的日志
