@@ -88,7 +88,7 @@
 
 - dde桌面环境退出命令(类似命令行注销): ` dde-*`找到合适的补全命令
 
-- kde桌面环境退出(类似于注销):`kdeinit5_shutdown`
+- kde桌面环境退出(类似于注销),我不想说这个,不过已在各个环境下都可以使用一个命令:`loginctl terminate-user [username]`
 
 - 红警 opneRa
 

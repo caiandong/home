@@ -1,3 +1,10 @@
+本文件中所有内容均来自官方文档,当时的版本是:Version 2.24.0
+    之所以提出这个版本号问题,是因为版本叠加出现了一些新命令(当然,不用担心向后兼容,所有之前的命令未经官方说明,都保存了下来),例如,git switch
+    但新命令的引入并不是从这个版本引入的,只是我认为的从我自己的之前的使用印象中,认为是新的命令
+    当前主要引用自文档模块中的一个用户手册部分(https://git-scm.com/docs/user-manual),但其中涉及到简略的命令说明,且很复杂时,也参考全局文档(https://git-scm.com/docs)
+    本想根据自己的优先顺序进行各个部分的大体翻译,碍于水平有限,且无法集中精力,于是此文档成为了一个用户手册的微小版本,
+    其包含了常用的命令,以及部分解释.我会尽力让之后的自己,或者一些读者能够理解此处的命令用法.
+
 HEAD^       表示HEAD的父
 HEAD^^      表示HEAD的父的父亲(爷爷)
 HEAD~4      表示表示HEAD的父的父的父的父亲(祖宗)
@@ -7,21 +14,39 @@ HEAD^2      第二个父
 形如 xx..yy表示范围,可以用于git show,git log等命令,例如:
     v2.5..v2.6 
     xx yy可以是:标签名,分支名,提交,HEAD等等
+    a..b:双点表示从b可到达,但从a不可到达的.例如,提交
+    a...b:三点表示从a和b到达,但不能同时从两个点到达.例如,a和b有共同祖先c,则a...b表示c..a和c..b
+工作树(working tree)   表示实际检出的文件树.工作树通常包含HEAD提交所对应的树的内容,加上树中你所做的任何的但还没有提交的本地改变.     
 git add
     1 git add <files>
-    当对一个文件第一次使用此命令时,它会把此文件添加到index对象树中,表明已跟踪了.随后对这个文件进行修改,那么这些变化也要使用
-        git add命令暂存到index中.files可以是目录和多个空格分开的文件列表或者通配符.最常用的是.,即当前目录.
+    当对一个文件第一次使用此命令时,它会把此文件内容添加到index对象树中,表明已跟踪了.随后对这个文件进行修改,那么这些变化也要使用
+        git add命令暂存到index中.files可以是目录和多个空格分开的文件列表或者通配符.最常用的是".",即当前目录.
+git restore(新命令)
+    此命令可以使用一个恢复源来恢复工作树中特定部分的内容,即,恢复索引文件或者恢复(索引对应)工作树中的文件.
+        (索引和工作树实际上类似一个硬币的两个面,它们呈现数据的方式不同)
+        git restore [<options>] [--source=<tree>] [--staged] [--worktree] <pathspec>…​
+    如果是恢复索引文件,则意味着git add所添加的改变将被复原.这也是git status命令中会提示的结果
+    若果恢复改变的文件,注意,这很危险,这样所做的改变将可能会丢失,务必谨慎使用,除非你知道自己在所什么
+    默认情况下不指定--source=<tree>选项,索引文件对应来源是HEAD,而索引树的改变对应的来源则是当前索引
+    1   git restore --staged <file>
+    只从HEAD中恢复file到索引中.但并不把工作目录中的变化也恢复.另一个选项--worktree表示只把有改变的已跟踪的文件恢复到索引中的状态
+    默认情况下携带--worktree选项,但指定--staged时,则只不携带--worktree选项.可以同时都指定,都恢复
+    
 git diff
     1   git diff
-    查看当前暂存区,也称作"index",索引区,的变化,而与当前工作目录(work directory)变化无关.
+    查看当前暂存区,也称作"index",索引区,的变化,即已跟踪的文件的变化,而与当前工作目录(work directory)变化无关.
         使用git add新跟踪的文件也不算在内.一般来说,修改已暂存的文件的变化会展示出来
     2   git diff --cached [<commit>]
     这样使用时,是假如当前使用git commit命令进行提交时,它与已提交的对象,commit,的变化.默认情况(即不存在commit参数)下,相对于HEAD
         当我们修改一个已暂存的对象时,使用命令1可以查看对应改变.然后git commit后,再用当前命令,之前的改变才会出现.
-        此命令是索引区(index)相对于已提交对象的变化,因此,使用git add新跟踪的文件,这样的变化也会显示
-    commit对象        index对象     修改的index对象      工作空间目录
-        |                 |                 |                     |
-        ---带--cached参数-|----裸diff命令---|
+        此命令是索引区(index)相对于已提交对象的变化,因此,使用git add新跟踪的文件,这样的变化也会显示.下图可以作为理解的一种方式
+    3   git diff <commit>
+    比较工作树与某个提交的改变.实际上包含了命令1与命令2的输出.即,输出是命令1与2的并集
+    以上3个命令表示的范围使用以下图表示:
+        commit对象        index对象     修改的index对象      工作空间目录
+            |                 |                 |                    
+            |命令2             |命令1             |
+            |命令3                               |
 git commit
     1   git commit
     提交当前index中的对象,之后会提示使用已设置的编辑器(例如:vim,默认根据平台安装的编辑器设置,也可手动设置)来输入提交信息.
@@ -34,26 +59,156 @@ git commit
         git commit -a -m"第二次提交"
 git log
     1   git log
-    提供简短的提交记录,包含作者,日期以及一个提交者提交信息的简要描述.
+    提供简短的提交记录所形成的提交列表.每个提交包含作者,日期以及一个提交者提交信息的简要描述.这条裸命令实际上会从HEAD开始
+        一直向父追溯到任意可到达的最深的提交,一般来说,就是初始提交.
+        这里有几种形式:
+            $ git log v2.5..	# 自从v2.5以来的提交,但从v2.5不可到达
+            $ git log test..master	# 从master可到达的提交,但test不可到达
+            $ git log master..test	# 与上面相反,test可到达,master不可到达的提交
+            $ git log master...test	# 两者任意一个可到达的提交,但不能是都可到达
+            $ git log --since="2 weeks ago" # 自从最近两个星期前到现在
+            $ git log Makefile      # 改变文件Makefile的提交,这些提交可能按照时间顺序开始
+            $ git log fs/		# 在fs目录下的任何数据的相关提交
+            $ git log -S'foo()'	# 添加或删除任何文件数据,其中匹配foo()字符串的提交
+
 git branch
     1   git branch  [<branchname>]
     当初始化一个仓库后自动生成一个master分支.以上命令创建一个新分支,名为给定的branchname.此命令默认情况下列出所有分支名的列表.
     2   git branch  -d|D  <branchname>
     删除branchname分支,它检查是否branchname分支的内容已合并到当前分支上,否则不允许删除,需要先合并.-D会强制删除分支,而不管是否那个分支上改变会丢失
+    3   git branch newbranch --track remotename/branch
+    创建newbranch,然后设置上游跟踪分支.跟踪分支是由git fetch更新或创建的.
+        带有此选项时,当创建新分支时,会建立branch.<name>.remote和branch.<name>.merge配置条目来
+        标记开始点分支作为从新分支的"upstream".此配置将告诉git在git status和git branch -v中展示两个分支间的关系.
+        更重要的是,当新分支被检查时,它指示不带参数的git pull从上游pull
+        这种行为是默认的,当开始点是一个remote-tracking(远程跟踪)分支时.
+    3   git branch (--set-upstream-to=<upstream> | -u <upstream>) [<branchname>]
+    修改branchname分支的上游分支为upstream.默认不存在branchname时,为当前分支
+    
 git switch(新命令) 
     1   git switch  <branchname>
-    切换到branchname分支.此命令是新命令
+    切换到branchname分支.git switch - 表示切换回之前的分支
+    2   git switch -c <newname> <commit>
+    从提交点commit创建新分支newname,并且切换到那个分支上
+    3   git switch -c  --track  orgin/master
+    如果给定-c后的分支名,则分支名不通过远程分支进行猜测.此命令表示设置跟踪上游分支
+    
 git merge
     1   git merge   <commit>
     合并commit指向的对象到当前所在的分支对应的已提交对象
+    
+git rebase
+    表示重新应用一个分支的一系列改变到一个不同的基底上,然后重置那个分支的头到之后的结果.默认情况下遇到相同的提交改变会丢弃(提交是不同的,但提交对应的树会是相同的).
+    当在公共仓库使用此命令时万分谨慎,例如,必须让所有人都进行一遍git pull --rebase,因此最佳适用范围是个人独立开发,或者没有推送到上游之前
+    1   git rebase <upstream>
+    假设当前分支和upstream有共同祖先c,把c..的那部分改变暂时存储起来,重新再应用到upstream上,然后修改当前分支head到之后的结果.
+    2   git rebase  <upstream> <branch>
+    把branch分支的变化重新应用到upstream上
+    3   git rebase --onto a b c
+    它所做的就好像计算完毕c要应用到b的部分后,但不是随后应用到b上,而是转而应用到a上.当c不依赖b或者依赖b的部分已被合并到a上,可以使用它.
+    k   git rebase --continue
+    解决冲突后,继续rebase
+    k   git rebase --abort
+    终止rebase
+    
+git fetch
+    从另一个源中下载对象和引用(refs)
+    形式:
+        git fetch [<options>] [<repository> [<refspec>…​]]
+    从一个或更多其他的源中,拉取分支(branch)和/或者标签(tag)(统称为refs),以及必要的使历史更完整的对象.
+    它会更新远程跟踪分支(remote-tracking),即在$GIT_DIR/refs/remotes/下更新或创建分支,例如,myteam/master
+    默认情况下,任何指向正在被拉取的历史的标签也被拉取.
+    git fetch可以从一个单个的命名源或URL拉取.或者立即从几个源拉取,如果<group>被给定并且有一个远程指定.
+    当没有remote被指定,默认orgin将会被使用,除非当前分支有一个已配置的上游分支.
+    拉取的refs的名字与他们指向的对象名一起,被写进.git/FETCH_HEAD.
+    <repository>:远程仓库是fetch或pull操作的源头.这个参数可以是URL或者远程名字.
+    REMOTES
+        一下名字其中之一可以用来替代URL作为<repository>参数:
+            git配置文件中的remote:$GIT_DIR/config,
+            $GIT_DIR/remotes目录下的文件,或者
+            $GIT_DIR/branches目录下的文件.
+        它们都允许你从命令行忽略refspec,因为它们自身包含refspec,git会使用它们.
+        配置文件中的命令远程(remote)
+            你可以选择提供你之前使用git remote,git config,甚至手动编辑$GIT_DIR/config文件所配置的远程名.
+            那么这个远程的URL会被用来访问源,它的refspec默认情况下当你没在命令行提供refspec时被使用.
+                	[remote "<name>"]
+                            url = <url>
+                            pushurl = <pushurl>
+                            push = <refspec>
+                            fetch = <refspec>
+    <refspec>:指定拉取哪些(远程仓库中的)refs以及更新哪些本地refs.当没有<refspec>出现在命令行中,要拉取的refs会从
+        remote.<repository>fetch变量中读取.
+        参数的格式为:可选的"+"符号,后跟一个源头<src>,再后跟一个冒号":",再后跟一个目的ref<dst>.
+        当<dst>是空时冒号可省略.<src>通常是一个ref,但也可以是一个完整拼写的十六进制对象名.
+        匹配<src>的远程ref会被拉取,并且如果<dst>不是一个空字符串,它会尝试更新<dst>匹配的本地ref
+    CONFIGURED REMOTE-TRACKING BRANCHES(配置的远程跟踪分支)
+        你经常会与同一个远程源交互,即,时不时地重复从它拉取.为了跟踪这样一个远程存储库的进度,git fetch允许
+        你配置remote.<repository>.fetch配置变量.典型的这样的变量看起来如下所示:
+            [remote "origin"]
+                    fetch = +refs/heads/*:refs/remotes/origin/*
+        它用在两种形式:
+            1.当git fetch没有在命令行指定要拉取的分支或者标签时运行,例如,git fetch orgin或git fetch,
+            remote.<repository>.fetch被用来作为refspec.这个例子中将会拉取origin中所有分支,然后更新对应的
+            在refs/remotes/orgin/*层次结构中的远程跟踪分支
+            2.当git fetch在命令行显示指定分支或标签时运行,例如,git fetch origin master,命令行上的<refspec>
+            决定要被拉取的ref,即master,master:的简写.这条命令只会拉取master分支.而由remote.<repository>.fetch值
+            决定哪个远程分支被更新,如果存在的话.当以这种方式使用时,在决定拉取ref时,remote.<repository>.fetch
+            不会有任何影响;通过一个映射动作,它们只被用来决定拉取的refs被存放在哪.
+    1   git fetch origin
+    复制所有来自远程 refs/heads/名称空间下的分支,然后存储它们到本地的refs/remotes/origin/名称空间下,
+    除非使用branch.<name>.fetch选项指定非默认的refspec.
+    2   git fetch origin +pu:pu maint:tmp
+    显示使用refspec.它更新(必要时创建)本地的源中的分支pu和tmp,通过从远程源的分支pu和maint拉取.
+    即使没有快进(fast-forward),pu分支也将更新,因为它前缀了加号"+";tmp则不会.
+git pull
+    从另一个仓库或者本地分支拉取,并且与它们进行整合.
+        git pull [<options>] [<repository> [<refspec>…​]]
+    把远程源的改变插入到当前分支.默认模式下,git pull是git fetch后跟git merge FETCH_HEAD的两条命令的快捷方式.
+    更精确的说,git pull使用被给的参数运行git fetch,然后调用git merge把取得的分支头合并到当前分支.使用--rebase,
+        它将运行git rebase替代git merge
+    <repository>银行是一个远程源的名字,正如被传递给git-fetch命令的那样.
+    <refspec>可以命名一个任意远程ref(例如标签名)或者甚至是相应远程跟踪分支的refs的集合(例如,refs/heads/*:refs/remotes/origin/*)
+        但通常它是远程源中的一个分支名.
+    默认<repository>和<branch>(可能此处说的是refspec参数)是从当前分支的"remote"和"merge"配置中读取,它们使用git-branch --track进行设置.
+git push
+    更新远程refs以及相关联的对象
+        git push [<repository> [<refspec>…​]]
+    使用本地refs更新远程refs,同时发送必要的对象补全给定的refs.
+    每次在你推送一个源时,你可以做些有趣的事,即通过设置hook.
+    当命令行并没有使用<repository>参数指定推送到何处时,当前分支的branch.*.remote配置会被考虑来决定推送到哪里.
+        如果缺少此配置,默认推送到origin.
+    当命令行没有使用<refspec>参数或者--all,--mirror,--tags选项指定推送什么对象时,此命令会查找默认<refspec>,即通过参考remote.*.push
+        配置.如果这也没被发现的话,使用push.default配置决定推送对象.
+    当命令行和配置都没有指定推送对象时,默认行为被使用,其行为对应到push.default配置的simple值上:当前分支被推送到相应上游分支,
+        但作为一个安全行为,如果上游分支找不到和本地分支名相同的分支,推送终止.
+    <refspec>…​
+        它和git fetch的refspec大部分类似,这里讨论一个特别的refspec,":"(或 +:).
+            它指示git推送匹配的分支:对于存在于本地端的每个分支,如果和它相同名字的分支存在于远程端,则更新远程端的这些分支.
+    git push
+    工作类似git push <remote>,<remote>是当前分支的remote(或者是origin,如果当前分支没有配置远程),即branch.*.remote配置
+    git push origin
+    没有额外配置,推送当前分支到配置的上游(remote.origin.merge),仅当上游分支名和当前分支名相同.否则出错而不会推送.
+    git push origin :
+    推送每个匹配的分支到origin
+    git push origin master
+    在源仓库中找到master匹配的ref更新origin仓库中的master相同ref.如果远程仓库不存在此ref,则它会被创建.
+    git push origin HEAD
+    方便的方式,来推送当前分支到远程上相同的分支
+    git push origin HEAD:master
+    推送当前分支到origin仓库中匹配master的远程ref.它不用考虑当前分支本地ref名,从而直接推送到远程仓库.
+    git push origin :experimental
+    找到origin仓库中匹配experimental的ref(例如refs/heads/experimental),然后删除它.
+git remote
 git tag
-    1   git tag <tagname> <commit>
+    1   git tag
+    显示所有标签.与git tag -l输出一样,带-l的命令允许在后面提供匹配模式.
+    2   git tag <tagname> <commit>
     给某个提交对象一个标签名,即打标签.
 查找某个提交点
 git bisect
-    以下命令在你认为的好的提交点和坏的提交之间查找状态产生变化的提交id,可认为是changecommit,类似二分查找.
+    以下命令在你认为的好的提交点和坏的提交之间查找状态产生变化的提交id,我先把这个提交点称作changecommit,类似二分查找.
     git默认你提供的good的提交是changecommit之前,并且bad提交是changecommit之后:
-            good---------------------changecommit------------------bad
+            good---------------------你要找的changecommit------------------bad
         git bisect start    //表明开始进入查找状态,准备修改HEAD
         git bisect good v2.6.18         //告诉git一个好的提交点
         git bisect bad master           //再告诉它一个坏的提交点
@@ -76,3 +231,33 @@ git bisect
             您当前针对旧状态的术语是 good，对新状态的术语是 bad
     2   git bisect log
         输出此次查找会话的已进行的日志
+git reset [<mode>] [<commit>]
+    这种形式用来重置当前分支的head到commit.但取决于mode,也可能会更新index(把索引重置为commit对应的树)和工作树.
+    如果mode被忽略,默认是--mixed.mode只能是以下其中一个:
+    --soft
+        不会触及index文件或者工作树(只是重置head到commit,就像其他所有模式所做的一样).这就使你的已改变的文件成为"要被提交的改变"状态,这也正如git status将显示的.
+    --mixed
+        重置index文件,但不重置工作树(改变的文件会保留,但不会被标记为待提交).也会报告还有什么没被更新.这是默认选项.
+    --hard
+        重置index和工作树.工作树中自commit以来任何已跟踪文件的改变都被丢弃.
+    --merge
+        重置index并且更新工作树中在commit和HEAD之间存在不同的那些文件,但会保持在index和工作树之间有所不同的那些文件(即还没add的改变).
+        如果一个文件在commit和index之间有所不同,且有未暂存的改变,重置终止.
+    --keep
+        重置index条目并且更新工作树中commit和HEAD之间有所不同的那些文件.
+        如果一个文件在commit和HEAD之间有所不同,且有本地的改变,重置终止.
+    working index HEAD target         working index HEAD
+    ----------------------------------------------------
+     A       B     C    D     --soft   A       B     D
+                              --mixed  A       D     D
+                              --hard   D       D     D
+                              --merge (disallowed)
+                              --keep  (disallowed)
+
+    working index HEAD target         working index HEAD                        
+    ----------------------------------------------------
+    A       B     C    C     --soft   A       B     C
+                            --mixed  A       C     C
+                            --hard   C       C     C
+                            --merge (disallowed)
+                            --keep   A       C     C
