@@ -1,0 +1,68 @@
+6.1 ECMAScript语言类型
+    ECMAScript语言类型对应于这样的值:值可以被使用ECMAScript语言的ECMAScript编程人员所操控.
+    ECMAScript语言类型是:
+        Undefined, 
+        Null,
+        Boolean, 
+        String,
+        Symbol, 
+        Number,
+        Object.
+    一个ECMAScript语言值是以ECMAScript语言类型为特征的值.(即每一个ECMAScript语言值都是其中一种类型)
+6.2 ECMAScript规范类型
+    规范类型对应于元值(meta-value),这些元值被用在算法中来描述ECMAScript语言构造和ECMAScript语言类型的语义.
+    规范类型是:
+        Reference, 
+        List, 
+        Completion, 
+        Property Descriptor,
+        Lexical Environment, 
+        Environment Record, 
+        Data Block
+    规范类型值是规范的产物,不需要对应于ECMAScript实现内的任何特定的实体.
+    规范类型值可以被用来描述ECMAScript表达式计算的中间结果,但这样的值不会被存储作为对象的属性或ECMAScript语言变量(variables).
+8.1 词法环境(Lexical Environments)
+    词法环境是规范类型(specification type),基于ECMAScript代码的嵌套结构的词法,它被用来定义标识符(Identifiers)
+        到特定变量(variables)和函数(functions)的关联.
+    词法环境由一个环境记录(Environment Record)和到外部词法环境的引用,引用可能为null.
+    通常一个词法环境与一些特ECMAScript代码的定句法结构关联,例如一个函数声明(FunctionDeclaration),块语句(BlockStatement),或
+        Try语句(TryStatement)的Catch从句.而且每次这样的代码被计算时,新的词法环境就会创建.
+    
+    环境记录会记录它所关联的词法环境作用域中被创建的标识符绑定(identifier bindings).它被引用为词法环境的环境记录(EnvironmentRecord).
+    
+    外部环境引用被用来建模词法环境值的逻辑嵌套.一个(内部)词法环境的外部引用引用到一个逻辑上包围内部词法环境的词法环境,
+    外部词法环境当然也可能有它自己的外部词法环境.
+    一个词法环境可以作为外部环境服务于多个内部词法环境.
+    例如,如果一个函数声明(FunctionDeclaration)包含两个内嵌函数声明,那么每一个内嵌的函数的词法环境有外围函数的当前
+        所计算的词法环境作为它们的外部词法环境.
+    
+    全局环境(global environment)是一个没有外部环境的词法环境.全局环境的外部环境引用是null.
+    全局环境的环境记录可以预先填充标识符绑定,以及包括一个相关联的全局对象(global object),其属性提供一些全局环境的标识符绑定.
+    全局对象是全局环境的this绑定值.当ECMAScript代码执行时,额外的属性可能被增加到全局对象上,而且初始的属性也可能被改变.
+    
+    模块环境(module environment)是一个包含模块的顶级声明的绑定的词法环境.它也包含由模块显式导入的绑定.
+    模块环境的外部环境是全局环境.
+    
+    函数环境(function environment)是一个对应于ECMAScript函数对象的调用的词法环境.
+    函数环境可以建立新的this绑定.
+    函数环境也捕获必须的状态来支持super方法调用
+    
+    词法环境和环境记录值都是纯粹的规范机制,不需要对应于任何特定的ECMAScript实现物.ECMAScript程序是不能够直接访问或操纵这样的值.
+8.1.1 环境记录(Environment Records)
+    有两种主要的环境记录值被用在此规范中:声明环境记录(declarative Environment Records)和对象环境记录(object Environment Records).
+    声明环境记录被用来定义ECMAScript语言句法元素的效果,例如:函数声明(FunctionDeclarations),变量声明(VariableDeclarations),
+        和Catch字句(Catch clauses),字句直接把标识符绑定与ECMAScript语言值关联.
+    对象环境记录被用来定义ECMAScript元素效果,例如with语句(WithStatement),它会把标识符绑定与一些对象属性关联.
+    
+    全局环境记录和函数环境记录是专门用于脚步化全局声明以及用于函数内的顶级声明.
+    
+    对于规范目的,环境记录值是记录规范类型的值,他可以被认作为简单的面向对象的体系结构:
+        环境记录是一个抽象类,它有三个具体的子类:
+            声明环境记录,对象环境记录,全局环境记录
+                函数环境记录和模块环境记录是声明环境记录的子类
+    抽象类包含抽象规范方法.这些抽象方法有不同的具体算法对应于每一个具体子类.
+8.1.1.1 声明环境记录
+    每个声明环境记录都被关联,与一个包含,变量(variable),常量(constant),let,class,模块(module),import和函数声明的ECMAScript程序作用域.
+8.1.1.2 对象环境记录
+    每个对象环境记录都与一个被叫做它的绑定对象的对象所关联.一个对象环境记录绑定一组字符串标识符名字,它们直接对应于它的各自的绑定对象的属性名.
+    
