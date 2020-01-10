@@ -1,3 +1,70 @@
+当前翻译的目的主要是为了看到中文可以很容易想起对应的英文,从而跨越翻译障碍,减少翻译带来的问题,更好理解原文的原意.
+    碍于水平有限,除非有十足把握,才会对难以翻译的部分使用意义相近的中文描述出来,否则使用
+    最直白的,(如果需要)也最不正常的,中文直译.
+    
+5.1.1 内容自由(Context-Free)的语法
+    内容自由的语法由一定数量的productions组成.
+    每个production有两大部分组成:
+        production的左手端(left-hand)有一个被称作nonterminal的抽象符号.
+        production的右手端(right-hand)有一系列0个或多个nonterminal和terminal符号.
+    对于每个语法,terminal符号都是从指定的字母表中抽取.
+    
+    一个production右手端只有一个nonterminal符号跟随0个或多个terminal符号,叫做production链.
+    
+    如果内容自由的语法是从一个包含单个可被区分的nonterminal句子开始,其中nonterminal被称作全局符号(goal symbol),那么它
+        指定一个语言(language),也就是一个可能的terminal符号序列的集合,这样的集合可以是使用production的右手端重复替换序列中nonterminal
+            而production的左手端是nonterminal.
+    :ps 原文
+        Starting from a sentence consisting of a single distinguished nonterminal, called the goal symbol, a given context-free grammar specifies a language, namely, the (perhaps infinite) set of possible sequences of terminal symbols that can result from repeatedly replacing any nonterminal in the sequence with a right-hand side of a production for which the nonterminal is the left-hand side.
+
+5.1.5 语法符号(Grammar Notation)
+     词法(lexical),正则表达式(RegExp),和数字字符(numeric string)语法的terminal符号被用固定宽度的字体显示.
+        在语法的production中和贯穿此规范中,无论什么时候文本直接指向这样的terminal符号,都这样显示.
+    这些将和.....
+    
+    nonterminal符号用斜体类型显示.
+    nonterminal的定义(也被称作production)由当前定义的nonterminal的名字后跟一个或多个冒号引进.
+        (冒号的数量表明production属于哪个语法)
+    nonterminal的一个或多个可替代的右手端之后跟在下一行,例如:
+        WhileStatement :
+            while ( Expression ) Statement
+        声明nonterminal WhileStatement表示,分词while,后跟左小括号分词,后跟Expression,后跟右小括号,后跟Statement.
+        Expression和Statement自身都是nonterminal.另一个例子:
+        ArgumentList :
+            AssignmentExpression
+            ArgumentList , AssignmentExpression
+        声明nonterminal ArgumentList要么代表单个AssignmentExpression要么是ArgumentList后跟一个逗号
+        后跟AssignmentExpression.ArgumentList的定义是递归的,就是说以自身的形式定义.
+        结果就是一个ArgumentList可以包含任意正数数量的参数(arguments),它们被逗号分割,每个参数表达式都是一个AssignmentExpression.
+        这样的递归定义很常见.
+        
+    下标后缀"opt",出现在terminal或nonterminal之后,表面一个可选的符号.包含可选符号的替代项实际上指定两个右手端,
+        一个忽略可选元素,另一个包括它,这意味着:
+        VariableDeclaration :
+            BindingIdentifier Initializer[opt]      //你懂得,碍于手段,没办法放到下标,使用[]替代
+        是以下方便的简写:
+        VariableDeclaration :
+            BindingIdentifier
+            BindingIdentifier Initializer
+        而
+        IterationStatement :
+            for ( LexicalDeclaration Expression[opt] ; Expression[opt] ) Statement
+        是下面方便的简写:
+        IterationStatement :
+            for ( LexicalDeclaration ; Expression[opt] ) Statement
+            for ( LexicalDeclaration Expression ; Expression[opt] ) Statement
+        按顺序又是下面的简写:
+        IterationStatement :
+            for ( LexicalDeclaration ; ) Statement
+            for ( LexicalDeclaration ; Expression ) Statement
+            for ( LexicalDeclaration Expression ; ) Statement
+            for ( LexicalDeclaration Expression ; Expression ) Statement
+        所以,这个例子中,nonterminal IterationStatement实际上有四种右手端的替代项.
+    
+    一个production也可以被一个“[parameters]”形式的下标注释参数化,这个下标可以出现在由production自身定义的nonterminal符号的后缀.
+    “[parameters]”可以是单个名字或逗号分割的名字列表.
+
+    
 6.1 ECMAScript语言类型
     ECMAScript语言类型对应于这样的值:值可以被使用ECMAScript语言的ECMAScript编程人员所操控.
     ECMAScript语言类型是:
@@ -22,25 +89,26 @@
     规范类型值是规范的产物,不需要对应于ECMAScript实现内的任何特定的实体.
     规范类型值可以被用来描述ECMAScript表达式计算的中间结果,但这样的值不会被存储作为对象的属性或ECMAScript语言变量(variables).
 8.1 词法环境(Lexical Environments)
-    词法环境是规范类型(specification type),基于ECMAScript代码的嵌套结构的词法,它被用来定义标识符(Identifiers)
+    词法环境是规范类型(specification type).基于ECMAScript代码的嵌套结构的词法,它被用来定义标识符(Identifiers)
         到特定变量(variables)和函数(functions)的关联.
-    词法环境由一个环境记录(Environment Record)和到外部词法环境的引用,引用可能为null.
-    通常一个词法环境与一些特ECMAScript代码的定句法结构关联,例如一个函数声明(FunctionDeclaration),块语句(BlockStatement),或
+    词法环境由一个环境记录(Environment Record)和到外部词法环境的引用组成,引用可能为null.
+    通常一个词法环境与一些特定的ECMAScript代码句法结构关联,例如一个函数声明(FunctionDeclaration),块语句(BlockStatement),或
         Try语句(TryStatement)的Catch从句.而且每次这样的代码被计算时,新的词法环境就会创建.
     
-    环境记录会记录它所关联的词法环境作用域中被创建的标识符绑定(identifier bindings).它被引用为词法环境的环境记录(EnvironmentRecord).
+    环境记录(Environment Record)会记录它所关联的词法环境作用域中被创建的标识符绑定(identifier bindings).
+        环境记录被指涉为词法环境的环境记录(EnvironmentRecord).
     
-    外部环境引用被用来建模词法环境值的逻辑嵌套.一个(内部)词法环境的外部引用引用到一个逻辑上包围内部词法环境的词法环境,
+    外部环境引用被用来建立词法环境值的逻辑嵌套模型.一个(内部)词法环境的外部引用引用到一个逻辑上包围内部词法环境的词法环境,
     外部词法环境当然也可能有它自己的外部词法环境.
     一个词法环境可以作为外部环境服务于多个内部词法环境.
-    例如,如果一个函数声明(FunctionDeclaration)包含两个内嵌函数声明,那么每一个内嵌的函数的词法环境有外围函数的当前
-        所计算的词法环境作为它们的外部词法环境.
+    例如,如果一个函数声明(FunctionDeclaration)包含两个内嵌函数声明,那么每一个内嵌的函数的词法环境有,外围函数的当前
+        所计算的词法环境,作为它们的外部词法环境.
     
     全局环境(global environment)是一个没有外部环境的词法环境.全局环境的外部环境引用是null.
-    全局环境的环境记录可以预先填充标识符绑定,以及包括一个相关联的全局对象(global object),其属性提供一些全局环境的标识符绑定.
-    全局对象是全局环境的this绑定值.当ECMAScript代码执行时,额外的属性可能被增加到全局对象上,而且初始的属性也可能被改变.
+    全局环境的环境记录可以预先填充标识符绑定,以及它也包括一个相关联的全局对象(global object),其属性提供一些全局环境的标识符绑定.
+    全局对象是全局环境的this绑定值.当ECMAScript代码执行时,额外的属性可能被增加到全局对象上,而且它初始的属性也可能被改变.
     
-    模块环境(module environment)是一个包含模块的顶级声明的绑定的词法环境.它也包含由模块显式导入的绑定.
+    模块环境(module environment)是一个包含模块中顶级声明的绑定的词法环境.它也包含由模块显式导入的绑定.
     模块环境的外部环境是全局环境.
     
     函数环境(function environment)是一个对应于ECMAScript函数对象的调用的词法环境.
@@ -51,10 +119,11 @@
 8.1.1 环境记录(Environment Records)
     有两种主要的环境记录值被用在此规范中:声明环境记录(declarative Environment Records)和对象环境记录(object Environment Records).
     声明环境记录被用来定义ECMAScript语言句法元素的效果,例如:函数声明(FunctionDeclarations),变量声明(VariableDeclarations),
-        和Catch字句(Catch clauses),字句直接把标识符绑定与ECMAScript语言值关联.
+        和Catch字句(Catch clauses),它们直接把标识符绑定与ECMAScript语言值关联.
+            :ps 上句意思可能是这样,规范中的语法没有读懂 - -
     对象环境记录被用来定义ECMAScript元素效果,例如with语句(WithStatement),它会把标识符绑定与一些对象属性关联.
     
-    全局环境记录和函数环境记录是专门用于脚步化全局声明以及用于函数内的顶级声明.
+    全局环境记录和函数环境记录是专门用于脚本化全局声明以及用于函数内的顶级声明.
     
     对于规范目的,环境记录值是记录规范类型的值,他可以被认作为简单的面向对象的体系结构:
         环境记录是一个抽象类,它有三个具体的子类:
@@ -62,7 +131,51 @@
                 函数环境记录和模块环境记录是声明环境记录的子类
     抽象类包含抽象规范方法.这些抽象方法有不同的具体算法对应于每一个具体子类.
 8.1.1.1 声明环境记录
-    每个声明环境记录都被关联,与一个包含,变量(variable),常量(constant),let,class,模块(module),import和函数声明的ECMAScript程序作用域.
+    每个声明环境记录都被关联,与一个包含变量(variable),常量(constant),let,class,模块(module),import和函数声明的ECMAScript程序作用域.
 8.1.1.2 对象环境记录
     每个对象环境记录都与一个被叫做它的绑定对象的对象所关联.一个对象环境记录绑定一组字符串标识符名字,它们直接对应于它的各自的绑定对象的属性名.
     
+8.1.1.3 函数环境记录
+    一个函数环境记录是一个被用来表示顶级函数作用域的声明环境记录,而且如果这个函数不是箭头函数(ArrowFunction),它提供this绑定.
+    如果一个函数不是箭头函数,而它引用了super,则它的函数环境记录也包含需要在此函数内部被用来执行super方法调用的状态.
+8.1.1.4 全局环境记录
+    全局环境记录被用来表示外部最大的作用域,它被所有在一般区域(Realm)被处理的ECMAScript Script元素共享.
+    全局环境记录提供对与内建全局和全局对象的属性的绑定,还有出现在脚本(Script)中的顶级声明.
+    
+    全局环境记录是一个逻辑上的单个记录,但它被指定作为一个复合品,其封装了一个对象环境记录和一个声明环境记录.
+    对象环境记录有与之关联的区域(Realm)全局对象作为它的基础对象.此对象是全局环境记录的GetThisBinding具体方法的返回值.
+    全局环境记录中的对象环境记录部分包含所有内建全局的绑定以及于全局代码中由函数声明,生成器声明,或变量语句(VariableStatement)引进的所有绑定.
+    全局代码中剩下所有其他的ECMAScript声明绑定被包含在它的声明环境记录中.
+        :ps 上述的变量语句可能笔误,也许说的是VariableDeclaration,变量声明.
+    
+    属性可以直接在全局对象上创建.因此,全局环境记录的对象环境记录既包含显式的由函数声明,生成器声明或变量声明,也包含
+        隐式创建的作为全局对象的属性的绑定.
+    为了分辨哪些绑定是显式使用声明创建的,全局环境记录维护了名字范围(bound)的列表.即通过使用 CreateGlobalVarBindings和
+        CreateGlobalFunctionBindings具体方法.
+8.1.1.5 模块环境记录
+    模块环境记录也是一个被用来表示ECMAScript模块的外部作用域的声明环境记录.
+    除了正常的可变与不可变绑定,模块环境记录也提供了不可变的导入绑定,,这样的绑定提供了到存在于另一个环境记录中的目标绑定的间接访问.
+    
+8.2 代码领域(Code Realms)
+    在代码被计算之前,所有ECMAScript代码必须与一个领域(Realm)关联起来.
+    概念上来说,一个领域由一个集合组成,其包括真正的对象,一个ECMAScript全局环境,所有在那个全局环境作用域中被加载的ECMAScript代码,
+        以及其他相关的状态和资源.
+8.3 执行上下文(Execution Contexts)
+    一个执行上下文是一个规范工具(device),被用来跟踪ECMAScript实现的运行时的代码计算.
+    在任何时间点,只有最多一个执行上下文真正在执行代码.这就是所知的运行(running)执行上下文.
+    一个栈被用来跟踪执行上下文.运行执行上下文总是栈的顶部元素.
+    新的执行上下文被创建,在任何时候控制被从关联当前运行执行上下文的可执行代码传递到没有关联那个执行上下文的可执行代码.
+        新创建的执行上下文被推到栈顶上,从而变成运行执行上下文.
+9.1 普通对象的内部方法和内部槽(slots)
+    所有普通对象都有一个内部槽,被称作[[Prototype]].其值要么是null要么是一个对象,这个值被用来实现继承.
+     [[Prototype]]对象的数据属性只为获取属性访问,而非修改属性,而继承的.访问器(accessor)属性是用于获取和修改目的而继承的.
+     
+     每个普通对象有一个Boolean类型值[[Extensible]]的内部槽,其控制是否属性可以被添加到对象上.
+     如果[[Extensible]]是false,此对象的[[Prototype]]内部槽的值不能改变.
+     一旦一个对象的[[Extensible]]内部槽的值被设置为false,它随后就不能再被变为true了.
+9.2 ECMAScript函数对象
+    ECMAScript函数对象封装参数化的闭合于词法环境中的ECMAScript代码,也支持那些代码动态计算.
+    一个ECMAScript函数对象也是一个普通对象,有和其他普通对象一样,相同的内部槽和内部方法.
+    ECMAScript函数对象的代码既可以是严格模式代码,也可是非严格模式代码.
+        严格模式下的代码称作严格函数(strict function)
+        非严格模式的代码称作非严格函数(non-strict function)
