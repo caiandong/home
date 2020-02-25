@@ -6,15 +6,6 @@ baseurl=https://download.nvidia.com/opensuse/tumbleweed
 type=rpm-md
 keeppackages=0
 
-[openSUSE-20191016-0]
-name=openSUSE-20191016-0
-enabled=0
-autorefresh=1
-baseurl=hd:/?device=/dev/disk/by-id/usb-Multiple_Card_Reader_058F63666438-0:0-part2
-path=/
-type=rpm-md
-keeppackages=0
-
 [openSUSE_Tumbleweed]
 name=packman
 enabled=1

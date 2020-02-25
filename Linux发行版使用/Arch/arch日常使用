@@ -1,0 +1,69 @@
+查看arch上的包组
+    https://www.archlinux.org/groups/
+assistant缺少libQt5WebKitWidgets.so.5 
+    qt5-webkit
+查找含有某个文件的包，例如:pacman -F libQt5WebKitWidgets.so.5
+    qtcreator
+电报
+    telegram-desktop
+ss
+    shadowsocks-qt5 
+ssr
+    electron-ssr
+v2ray
+    v2ray
+    qv2ray  //图形客户端
+    Mellow      //同上
+github clone慢
+    proxychains-ng  //配置文件 /etc/proxychains.conf
+        例如:proxychains git clone https://github.com/caiandong/home.git
+vpn
+    银河vpn
+    小明vpn
+    边缘vpn
+    老王vpn
+    蚂蚁vpn
+    https://www.bee158.com/
+    https://www.ucxv0rq21.com/
+注册ssr节点
+    https://www.baavpn.com/     //2G    需翻墙
+    https://ji-ao.pw/       //几鸡20G
+    https://shukevpn.tk/        //舒克100M
+    http://www.huyue.buzz/      //虎跃  300M
+    https://piecloud.site/      //  5G
+    https://lostcloud.club/     //国外的 不知道啥玩意
+    https://dukousyun.club/     //渡口    5G
+节点网站    
+    https://lncn.org/
+    https://www.youneed.win/free-ss
+    https://ssrtool.us/tool/free_ssr
+    https://free-ss.site/
+搜狗
+    fcitx-configtool fcitx-lilydjwg-git fcitx-sogoupinyin fcitx-qt5
+文本编辑器
+    kate
+chm查看
+    kchmviewer
+pdf
+    okular
+        poppler-data //pdf乱码
+压缩
+    ark
+百度网盘
+    baidunetdisk-bin 
+字体
+    wqy-microhei    //文泉驿正黑
+chmod
+    正常写法是chmod u+wr,表示给拥有者读写权限
+    1.chmod g=u 表示给同组的用户与文件属主相同的权限
+    2.chmod 755 表示的是0755的缩写
+        chmod 55 表示的是0055的缩写
+        和我们书写数学数字一样,从高位补零
+    3.chmod -R  表示目录下所有文件都修改成同样的权限
+百度网盘搜索
+    https://www.dalipan.com/        //大力盘搜索
+    http://www.rufengso.net/        //如风搜索
+    http://www.bdyso.com/           //bdy搜
+    https://www.58wangpan.com/      //58网盘搜
+
+

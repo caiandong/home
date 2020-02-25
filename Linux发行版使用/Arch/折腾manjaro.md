@@ -22,11 +22,7 @@
 
 - 刷新,签名认证什么的
 
-  - sudo pacman -Syy && sudo pacman -S archlinuxcn-keyring && sudo pacman -Syy
-
-- > 这一步先更新系统,不然安装其他软件出问题
-
-  - sudo pacman -Syyu
+  - sudo pacman -S archlinuxcn-keyring && sudo pacman -Syｕ
 
 - 安装bash命令补全
 
@@ -34,11 +30,9 @@
 
 - 安装搜狗(fcitx-sogoupinyin)
 
-  - sudo pacman -S fcitx-im
-  - sudo pacman -S fcitx-configtool
-  - yaourt -S fcitx-sogoupinyin  
+  - sudo pacman -S fcitx-qt5 fcitx-sogoupinyin fcitx-configtool fcitx-lilydjwg-git
 
-- 要设置开机启动，我们还需要在/etc/profile中添加如下内容：
+- 要设置开机启动，我们还需要在/etc/profile.d/目录中下加一个任意名以.sh结尾的文件，添加如下内容：
 
   - ```
     export GTK_IM_MODULE=fcitx
@@ -48,8 +42,6 @@
     #export XMODIFIERS="@im=fcitx"
     #据说含义相同
     ```
-
-  > 注意manjaro18.0.4更新后，官方软件源没有fcitx-qt4，去aur，到软件信息上找到一个[评论](https://aur.archlinux.org/packages/fcitx-sogoupinyin/),[这是链接](https://archive.archlinux.org/repos/2019/03/31/community/os/x86_64/fcitx-qt4-4.2.9.6-1-x86_64.pkg.tar.xz)，下载本地安装
 
 - 安装mariadb(mariadb)，我瞎了，没看到安装输出信息，结果踩坑了
 
@@ -64,22 +56,27 @@
 
 - 安装sublime text
 
-- 安装qq(deepin-wine-qq)，位于AUR [deepin-wine-qq](https://aur.archlinux.org/packages/deepin-wine-qq/)，可使用 `yay` 或 `yaourt` 安装:
+- 安装qq(deepin-wine-qq)，位于AUR [deepin-wine-qq](https://aur.archlinux.org/packages/deepin-wine-qq/)，可使用 `yay` 安装:
 
   - ```
-    yaourt -S deepin-wine-qq
+    yay -S deepin-wine-qq
     ```
 
 - 安装迅雷(deepin-wine-thunderspeed)，同上
 
   - ```
-    yaourt -S deepin-wine-thunderspeed
+    yay -S deepin-wine-thunderspeed
     ```
-
-- 安装百度云(deepin-wine-baidupan)
+    
+- 安装百度云(baidunetdisk-bin)，这是官方rpm包重新打包
 
   - ```
-    yaourt -S deepin-wine-baidupan
+    sudo pacman -S baidunetdisk-bin
+    
+- 安装百度云(deepin-wine-baidupan),可以不用这个了
+
+  - ```
+    yay -S deepin-wine-baidupan
     ```
 
 - 安装markdown编辑器 Typora(typora)
