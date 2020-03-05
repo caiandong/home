@@ -1,0 +1,64 @@
+osc checkout home:Dayu521       //osc  co
+    从远端拉取仓库实例,类似于git clone.会在本地生成home:Dayu521目录,其作为工程目录.
+osc update          //osc up
+    更新当前工程内容.类似 git pull
+osc commit          //osc ci
+    上传内容变化到服务端.类似 git commit.不过可以单独对某些内容上传,不用上传整个工程变化
+osc log
+    检查提交日志
+osc status          //osc st
+    查看本地工程的状态.类似 git status
+osc add fuck      
+    标记fuck文件为下次添加.
+osc rm  fuck2
+    标记fuck2下次移除
+osc addremove
+    添加新增的文件,移除没有的文件.注意,这里相当于自己先增加数个文件,这个是相对于属于工程的本地目录中的文件.
+    然后同样的相对,再删除数个文件,最终调用这个命令把这种行为应用到工程上.而osc add 和osc rm表示分步的动作.
+osc diff <file>
+    生成一个差异,可用于浏览变化
+osc results
+    查看obs实例上的构建结果,例如,成功失败
+osc buildlog [platform] [arch]
+    展示构建的日志
+osc repourls  [dir]
+    展示源仓库的url,其用于包管理器安装软件
+osc rebuildpac  [dir]
+    触发obs服务实例上,所有仓库/架构的包进行重构,
+osc build [platform] [arch] [specfile] [--clean|--noinit|...]
+    在你的电脑上构建包
+osc platforms [project]
+    显示已经配置的平台和架构
+osc repos
+    显示你的工程可以进行的构建目标
+osc meta .....
+    关于元数据的操作,具体看手册
+osc meta prj --edit
+    编辑工程配置
+本地构建根(build root)目录
+    默认情况下,目录/var/tmp/build-root/是用作构建根(build root).
+        这是在配置文件~/.oscrc中,使用键build-root定义的.
+    发行版和架构的每一种组合都有它们自己的构建根.
+        使用下面命令进入openSUSE_Tumbleweed x86_64组合的构建根
+            osc chroot openSUSE_Tumbleweed x86_64
+        你的shell会改变到目录/home/abuild,此目录属于用户abuild,用户于组abuild中.
+    /home/abuild/
+    └── rpmbuild
+        ├── BUILD       1
+        ├── BUILDROOT   2
+        ├── OTHER       3
+        ├── RPMS        4
+        │   ├── i386
+        │   ├── noarch
+        │   └── x86_64
+        ├── SOURCES     5
+        ├── SPECS       6
+        └── SRPMS       7
+    1.包含以包名命名的目录.在spec文件中,包目录名可以使用%buildroot宏引用.
+    2.如果构建过程不能创建一个包,这个目录包含文件和目录,通过spec文件的%install部分,他们会被安装在构建目标系统
+        如果包构建成功,此目录是空的.
+    3.通常包含日志文件rpmlint.log
+    4.如果构建成功,就存放二进制RPM分别到架构子目录.(例如noarch 或 x86_64)
+    5.所有来自工作副本的源文件将被复制到这里.
+    6.
+    7.存放source RPM到这个目录

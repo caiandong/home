@@ -1,0 +1,134 @@
+本文来自官方文档的入门教程CMake Tutorial (https://cmake.org/cmake/help/v3.17/guide/tutorial/index.html)
+目的在于对入门教程的再补充,从而对教程中出现的细节部分都搞懂.
+因此,如果在阅读教程时产生疑问,可以到此碰碰运气.
+
+必备要点
+    1.每个工程都需要一个CMakeLists.txt文件,一般位于源码目录.大概有个印象就是:工程包含源码与数个这样的文件
+    2.包含源文件的顶级目录称为源码树(source tree)
+    3.cmake构建系统的文件和构建输出档案所在的顶级目录称作构建树(build tree)
+        注意:也就是说,一般构建目录和源码所在目录是分开的,分别称作构建树和源码树
+    4.cmake [<options>] -S <path-to-source> -B <path-to-build>
+        表示使用<path-to-source>目录中的CMakeLists.txt文件生成构建工程,并未开始构建
+        构建工程位于<path-to-build>所在目录.
+        一般通常用法是在当前目录下作为构建路径,从而:cmake <path-to-source> 
+        例如,假定已存在源码树目录为sourcedir:
+            mkdir builddir  //创建构建目录
+            cd builddir     //进入目录
+            cmake sourcedir //在当前目录下(构建树目录)生成构建工程,其对应于sourcedir的源码树
+    5.其他cmake子命令
+        例如接着上面,再输入下面命令:
+            cmake --build . //在当前目录下进行构建
+            cmake --install . --prefix fuck   //执行安装当前目录,安装到相对当前目录的fuck目录下
+            注意:上两个选项需要放在第一位.
+    6.cpack命令进行打包,包括源码
+
+project(Tutorial)
+    设置工程名为Tutorial,可选的,你也能设置版本名,例如
+        project(Tutorial VERSION 1.0)
+        版本名形如 x.x.x 同时设置
+            PROJECT_VERSION     1.0
+            <PROJECT-NAME>_VERSION_MAJOR    1
+            <PROJECT-NAME>_VERSION_MINOR    0
+        等等.其中<PROJECT-NAME>,在本例来说,就是Tutorial
+add_executable(Tutorial tutorial.cxx)
+    添加一个使用后面的源文件生成的可执行档,默认情况下放在源码树对应的构建树目录
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+    复制一个输入文件到一个输出文件,然后修改输出文件的内容.即复制TutorialConfig.h.in 为TutorialConfig.h.
+    还会替换来自输入文件中@VAR@和${VAR}所对应的变量值.
+target_include_directories(Tutorial PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           )
+    添加头文件包含目录到此目标.即添加${PROJECT_BINARY_DIR}目录给Tutorial
+    PUBLIC表示指定之后参数的一种作用域,一般有三个选择
+        PUBLIC:将设置INCLUDE_DIRECTORIES和INTERFACE_INCLUDE_DIRECTORIES选项
+        PRIVATE:设置INCLUDE_DIRECTORIES,
+        INTERFACE:设置INTERFACE_INCLUDE_DIRECTORIES
+        其中
+        INCLUDE_DIRECTORIES表示只在编译当前目标时需要查找的目录
+        INTERFACE_INCLUDE_DIRECTORIES表示档有其他目标依赖此目标时,将会暴露这个目录作为头文件
+            例如当使用target_link_libraries()指定某个库,并且这个库指定INTERFACE的话,
+            也就自动包含此目录作为头文件搜寻目录
+        注意:默认编译器会在当前源文件相同的目录下搜索""引号包含的头文件,所以,在库的源文件种可以引用
+            相对于当前目录的头文件,例如,#include "fuck/fuck.h".从而在暴露库头文件时,即指定INTERFACE
+            时,通过这种相对路径包含方式,而不再需要指定PRIVATE.当然,指定了,就可以直接包含,#include "fuck.h"
+set(CMAKE_CXX_STANDARD 11)
+    设置某个变量值.以上设置CMAKE_CXX_STANDARD为11
+add_library(MathFunctions mysqrt.cxx)
+    添加一个使用后面源文件生的库.即添加MathFunctions库,由mysqrt.cxx编译而成.
+    默认添加静态库.可以指定为三个选项
+        STATIC:静态库
+        SHARED:动态共享库(默认不是pic)
+        MODULE:动态库,可以运行时通过打桩函数加载
+    option(BUILD_SHARED_LIBS "Build using shared libraries" ON)可以开启全局SHARED
+    对于SHARED和MODULE,默认POSITION_INDEPENDENT_CODE是ON(打开的)
+target_link_libraries(Tutorial PUBLIC MathFunctions)
+    以上形式表示目标Tutorial会链接向MathFunctions库,然后当前目标附带Mathfucntions,一起作为连接接口
+    有三种方式,不算上述PUBLIC,还有两种
+        PRIVATE:表示随后的库或目标会被连接,它们不会作为连接接口
+        INTERFACE:表示会附带随后的库或目标作为连接接口,但它们并不连接到当前指定目标
+    还有一种形式没有这个选项:target_link_libraries(<target> <item>...)
+        表示传递依赖.如果其他目标依赖当前指定的目标,那么通过此命令指定的后面的目标也作为依赖
+add_subdirectory(MathFunctions)
+    添加子构建目录.即添加Mathfunctions目录,构建系统会查找其中的CMakeLists.txt文件
+option(USE_MYMATH "Use tutorial provided math implementation" ON)
+    表示可选地打开或关闭某个条件变量.ON和OFF,默认为OFF.变量可以自己任意写,如果和之前的表示其他类型的变量冲突,则无效.
+install(TARGETS MathFunctions DESTINATION lib)
+install(FILES MathFunctions.h DESTINATION include)
+
+list(APPEND EXTRA_LIBS MathFunctions)
+    表示在列表中后添加一个值到列表中.即把MathFunctions添加到EXTRA_LIBS中.
+    EXTRA_LIBS不存在,则先在当前作用域定义它.具体其他子命令见官网
+add_test(NAME Runs COMMAND Tutorial 25)
+    添加测试runs,使用命令TUtorial 25
+set_tests_properties(Usage
+  PROPERTIES PASS_REGULAR_EXPRESSION "Usage:.*number"
+  )
+    设置Usage测试(即使用add_test()命令添加的测试名)的PASS_REGULAR_EXPRESSION属性.
+        表示输出如果存在一条匹配后面的正则表达式,则测试通过
+include(CheckSymbolExists)
+    加载或运行CheckSymbolExists模块中的代码.也可加载或执行文件
+check_symbol_exists(log "math.h" HAVE_LOG)
+    这是属于模块中,不属于命令中.
+    表示检查c语言中,在math.h文件中是否存在一个符号,例如,函数,变量或宏,然后把结果放到cmake的HAVE_LOG变量中,
+        它会被创建作为内部缓存变量
+target_compile_definitions(MathFunctions
+                            PRIVATE "HAVE_LOG" "HAVE_EXP")
+    添加编译器定义到目标中(类似于在命令行定义宏),-D前缀则移除条目
+        target_compile_definitions(foo PUBLIC FOO)
+        target_compile_definitions(foo PUBLIC -DFOO)  # -D removed
+        target_compile_definitions(foo PUBLIC "" FOO) # "" ignored
+        target_compile_definitions(foo PUBLIC -D FOO) # -D becomes "", then ignored
+    一共也存在包括PRIVATE的三种选项.
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Table.h
+  COMMAND MakeTable ${CMAKE_CURRENT_BINARY_DIR}/Table.h
+  DEPENDS MakeTable
+  )
+    添加自定义命令到构建系统.以上首先
+        输出文件是${CMAKE_CURRENT_BINARY_DIR}/Table.h
+        命令是MakeTable ${CMAKE_CURRENT_BINARY_DIR}/Table.h
+        指定命令依赖是MakeTable,可以是目标或文件
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+include(CPack)
+    以上命令为打包做准备.
+include(CTest)
+set(CTEST_PROJECT_NAME "CMakeTutorial")
+set(CTEST_NIGHTLY_START_TIME "00:00:00 EST")
+set(CTEST_DROP_METHOD "http")
+set(CTEST_DROP_SITE "my.cdash.org")
+set(CTEST_DROP_LOCATION "/submit.php?project=CMakeTutorial")
+set(CTEST_DROP_SITE_CDASH TRUE)
+    以上命令为执行测试,之后执行 
+        ctest [-VV] -D Experimental
+    其执行dashboard测试操作,最终提交到CDash上
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+    启动共享库,即所有生成的库是共享库,而非默认的静态库
+set_target_properties(SqrtLibrary PROPERTIES
+                    POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
+                    )
+    设置SqrtLibrary库为位置无关的库,其中${BUILD_SHARED_LIBS}已被设置为ON了,因此只需要提取变量值
+target_compile_features(tutorial_compiler_flags INTERFACE cxx_std_11)
+    设置目标tutorial_compiler_flags的编译器特性

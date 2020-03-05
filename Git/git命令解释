@@ -1,9 +1,10 @@
 本文件中所有内容均来自官方文档,当时的版本是:Version 2.24.0
     之所以提出这个版本号问题,是因为版本叠加出现了一些新命令(当然,不用担心向后兼容,所有之前的命令未经官方说明,都保存了下来),例如,git switch
-    但新命令的引入并不是从这个版本引入的,只是我认为的从我自己的之前的使用印象中,认为是新的命令
+    但新命令的引入并不一定是从这个版本引入的,只是我认为的从我自己的之前的使用印象中,认为是新的命令
     当前主要引用自文档模块中的一个用户手册部分(https://git-scm.com/docs/user-manual),但其中涉及到简略的命令说明,且很复杂时,也参考全局文档(https://git-scm.com/docs)
     本想根据自己的优先顺序进行各个部分的大体翻译,碍于水平有限,且无法集中精力,于是此文档成为了一个用户手册的微小版本,
     其包含了常用的命令,以及部分解释.我会尽力让之后的自己,或者一些读者能够理解此处的命令用法.
+    
 说明:
    1.对于工程中的没有跟踪的文件,它们对于git是不可知的,因此,git并不会操作它们,就好像透明一样.它们仅仅是在同一个文件系统目录内,不在git控制之内.
    2.一般对于需要commit的地方,可以使用十六进制散列名,也可用HEAD,分支名,甚至是标签名.
@@ -19,25 +20,28 @@ HEAD^2      第二个父
     a..b:双点表示从b可到达,但从a不可到达的.例如,提交
     a...b:三点表示从a和b到达,但不能同时从两个点到达.例如,a和b有共同祖先c,则a...b表示c..a和c..b
 工作树(working tree)   表示实际检出的文件树.工作树通常包含HEAD提交所对应的树的内容,加上树中你所做的任何的但还没有提交的本地改变.     
+
+                开始
+        
 git add
     1 git add <files>
-    当对一个文件第一次使用此命令时,它会把此文件内容添加到index对象树中,表明已跟踪了.随后对这个文件进行修改,那么这些变化也要使用
-        git add命令暂存到index中.files可以是目录和多个空格分开的文件列表或者通配符.最常用的是".",即当前目录.
+    当对一个文件第一次使用此命令时,它会把此文件内容添加到index对象树中,表明已跟踪了.随后对这个文件进行修改,那么这些变化要再次使用
+        git add命令添加到index中.files可以是目录或多个空格分开的文件列表或者通配符,最常用的是".",即当前目录.
 git restore(新命令)
     此命令可以使用一个恢复源来恢复工作树中特定部分的内容,即,恢复索引文件或者恢复(索引对应)工作树中的文件.
-        (索引和工作树实际上类似一个硬币的两个面,它们呈现数据的方式不同)
+        (工作树就是从commit指向的树对象checkout出来树,用于使用)
         git restore [<options>] [--source=<tree>] [--staged] [--worktree] <pathspec>…​
     如果是恢复索引文件,则意味着git add所添加的改变将被复原.这也是git status命令中会提示的结果
     如果恢复改变的文件,注意,这很危险,这样所做的改变将可能会丢失,务必谨慎使用,除非你知道自己在所什么
     默认情况下不指定--source=<tree>选项,索引文件对应来源是HEAD,而索引树的改变对应的来源则是当前索引
     1   git restore --staged <file>
     只从HEAD中恢复file到索引中.但并不把工作目录中的变化也恢复.另一个选项--worktree表示只把有改变的已跟踪的文件恢复到索引中的状态
-    默认情况下携带--worktree选项,但指定--staged时,则只不携带--worktree选项.可以同时都指定,都恢复
+    默认情况下携带--worktree选项,但指定--staged时,则默认不携带--worktree选项.可以同时都指定,都恢复
     
 git diff
     1   git diff
-    查看当前暂存区,也称作"index",索引区,的变化,即已跟踪的文件的变化,而与当前工作目录(work directory)变化无关.
-        使用git add新跟踪的文件也不算在内.一般来说,修改已暂存的文件的变化会展示出来
+    查看当前index(索引区)的变化,即已跟踪的文件的变化.也就是对已跟踪文件的修改(注意:实际上与当前工作目录(work directory)变化无关)
+        使用git add新跟踪的文件也不算在内
     2   git diff --cached [<commit>]
     这样使用时,是假如当前使用git commit命令进行提交时,它与已提交的对象,commit,的变化.默认情况(即不存在commit参数)下,相对于HEAD
         当我们修改一个已暂存的对象时,使用命令1可以查看对应改变.然后git add后,再用当前命令,之前的改变才会出现.
@@ -51,11 +55,11 @@ git diff
         git diff <commit>   ----->工作树与commit的变化,通常,commit可以是HEAD
 git commit
     1   git commit
-    提交当前index中的对象,之后会提示使用已设置的编辑器(例如:vim,默认根据平台安装的编辑器设置,也可手动设置)来输入提交信息.
+    提交当前index中的对象,之后会提示使用已设置的编辑器(例如:vim,默认根据平台安装的编辑器设置,也可手动设置core.editor变量)来输入提交信息.
         关于提交信息的编写,那会是一个值得仔细考虑的问题.
     2   git commit -a
-    直接使用git commit命令会提交通过git add命令所暂存的或已跟踪的index对象.-a选项相当于先对所有存在于index中的修改使用
-        了git add 命令,于是只用这一条命令就可以直接提交已跟踪但未暂存修改的文件.当然,同样的与当前工作目录中的新文件无关.
+    直接使用git commit命令会提交通过git add命令所暂存的index对象.-a选项相当于先对所有存在于index中的修改使用
+        了git add 命令,于是只用这一条命令就可以直接提交已跟踪的修改的文件(当然,同样的再次与当前工作目录中的新文件无关)
     3   git commit -m<message>
     -m选项可以在一行内提供提交信息,而不需要在编辑器内写提交信息,例如:
         git commit -a -m"第二次提交"
@@ -262,3 +266,26 @@ git reset [<mode>] [<commit>]
                             --hard   C       C     C
                             --merge (disallowed)
                             --keep   A       C     C
+git submodule
+    子模块命令,子命令:add status init deinit update summary foreach sync absorbgitdirs
+    git submodule add <repository> [<path>] 
+        添加子模块,然后添加对应目录到path对应的目录,这个目录是相对目录,相对于父工程的顶级目录.如果不存在path,则使用repository
+        中最后的一个路径,例如,http://github.com/a/b.git,那么目录是b.
+    *   这条裸命令效果是clone一个工程到path路径下,然后增加或修改一个文件.gitmodules,其在superproject顶级目录.这会在
+        git status命令下出现两个待提交的新条目.
+    git submodule init [--] [<path>...]
+        初始化子模块path,或者初始化submodule.active配置的模块,或者所有模块.
+    *   实际效果是在superproject的.git/config文件中增加submodule.$name.url条目,它使用.gitmodules中
+        一样的设置来作为模板
+    git submodule update  [--init]
+        更新已注册(已init的)的子模块,来匹配superproject所引用的commit,这会clone数据,然后更改子模块的工作树.
+        默认情况下会在子模块中checkout一个分离的HEAD.使用--init选项,就不用先init
+    *   所有子模块的.git目录都在superproject的.git/modules目录下
+    git submodule summary
+        显示子模块一些摘要信息
+    git submodule foreach [--recursive] <command>
+        对每个模块执行shell命令command.可选地递归子模块的子模块
+    git submodule sync [--recursive] [--] [<path>...]
+        同步子模块的远程url配置为.gitmodules文件中的.也就是改变path子模块上游.
+        只对superproject中.git/config文件中的条目有影响.
+        

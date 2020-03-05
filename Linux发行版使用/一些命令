@@ -12,3 +12,6 @@ popd pushd dirs
 
 ar,建立, 修改档案或从档案中抽取成员
     ar -x  xxx 从归档文件中抽取文件
+
+sed ':a ; N;s/\n/ / ; t a ; '
+    合并文件中所有行

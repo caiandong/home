@@ -6,16 +6,16 @@ git对象数据库
     让我们以一个新工程开始然后创建一个少量的历史:
         $ mkdir test-project
         $ cd test-project
-        $ git init
+        $ git init          //初始化一个git仓库
         Initialized empty Git repository in .git/
         $ echo 'hello world' > file.txt
-        $ git add .
-        $ git commit -a -m "initial commit"
+        $ git add .         //把当前目录添加到index
+        $ git commit -a -m "initial commit"     //提交
         [master (root-commit) 54196cc] initial commit
         1 file changed, 1 insertion(+)
         create mode 100644 file.txt
-        $ echo 'hello world!' >file.txt
-        $ git commit -a -m "add emphasis"
+        $ echo 'hello world!' >file.txt         //修改
+        $ git commit -a -m "add emphasis"       //-a选项提交index与目录树的改变
         [master c4d59f3] add emphasis
         1 file changed, 1 insertion(+), 1 deletion(-)
     git回应commit的7个十六进制数字是什么?
@@ -25,22 +25,22 @@ git对象数据库
     当跟随以上的例子时,我们可以料到你创建的提交对象的内容会生成不同的SHA-1散列而不是上面显示的那个,因为提交对象会记录它被生成时的时间和执行提交的人的名字.
     
     我们使用cat-file命令可以询问git关于这个特别的对象.复制你自己的版本的40位的十六进制提交名而非上面显示的.你也可以缩减到只有几个字母,减少输入整个40位长度.
-        $ git cat-file -t 54196cc2
+        $ git cat-file -t 54196cc2      //查看对象
         commit
-        $ git cat-file commit 54196cc2
+        $ git cat-file commit 54196cc2      //查看commit类型对象的内容
         tree 92b8b694ffb1675e5975148e1121810081dbdffe
         author J. Bruce Fields <bfields@puzzle.fieldses.org> 1143414668 -0500
         committer J. Bruce Fields <bfields@puzzle.fieldses.org> 1143414668 -0500
 
         initial commit
     一个树(tree)可以指向一个或更多"blob"对象,每个都对应一个文件.除此之外,树也可以指向其他树对象,从而会创建一个目录层次.你可以使用ls-tree命令检查任何树的内容(记住,足够长的开始的SHA-1名就够了):
-        $ git ls-tree 92b8b694
+        $ git ls-tree 92b8b694          //列出树对象
         100644 blob 3b18e512dba79e4c8300dd08aeb37f8e728b8dad    file.txt
     因此我们看到这棵树中有一个文件.SHA-1散列是到文件的数据的引用:
         $ git cat-file -t 3b18e512
         blob
     "blob"只是一个文件数据,我们也可以使用cat-file命令检查它:
-        $ git cat-file blob 3b18e512
+        $ git cat-file blob 3b18e512        //查看blob类型对象内容
         hello world
     注意到这是老的文件数据;所以git对初始树的响应所命名的对象是目录状态的快照,其由第一次提交所记录.
     

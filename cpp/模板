@@ -1,0 +1,49 @@
+
+template <int ...>
+struct IndexSeq{};
+非类型模板部分特化,特化为一个参数包
+
+template <int N,int ...Indexes>
+struct MakeIndexes:MakeIndexes<N-1,N-1,Indexes...>{};
+
+template <int ...Indexes>
+struct MakeIndexes<0,Indexes...>        //部分特化
+{
+    typedef  IndexSeq<Indexes...> type;
+}; 
+
+
+与以上相反,参数包部分特化为一个参数加参数包
+template <class ...T>
+class fuckyou
+{
+public:
+    fuckyou(){std::cout<<"本来模板\n";}
+};
+
+template<class T1,class ...t2>
+class fuckyou<T1,t2...>
+{
+public:
+    fuckyou(){std::cout<<"特化\n";}
+};
+
+
+
+template <class... Ts> struct tuple {};
+
+template <class T, class... Ts>         //部分特化
+struct tuple<T, Ts...> : tuple<Ts...> {
+  tuple(T t, Ts... ts) : tuple<Ts...>(ts...), tail(t) {}
+
+  T tail;
+};
+__PRETTY_FUNCTION__     
+    std::cout << __PRETTY_FUNCTION__ << "\n";
+    打印类型
+
+
+
+template<typename Head, typename... Tail>
+class tuple<Head, Tail...>:private tuple<Tail...> {  // here is the recursion
+}

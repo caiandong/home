@@ -1,8 +1,8 @@
-每个QML对象类型都一组已定义的属性(attribute)集合。一个对象类型的每一个实例被创建时都有一组已被定义为这种类型的属性的集合 。有几种不同类型的属性在以下被指定与描述。
+每个QML对象类型都一组已定义的属性(attribute)集合。一个对象类型的每一个实例在被创建时,都有一组属性的集合 。有几种不同类型的属性在以下被指定与描述。
 
 ## 对象声明中的属性
 
-在QML文档中的一个对象声明定义 了一个新类型。它也声明了一个将被实例化的对象层次结构，should an instance of that newly defined type be created.
+在QML文档中的一个对象声明(object declaration)定义了一个新类型。它也声明了一个将被实例化的对象层次结构，should an instance of that newly defined type be created.
 
 这组QML对象类型(object-type)属性类型如下:
 
@@ -19,9 +19,9 @@
 
 每个QML对象类型都有一个确定的id属性.此属性由语言自身提供，而且也不能被任何QML对象类型重新定义或者覆盖。
 
-一个值可能被赋予一个对象类型的id属性，***来让那个对象是唯一标识然后被其他对象指向引用***。id必须以小写字母或下划线开头，不能包含非字母，数字和下划线。
+一个值可以被赋予一个对象类型的id属性，***来让那个对象是唯一标识然后被其他对象指向引用***。id必须以小写字母或下划线开头，不能包含非字母，数字和下划线。
 
-下面是一个TextInput对象和一个Text对象,TextInput对象的id值被设置成"myTextInput"。Text对象设置它的text属性的值和TextInput的Text属性值相同，这是通过指向myTextInput.text。现在，两个条目将显示相同的文本:
+下面是一个TextInput对象和一个Text对象,TextInput对象的id值被设置成"myTextInput"。Text对象把它的text属性的值设置和TextInput的text属性值相同，这是通过指向myTextInput.text。现在，两个条目将显示相同的文本:
 
 ```qml
   import QtQuick 2.0

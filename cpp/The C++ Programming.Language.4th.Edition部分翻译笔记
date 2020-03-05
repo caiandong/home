@@ -1,0 +1,131 @@
+### 7.7.2 右值引用(Rvalue References)
+有超过一种引用类型的基本想法是为了支持对象的不同的用途:
+
+- 一个指向对象的`non-const左值引用`,这个引用的使用者可以写这个对象.
+- 一个指向常量的`const左值引用`,从引用使用者的视角看来是不可变的.
+- 一个指向临时对象的`右值引用`,引用的使用者可能会修改(通常来说会的)它,且假设对象再也不会被使用.
+
+我们想要知道是否一个引用指向临量,因为如果是这样,我们有时候可以把一个昂贵的复制操作转化为一个廉价的移动操作.被一个小的,指向可能有大量信息的描述符表示的对象,可以被简单廉价地移动,要是我们知道那样的资源不再打算被使用的话.典型的例子是返回值,编译器知道一个本地返回的变量将永不再会被使用.
+
+一个右值引用可以绑定到一个右值,而不能到一个左值.在那样的情况下,右值引用和左值引用完全想法.例如:
+
+```cpp
+string var {"Cambridge"};
+string f();
+string& r1 {var};               //左值引用
+string& r2 {f()};               //错误    
+string& r3 {"Princeton"};       //错误
+
+string&& rr2 {var};             //错误
+string&& rr1 {f()};             //右值引用
+string&& rr3 {"Oxford"};        //右值引用
+
+const string cr1& {"Harvard"};  //const左值引用	
+```
+
+&& 声明符操作符意味着"右值引用".我们不使用const右值引用;因为使用右值引用的大多数好处都关系到写入它所指向的对象.
+const左值引用和右值引用都可以绑定到一个右值.然而,这些目的是从根本上不同的:
+
+- 我们使用右值引用实现"有破坏性的读取",是为了一个本应该需要复制操作的优化.
+- 我们使用const左值引用防止一个实参被修改.
+	
+
+一个由右值引用指向的对象被访问时,完全就像在访问由左值引用指向的对象或一个普通的变量名指向的对象.例如:
+
+```cpp
+string f(string&& s)
+{
+    if (s.size())
+        s[0] = toupper(s[0]);
+    return s;
+}
+```
+
+有时候,编程人员知道一个对象将不再被使用,甚至编译器都不知道.考虑下面:
+
+```cpp
+ template<class T>
+ swap(T& a, T& b)    // "old-style swap"
+ {
+     T tmp {a};  // now we have two copies of a
+     a = b;      // now we have two copies of b
+     b = tmp;    // now we have two copies of tmp (aka a)
+ }
+```
+
+如果T类型在复制它的元素时是一个昂贵操作,例如string和vector,此swap()也会变为昂贵操作.注意到不平常的事情是:我们不想要任何复制;我们只想来回移动a,b和tmp的值.我们可以告诉编译:
+
+```cpp
+template<class T>
+void swap(T& a, T& b)            // "perfect swap" (almost)
+{
+    T tmp {static_cast<T&&>(a)};     // the initialization may write to a
+    a = static_cast<T&&>(b);         // the assignment may write to b
+    b = static_cast<T&&>(tmp);      // the assignment may write to tmp
+}
+```
+
+static_cast<T&&>(x)的结果值是一个指向x的T&&类型右值.如果有对于右值优化的操作,现在可以用在x上了.
+​尤其是,如果类型T有一个移动构造器,或移动赋值,那它会被使用,考虑vector:
+
+```cpp
+template<class T> class vector 
+{
+    // ...
+    vector(const vector& r);    // copy constr uctor (copy r’s representation)
+    vector(vector&& r);         // move constructor ("steal" representation from r)
+};
+vector<string> s;
+vector<string> s2 {s};              // s is an lvalue, so use copy constructor
+vector<string> s3 {s+"tail");       // s+"tail" is an rvalue so pick move constr uctor
+```
+
+swap()中使用static_cast有点啰嗦且有点容易打错,所以标准库提供move()函数:move(x)意味着static_cast<X&&>(x),X是x的类型.使用给定函数,我们可以清理下swap()的定义:   
+
+```cpp
+template<class T>
+void swap(T& a, T& b)   // "perfect swap" (almost)
+{
+    T tmp {move(a)};
+    a = move(b);
+    b = move(tmp);
+}
+```
+
+与原来的swap()比较,最新的版本不需要任何复制;它会在任何可能的时候使用移动操作.
+	
+既然move(x)并不移动x(它简单地产生一个到x的右值引用),如果move()被叫做rval()的话肯定更好,但到现在,move()已被使用多年了.
+
+我之前认做swap()"几乎完美",因为它只交换左值.考虑以下:	   
+
+```cpp
+ void f(vector<int>& v)
+ {
+     swap(v,vector<int>{1,2,3});
+     // ...
+ }
+```
+
+想要用一些默认值替换容器的内容并不常见,但这个特殊的swap()做不到.一个解决方式是使用两个重载:
+
+```cpp
+ template<class T> void swap(T&& a, T& b);
+ template<class T> void swap(T& a, T&& b);
+```
+
+我们的例子将会被最新版的swap()处理.标准库采用一个不同的方式,它给vector,string定义了shrink_to_fit()和clear() 等等函数,来处理到swap()右值参数的常见情况:
+
+```cpp
+void f(string& s, vector<int>& v)
+{
+    s.shrink_to_fit();// make s.capacity()==s.size()
+    swap(s,string{s});// make s.capacity()==s.size()
+    v.clear();
+    swap(v.vector<int>{});
+    v = {};
+}
+```
+
+右值引用也可以用来提供完美转发.
+	
+所有标准库容器都提供了移动构造器和移动赋值.并且,他们的插入新元素操作,例如insert()和push_back(),有一个使用右值引用的版本.
