@@ -8,8 +8,9 @@
 ## 检查配置信息
 
     如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置。
-# 特别的，为github生成ssh密钥
+# 特别的,生成ssh密钥
     $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    > 默认生成在~/.ssh/目录下,复制*key.pub*文件中的公钥内容内容到github指定处.
 ## 基本命令
   * git init
   

@@ -2,16 +2,16 @@
 
 ## 为上文的部分学习笔记(大部分自译)
 
-### 2.1       Variadic Class Templates
-可变模板让我们显式声明`tuple`接受一个或多个模板类型形参(parameter),:以上模板变成:
+### 2.1 Variadic Class Templates(变参模板)
+**变参模板**(也有叫做可变参数模板)让我们显式声明`tuple`接受一个或多个**模板类型形参(template type parameter)**,:以上模板变成:
 
 ``` cpp
 template<typename... Elements> class tuple;
 ```
 
-`Elements`标识符左边的省略号表明`Elements`是一个模板类型形参包:一个形参包是由可变模板引入的一种新实体.不像一个形参只能绑定到一单个实参(argument)上,多个实参可以可以被"打包"进一单个形参包.如果使用以上`integral types`类型定义,`Elements`形参包将绑定到一个模板实参列表:char,short,int,long,和long long.
+`Elements`标识符左边的省略号表明`Elements`是一个**模板类型形参包(template type parameter pack)**:一个形参包是由变参模板引入的一种新实体.不像一个形参只能绑定到一单个**实参(argument)**上,多个实参可以可以被"打包"进一单个形参包.如果使用以上`integral types`的`typedef`,形参包`Elements`将绑定到一个模板实参列表:char,short,int,long,和long long.
 
-除了模板类型实参的模板形参包,可变类模板也可以有非类型实参和模板模板实参的形参包.例如,我们可以声明一个`array`类,它支持任意维度:
+除了模板类型实参的模板形参包,变参类模板也可以有非类型实参和模板模板实参的形参包.例如,我们可以声明一个`array`类,它支持任意维度:
 
 ``` cpp
 template<typename T, unsigned PrimaryDimension, unsigned... Dimensions>
@@ -19,11 +19,11 @@ class array { /∗ implementation ∗/ };
 array<double, 3, 3> rotation_matrix; // 3x3 rotation matrix
 ```
 
-对于`rotation_matrix`,`array`的模板形参被推断为:T=double, PrimaryDimension=3, 以及Dimensions形参包包含3.注意`Dimensions`实际上是一个模板非类实参列表,尽管那个列表只包含一单个元素.
+对于`rotation_matrix`,`array`的模板形参被推断为:T=double, PrimaryDimension=3, 以及包含3的Dimensions形参包.注意`Dimensions`实际上是一个模板非类实参列表,尽管那个列表只包含一单个元素.
 
 ### 2.2 Packing and Unpacking Parameter Packs
 
-很容易声明一个可变类模板,但到目前为止,我们还未用这些被传递给我们的模板的额外的实参做任何事情.想要用形参包做些事情,先要`解包`(或扩展)形参包中的所有实参成分割的实参列表,从而被转发到另一个模板上.为了演示这个过程,我们定义一个模板,它数出模板类型实参的数量,它被给定为:
+很容易声明一个变参类模板,但到目前为止,我们还未用这些被传递给我们的模板的额外的实参做任何事情.想要用形参包做些事情,先要把形参包中的所有实参`解包`(或扩展)成分割的实参列表,从而能被转发到另一个模板上.为了演示这个过程,我们定义一个模板,让它数出模板类型实参的数量,它被给定为:
 
 ```cpp
 template<typename... Args> struct count;
@@ -38,7 +38,7 @@ struct count<> {
 };
 ```
 
-接着我们想要定义递归情况.想法是剥离出第一个提供给`count`的模板类型实参,然后打包剩下的实参成一个模板形参包:
+接着我们想要定义递归情况.想法是剥离出提供给`count`的第一个模板类型实参,然后把剩下的实参打包成一个模板形参包:
 
 ```cpp
 template<typename T, typename... Args>
@@ -51,25 +51,27 @@ struct count<T, Args...> {
 
 省略号也解包一个位于部分特化的`count<T,Args...>`中的形参包,在这个特化模板中,**模板实参推断又会打包"额外的"被传递给`count`的形参进`Args`**.例如,`count<char, short, int> `实例会选择这个部分特化,绑定**T**到**char**,**Args**到一个包含**short**和**int**的列表.
 
-`count`模板是一个递归算法.部分特化会从模板实参列表拉出一个实参(T),同时把剩下的实参放进`Args`.然后它会通过实例化`count<Args...>`计算`Args`的长度,然后再把它加1.当`Args`最终是空时,实例`count<Args...>`会选择全特化的`count<>`(它扮演着递归的基本情形),然后递归终止.
+`count`模板是一个递归算法.当这个部分特化被选中时,它(这个特化模板)会从模板实参列表拉出一个实参(T),同时把剩下的实参放进`Args`.然后它会通过实例化`count<Args...>`计算`Args`的长度,然后再把它加1.当`Args`最终是空时,实例`count<Args...>`会选择全特化的`count<>`(它扮演着递归的基本情形),然后递归终止.
 
 省略号操作符对于解包的使用,允许我们利用可变模板实现`tuple`:
 
 ```cpp
 template<typename... Elements> class tuple;
+
 template<typename Head, typename... Tail>
 class tuple<Head, Tail...> : private tuple<Tail...> {
 	Head head;
 public:
 	/∗ implementation ∗/
 };
+
 template<>
 class tuple<> {
 	/∗ zero-tuple implementation ∗/
 };
 ```
 
-这里,我们使用递归继承来为形参包中的每个元素在每个类存储一个成员.每个`tuple`实例剥离第一个模板实参,创建那种类型的一个成员`head`,然后从包含剩下模板实参的`tuple`继承.
+这里,我们使用递归继承来为形参包中的每个元素在每个类中存储一个成员.每个`tuple`实例剥离第一个模板实参,创建那种类型的一个成员`head`,然后从包含剩下模板实参的`tuple`继承.
 
 ### 2.3 Variadic Function Templates
 C的变长函数形参列表允许任意数量的"额外的"实参被传递给函数.这个特性很少被用在C++代码中(除了一些与C库的兼容性用到),因为通过省略号传递非POD类型关系到未定义行为.例如,这个简单的代码在运行时将可能崩溃:
@@ -85,14 +87,14 @@ printf(msg, std::string(”pi”), 3.14159, ”Indiana”)
 template<typename... Args> void eat(Args... args);
 ```
 
-`eat()`函数是一个带有形参包`Args`的可变模板.然而,函数形参列表更有趣:标识符`args`左边的省略号表明`args`是一个*函数形参包*.函数形参包可以接受任意数量函数实参,它的类型是模板类型形参包`Args`.考虑下,例如,调用`eat(17, 3.14159, string(‘‘Hello!’’))`:三个函数调用实参会被打包,所以`args`包含**17**,**3.14159**和**string("hello")**,然而`Args`包含这些实参的类型:**int** **double** 和**string**.这效果就好像我们像下面那样已经写了三个实参版本的`eat()`函数,但没有必须三个实参的限制:
+`eat()`函数是一个带有形参包`Args`的变参模板.然而,函数形参列表更有趣:标识符`args`左边的省略号表明`args`是一个***函数形参包***.函数形参包可以接受任意数量函数实参,**它的类型是模板类型形参包`Args`**(个人认为这句话有待商榷).例如,考虑下调用`eat(17, 3.14159, string(‘‘Hello!’’))`:三个函数调用实参会被打包,所以`args`包含**17**,**3.14159**和**string("hello")**,然而`Args`包含这些实参的类型:**int** **double** 和**string**.这效果就好像我们像下面那样已经写了三个实参版本的`eat()`函数,但没有必须要三个实参的限制:
 
 ```cpp
 template<typename Arg1, typename Arg2, typename Arg3>
 void eat(Arg1 arg1, Arg2 arg2, Arg3 arg3);
 ```
 
-可变函数模板允许我们表示一个类型安全的`printf()`来用于非POD类型.下面的代码使用可变模板实现一个对C++友好的,类型安全的`printf()`:
+变参函数模板允许我们表示一个类型安全的`printf()`来用于非POD类型.下面的代码使用可变模板实现一个对C++友好的,类型安全的`printf()`:
 
 ```cpp
 void printf(const char∗ s) {
@@ -159,14 +161,14 @@ struct adaptor : public Base {
 };
 ```
 
-解包模式可以出现在任何模板实参列表的尾部.这也意味着多个形参包可以出现在同一个模板中.例如,可以声明一个用于tuple的比较相等性操作符(==),让它可以比较存储不同元素集合的tuples:
+解包模式可以出现在任何模板实参列表的尾部.这也意味着多个形参包可以出现在同一个模板中.例如,可以声明一个用于tuple的比较相等性操作符(==),让它可以比较存储不同元素集合的两个tuple:
 
 ```cpp
 template<typename... Elements1, typename... Elements2>
 bool operator==(const tuple<Elements1...>& t1, const tuple<Elements2...>& t2);
 ```
 
-这个函数是一个可变模板(它包含两个模板形参包),但函数形参列表是固定的(它没有包含函数参数包).它使用两个模板形参包,它们各自用于每个tuple实参.如果我们想要我们的比较相等性操作只考虑精确的相同元素类型,我们会这样写:
+这个函数是一个变参模板(它包含两个模板形参包),但函数形参列表是固定的(它没有包含函数形参包).它使用两个模板形参包,它们各自用于每个tuple实参.如果我们想要我们的比较相等性操作只考虑精确的相同元素类型,我们会这样写:
 
 ```cpp
 template<typename... Elements>
@@ -199,3 +201,14 @@ struct count {
 ```
 
 尽管不是严格必须的(没有这个特性我们也可以实现count),但检查参数包的长度是一个普遍操作,它值得有简单的语法.更重要的是,这个操作对于类型检查原因可能会变得必要,即当可变模板和`concept`结合时.参见3.3部分
+
+> 这部分对部分地方的疑问的一个理解,即:
+>
+> *对于**template<typename... Args> void eat(Args... args);** ,它既是一个函数形参包声明args,又是一个Args的解包模式,这很让人困惑*
+>
+> 从函数参数中的...省略号(第二个省略号)入手.对于函数模板形参包Args来说,它位于右边,所以它是解包.对于args来说,它位于左面,因而是函数形参包的声明.重点在于省略号有种一石二鸟的作用,更重要的是,这两个作用是在不同阶段产生的,尝试这样思考,我们已经朝着解开疑问的重要方向了.
+>
+> 第一阶段,当然是函数形参包args的声明,它让此变参函数模板接受0或多个实参.然后进行模板实参推导,对每一个实参推断出对应的类型,于是打包到Args中.假设eat(5,"abc",1.0).于是推断为Args(int,const char *,double)
+>
+> 第二阶段,做完其他工作后,最终需要生成模板形参包对应的函数.于是对形参包Args解包.生成函数eat(int ,const char *,double);
+

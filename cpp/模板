@@ -1,36 +1,101 @@
+- <u>**parameter(形参)**和**argument(实参)**有时候可能都称作`参数`,可以根据上下文中进行判断出来</u>
 
+#### 部分概念
+
+```text
+		泛左值          	右值
+
+左值         		 亡值      		 纯右值    
+```
+
+### 引用坍塌(或引用折叠)
+
+- T&& &&,坍塌成为T&&
+
+- 其他都坍塌成为T&,例如:T&& &,T& &,T& &&.
+
+#### std::remove_reference
+
+```cpp
+template< class T >
+struct remove_reference;
+//可能的实现
+template< class T > struct remove_reference      {typedef T type;};
+template< class T > struct remove_reference<T&>  {typedef T type;};
+template< class T > struct remove_reference<T&&> {typedef T type;};
+//c++14
+template< class T >
+using remove_reference_t = typename remove_reference<T>::type;
+```
+
+#### std::forward
+
+```cpp
+//c++14起
+template< class T >
+constexpr T&& forward( std::remove_reference_t<T>& t ) noexcept;
+template< class T >
+constexpr T&& forward( std::remove_reference_t<T>&& t ) noexcept;
+```
+
+一个可能的用法是:
+
+```cpp
+template<class T>
+void wrapper(T&& arg) 
+{
+    // arg 始终是左值
+    foo(std::forward<T>(arg)); // 转发为左值或右值，依赖于 T
+}
+```
+
+
+
+### 部分特化
+
+- 基准情形是第一个**模板非类型参数**(template non-type parameter)int为0.模板非类型参数部分特化.其中,每次模板非类型参数包增加前面一个非类型参数`N-1`,参数包中元素数量增加.
+
+```cpp
 template <int ...>
 struct IndexSeq{};
-非类型模板部分特化,特化为一个参数包
 
+//主模板(primary template)
+//递归情形
 template <int N,int ...Indexes>
-struct MakeIndexes:MakeIndexes<N-1,N-1,Indexes...>{};
+struct MakeIndexes:MakeIndexes<N-1,N-1,Indexes...> //与下面不同
+{
+    
+};
 
 template <int ...Indexes>
-struct MakeIndexes<0,Indexes...>        //部分特化
+struct MakeIndexes<0,Indexes...>        //部分特化.基准情形
 {
     typedef  IndexSeq<Indexes...> type;
 }; 
+```
 
+- 基准情形是形参包元素数量为0.与以上相似,但它是**解包**(unpack),每次使参数包元素数量减少1.
 
-与以上相反,参数包部分特化为一个参数加参数包
+```cpp
 template <class ...T>
-class fuckyou
+class fuckyou		//也是基准情形
 {
 public:
     fuckyou(){std::cout<<"本来模板\n";}
 };
 
-template<class T1,class ...t2>
-class fuckyou<T1,t2...>
+template<class T1,class ...T2>
+class fuckyou<T1,T2...>:public fuckyou<T2...>	//递归情形.此处与上面不同
 {
 public:
     fuckyou(){std::cout<<"特化\n";}
 };
+```
 
+- 基准情形也是形参包元素数量为0
 
-
-template <class... Ts> struct tuple {};
+```cpp
+template <class... Ts> struct tuple {};		//主模板
 
 template <class T, class... Ts>         //部分特化
 struct tuple<T, Ts...> : tuple<Ts...> {
@@ -38,12 +103,11 @@ struct tuple<T, Ts...> : tuple<Ts...> {
 
   T tail;
 };
-__PRETTY_FUNCTION__     
-    std::cout << __PRETTY_FUNCTION__ << "\n";
-    打印类型
-
-
 
 template<typename Head, typename... Tail>
 class tuple<Head, Tail...>:private tuple<Tail...> {  // here is the recursion
 }
+```
+
+> __PRETTY_FUNCTION__     
+>     std::cout << __PRETTY_FUNCTION__ << "\n";	//打印类型
