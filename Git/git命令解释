@@ -269,18 +269,18 @@ git reset [<mode>] [<commit>]
 git submodule
     子模块命令,子命令:add status init deinit update summary foreach sync absorbgitdirs
     git submodule add <repository> [<path>] 
-        添加子模块,然后添加对应目录到path对应的目录,这个目录是相对目录,相对于父工程的顶级目录.如果不存在path,则使用repository
+        添加子模块,然后添加对应的目录path(目录名不存在,则生成),这个目录是相对目录,相对于父工程的顶级目录.如果不存在path参数,则使用repository
         中最后的一个路径,例如,http://github.com/a/b.git,那么目录是b.
-    *   这条裸命令效果是clone一个工程到path路径下,然后增加或修改一个文件.gitmodules,其在superproject顶级目录.这会在
-        git status命令下出现两个待提交的新条目.
+    *   这条裸命令效果是clone一个工程到path路径下,然后增加或修改一个文件.gitmodules,这个文件在superproject顶级目录.
+        然后,你会会在git status命令下看见两个待提交的新条目.
     git submodule init [--] [<path>...]
         初始化子模块path,或者初始化submodule.active配置的模块,或者所有模块.
     *   实际效果是在superproject的.git/config文件中增加submodule.$name.url条目,它使用.gitmodules中
         一样的设置来作为模板
-    git submodule update  [--init]
-        更新已注册(已init的)的子模块,来匹配superproject所引用的commit,这会clone数据,然后更改子模块的工作树.
-        默认情况下会在子模块中checkout一个分离的HEAD.使用--init选项,就不用先init
-    *   所有子模块的.git目录都在superproject的.git/modules目录下
+    git submodule update  [--init]  [--depth]
+        更新已注册(已init的)的子模块,来匹配superproject所引用的commit,这基本上会clone数据,然后又更改子模块的工作树.
+        默认情况下会在子模块中checkout一个分离的HEAD.如果使用--init选项,就不用先init
+    *   所有子模块的.git目录都在superproject的.git/modules/目录下
     git submodule summary
         显示子模块一些摘要信息
     git submodule foreach [--recursive] <command>

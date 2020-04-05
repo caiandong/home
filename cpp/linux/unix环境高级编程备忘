@@ -1,0 +1,9 @@
+8.12节解释器文件
+    可以参考https://linux.die.net/man/2/execve中的Interpreter scripts部分
+    An interpreter script is a text file that has execute permission enabled and whose first line is of the form:
+        #! interpreter [optional-arg]
+    The interpreter must be a valid pathname for an executable which is not itself a script. If the filename argument of execve() specifies an interpreter script, then interpreter will be invoked with the following arguments:
+        interpreter [optional-arg] filename arg...
+    where arg... is the series of words pointed to by the argv argument of execve().
+    For portable use, optional-arg should either be absent, or be specified as a single word (i.e., it should not contain white space); 
+    位于man 2 execve

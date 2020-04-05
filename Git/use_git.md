@@ -9,15 +9,16 @@
 
     如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置。
 # 特别的,生成ssh密钥
-    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-    > 默认生成在~/.ssh/目录下,复制*key.pub*文件中的公钥内容内容到github指定处.
+$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"    
+> 默认生成在~/.ssh/目录下,复制*key.pub*文件中的公钥内容内容到github指定处.
+
 ## 基本命令
-  * git init
-  
+* git init
+
     初始化一个仓库
-    
-  * git clone [仓库名]  [仓库的本地名]
-  
+
+* git clone [仓库名]  [仓库的本地名]
+
     如果本地名省略。默认为 origin
 
 * git add [filename|.]
@@ -69,7 +70,6 @@
   > 件做的任何修改都会消失 - 你只是拷贝了另一个文件来覆盖它。 除非你确实清楚不想要
   > 那个文件了,否则不要使用这个命令。
   
-
 * git commit --amend 
 
   等价于git reset --soft ~HEAD.类似于把上次提交放弃,然后加上当前提交内容,组成一个新提交.
@@ -225,11 +225,11 @@
 
   * git reset --soft ~HEAD 
     
-    移动HEAD所指向的当前分支(比如master)到分支的父节点。
+    移动HEAD所指向的当前分支(比如master)到分支的父commit。
     
   * git reset --mixed ~HEAD 
     
-    不仅把当前分支移动到父节点，也把索引更新为父节点。这是git reset ~HEAD 的默认行为
+    不仅把当前分支移动到父commit，也把index更新为父commit。这是git reset ~HEAD 的默认行为
 
 ####  git reset --mixed ~HEAD
 
@@ -238,15 +238,14 @@
   * 说明
     reset 命令会以特定的顺序重写这三棵树,在你指定以下选项时停止:
     1. 移动 HEAD 分支的指向 (若指定了 --soft,则到此停止)
-    2. 使索引看起来像 HEAD (若未指定 --hard,则到此停止)
-    3. 使工作目录看起来像索引
+    2. 使index看起来像 HEAD (若未指定 --hard,则到此停止)
+    3. 使工作目录看起来像index
     
   * git reset file.txt (这其实是 git reset --mixed HEAD file.txt 的简写形式)
   
-    git跳过第一步，因为你无法让它同时指向两个提交中各自的一部分(找不到这样的提交节点去引用，相反索引和工作目录可以部分改变)。
-    结果就是再一次把索引部分更改为其他引用(这里是HEAD)所指向的版本，例如:
+    git跳过第一步，因为你无法让它同时指向两个提交中各自的一部分(找不到这样的提交节点去引用，相反index和工作目录可以部分改变)。
+    结果就是再一次把index更改为其他引用(这里是HEAD)所指向的版本，例如:
     也可以指定具体的提交节点 git reset eb43bf file.txt 。
-    
 #### git checkout file.txt
 
-    也不改变HEAD,但把索引内file.txt更改为其他提交节点的版本，也把工作目录file.txt也覆盖掉。这是危险的命令，不可逆
+    也不改变HEAD,但把index内file.txt更改为其他提交节点的版本，也把工作目录file.txt也覆盖掉。这是危险的命令，不可逆

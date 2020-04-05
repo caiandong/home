@@ -1,45 +1,9 @@
-查看arch上的包组
-    https://www.archlinux.org/groups/
-assistant缺少libQt5WebKitWidgets.so.5 
-    qt5-webkit
-查找含有某个文件的包，例如:pacman -F libQt5WebKitWidgets.so.5
-    qtcreator
-电报
-    telegram-desktop
-ss
-    shadowsocks-qt5 
-ssr
-    electron-ssr
-v2ray
-    v2ray
-    qv2ray  //图形客户端
-    Mellow      //同上
-强制代理
-    proxychains-ng  
-    配置文件 /etc/proxychains.conf
-github clone慢
-        例如:proxychains git clone https://github.com/caiandong/home.git
-搜狗
-    fcitx-configtool fcitx-lilydjwg-git fcitx-sogoupinyin fcitx-qt5
-==============kde============
-截图
-    spectacle
-文本编辑器
-    kate
-chm查看
-    kchmviewer
-pdf
-    okular
-        poppler-data //pdf乱码
-压缩
-    ark
-计算器
-    kcalc
-=====================end=============
-百度网盘
-    baidunetdisk-bin 
-字体
-    wqy-microhei    //文泉驿正黑
+1.关闭swap
+    一方面目前内存日常使用足够,另一方面swap空间换出换进影响运行速度.
+        systemctl list-units --type swap        //找出目前所用的交换区单元名字
+    假如是dev-sda4.swap
+        systemctl mask dev-sda4.swap        //让systemd开机不再使用交换区
+    然后到/etc/fstab中把交换区那行注释掉.
 chmod
     正常写法是chmod u+wr,表示给拥有者读写权限
     1.chmod g=u 表示给同组的用户与文件属主相同的权限

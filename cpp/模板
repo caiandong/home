@@ -6,6 +6,9 @@
 		泛左值          	右值
 
 左值         		 亡值      		 纯右值    
+
+//泛左值是:左值和亡值
+//右值是:亡值和纯右值
 ```
 
 ### 引用坍塌(或引用折叠)
@@ -38,7 +41,7 @@ template< class T >
 constexpr T&& forward( std::remove_reference_t<T>&& t ) noexcept;
 ```
 
-一个可能的用法是:
+一个可能的***完美转发***的用法是:
 
 ```cpp
 template<class T>
@@ -49,7 +52,34 @@ void wrapper(T&& arg)
 }
 ```
 
+形参arg的声明形式表明它是一个***转发引用***.分为两种情况:
 
+> 只有把函数模板的函数形参声明为指向模板形参的右值引用,例如,是上述情况,那才是转发引用,甚至不能有cv限定.
+>
+> 转发引用可以接受左值.如果传递一个int左值给上述函数,则T被推断为int &,函数参数就为int & &&,当然,这是模板推导出来的,我们无法手动声明这样的参数,于是应用以上引用折叠,arg的最终类型是int &.
+
+- 例如传递参数5给arg.首先,`T&& arg`推导T为int,于是`std::forward<T>`中T为int,(之后会先选择上述第一个非特化版remove_reference)注意右值引用名arg是左值,此时arg是一个左值,从而选择第一个forward重载,返回int &&.转发成功,返回原来的右值参数.
+- 例如传递有名字的int变量a给arg.首先,因为arg是转发引用且a为左值,模板会推导T为int &也就是,`std::forward<T>`中T为int &(之后选择上述第二个特化版remove_reference),虽然也选择第一个forward重载,但会和它的返回值:`T &&`产生引用折叠,即`int & &&`返回值变为int &.转发成功,返回原来的左值参数.
+
+### 根据编译时条件选择某个类型
+
+```cpp
+template <bool FK,typename T1,typename T2>
+struct IfThenElse;
+
+template <typename T1,typename T2>
+struct IfThenElse<true,T1,T2>
+{
+    typedef T1 Result;
+};
+template <typename T1,typename T2>
+struct IfThenElse<false,T1,T2>
+{
+    typedef T2 Result;
+};
+```
+
+从`c++ templates`节选
 
 ### 部分特化
 

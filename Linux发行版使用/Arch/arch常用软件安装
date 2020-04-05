@@ -1,0 +1,50 @@
+查看arch上的包组
+    https://www.archlinux.org/groups/
+assistant缺少libQt5WebKitWidgets.so.5 
+    qt5-webkit
+查找含有某个文件的包，例如:pacman -F libQt5WebKitWidgets.so.5
+    qtcreator
+电报
+    telegram-desktop
+ss
+    shadowsocks-qt5 
+ssr
+    electron-ssr
+v2ray
+    v2ray
+    qv2ray  //图形客户端
+    Mellow      //同上
+强制代理
+    proxychains-ng  
+    配置文件 /etc/proxychains.conf
+github clone慢
+        例如:proxychains git clone https://github.com/caiandong/home.git
+搜狗
+    fcitx-configtool fcitx-lilydjwg-git fcitx-sogoupinyin fcitx-qt5
+==============kde============
+截图
+    spectacle
+文本编辑器
+    kate
+chm查看
+    kchmviewer
+pdf
+    okular
+        poppler-data //pdf乱码
+压缩
+    ark
+计算器
+    kcalc
+图片查看
+    gwenview
+=====================end=============
+百度网盘
+    baidunetdisk-bin 
+字体
+    wqy-microhei    //文泉驿正黑
+
+Doxygen
+    doxygen //生成文档.此打包包含了doxywizard
+        graphviz    //生成类的关系图
+    
+
