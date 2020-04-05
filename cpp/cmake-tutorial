@@ -6,12 +6,12 @@
     1.每个工程都需要一个CMakeLists.txt文件,一般位于源码目录.大概有个印象就是:工程包含源码与数个这样的文件
     2.包含源文件的顶级目录称为源码树(source tree)
     3.cmake构建系统的文件和构建输出档案所在的顶级目录称作构建树(build tree)
-        注意:也就是说,一般构建目录和源码所在目录是分开的,分别称作构建树和源码树
+        注意:也就是说,一般构建目录和源码所在目录是分开的,分别称作构建树和源码树.
+        qt也和这个一样,一个源码目录,一个构建目录.
     4.cmake [<options>] -S <path-to-source> -B <path-to-build>
-        表示使用<path-to-source>目录中的CMakeLists.txt文件生成构建工程,并未开始构建
-        构建工程位于<path-to-build>所在目录.
-        一般通常用法是在当前目录下作为构建路径,从而:cmake <path-to-source> 
-        例如,假定已存在源码树目录为sourcedir:
+      cmake [options] <path-to-source>
+        表示使用<path-to-source>目录中的CMakeLists.txt文件生成构建工程,并未开始构建,构建工程位于<path-to-build>所在目录.
+        一般通常用法是在当前目录下作为构建路径,例如,假定已存在源码树目录为sourcedir:
             mkdir builddir  //创建构建目录
             cd builddir     //进入目录
             cmake sourcedir //在当前目录下(构建树目录)生成构建工程,其对应于sourcedir的源码树
@@ -21,7 +21,21 @@
             cmake --install . --prefix fuck   //执行安装当前目录,安装到相对当前目录的fuck目录下
             注意:上两个选项需要放在第一位.
     6.cpack命令进行打包,包括源码
-
+常见变量
+    PROJECT_BINARY_DIR
+        Full path to build directory for project.This is the binary directory of the most recent project() command.
+    CMAKE_BINARY_DIR
+        构建树的顶级绝对路径
+    CMAKE_SOURCE_DIR
+        当前cmake源码树的顶级绝对路径
+    CMAKE_CURRENT_BINARY_DIR
+        当前正被处理的绝对二进制目录
+        每个由add_subdirectory()添加的目录都会在构建树中创建一个二进制目录,当这个目录被
+        处理时会设置此变量.
+    CMAKE_CURRENT_SOURCE_DIR
+        当前被处理的源(source)的绝对路径
+    
+    
 project(Tutorial)
     设置工程名为Tutorial,可选的,你也能设置版本名,例如
         project(Tutorial VERSION 1.0)
@@ -39,16 +53,16 @@ target_include_directories(Tutorial PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            )
     添加头文件包含目录到此目标.即添加${PROJECT_BINARY_DIR}目录给Tutorial
-    PUBLIC表示指定之后参数的一种作用域,一般有三个选择
+    PUBLIC指定之后参数的其中一种作用域,一般有三个选择
         PUBLIC:将设置INCLUDE_DIRECTORIES和INTERFACE_INCLUDE_DIRECTORIES选项
         PRIVATE:设置INCLUDE_DIRECTORIES,
         INTERFACE:设置INTERFACE_INCLUDE_DIRECTORIES
         其中
         INCLUDE_DIRECTORIES表示只在编译当前目标时需要查找的目录
-        INTERFACE_INCLUDE_DIRECTORIES表示档有其他目标依赖此目标时,将会暴露这个目录作为头文件
-            例如当使用target_link_libraries()指定某个库,并且这个库指定INTERFACE的话,
-            也就自动包含此目录作为头文件搜寻目录
-        注意:默认编译器会在当前源文件相同的目录下搜索""引号包含的头文件,所以,在库的源文件种可以引用
+        INTERFACE_INCLUDE_DIRECTORIES表示档有其他目标依赖此目标时,将会暴露这个目录作为头文件(也就是作为库被其他target使用时)
+            例如当使用target_link_libraries()指定链接时使用个库,并且那个库指定INTERFACE的话,
+            也就自动包括其修饰的目录作为头文件搜寻目录
+        注意:默认编译器会在当前源文件相同的目录下搜索""引号包含的头文件,所以,在库的源文件中可以引用
             相对于当前目录的头文件,例如,#include "fuck/fuck.h".从而在暴露库头文件时,即指定INTERFACE
             时,通过这种相对路径包含方式,而不再需要指定PRIVATE.当然,指定了,就可以直接包含,#include "fuck.h"
 set(CMAKE_CXX_STANDARD 11)
@@ -62,14 +76,18 @@ add_library(MathFunctions mysqrt.cxx)
     option(BUILD_SHARED_LIBS "Build using shared libraries" ON)可以开启全局SHARED
     对于SHARED和MODULE,默认POSITION_INDEPENDENT_CODE是ON(打开的)
 target_link_libraries(Tutorial PUBLIC MathFunctions)
-    以上形式表示目标Tutorial会链接向MathFunctions库,然后当前目标附带Mathfucntions,一起作为连接接口
+    以上形式表示目标Tutorial被链接时需要使用MathFunctions库,然后当前目标附带Mathfucntions,一起作为连接接口
     有三种方式,不算上述PUBLIC,还有两种
         PRIVATE:表示随后的库或目标会被连接,它们不会作为连接接口
         INTERFACE:表示会附带随后的库或目标作为连接接口,但它们并不连接到当前指定目标
     还有一种形式没有这个选项:target_link_libraries(<target> <item>...)
         表示传递依赖.如果其他目标依赖当前指定的目标,那么通过此命令指定的后面的目标也作为依赖
-add_subdirectory(MathFunctions)
-    添加子构建目录.即添加Mathfunctions目录,构建系统会查找其中的CMakeLists.txt文件
+add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL])
+    添加含有CMakeLists.txt文件的目录source_dir.binary_dir指定输出所在目录.
+    如果是相对目录,会相对各自的源码树和构建树中的目录,不指定binary_dir则与source_dir相同
+        add_subdirectory(MathFunctions)
+            添加子目录.即添加Mathfunctions目录,构建系统会查找其中的CMakeLists.txt文件,
+            然后输出在构建目录中的MathFunctions目录
 option(USE_MYMATH "Use tutorial provided math implementation" ON)
     表示可选地打开或关闭某个条件变量.ON和OFF,默认为OFF.变量可以自己任意写,如果和之前的表示其他类型的变量冲突,则无效.
 install(TARGETS MathFunctions DESTINATION lib)
