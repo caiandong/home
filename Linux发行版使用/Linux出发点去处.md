@@ -33,24 +33,32 @@
 
 ### 其他发行版
 
-[红帽](https://access.redhat.com/)
+[EndeavourOS](https://endeavouros.com/)
 
-- 企业用的最多版本，提供收费服务
+- 基于arch的发行版
 
-[centos](https://www.centos.org/)
+[GeckoLinux](https://geckolinux.github.io/)
 
-- 企业使用最多版本，免费
+- 基于openSUSE的发行版,很久没更新了
 
 [elementary](<https://elementary.io/>)
 
 - [elementaryos中文非官方网站](https://elementaryos.cn/)
 
-- 界面美观的发行版，下载时没钱输入0。
+- 界面美观的发行版，下载时没钱输入0
 
 [manjaro](<https://manjaro.org/>)
 
-- opensuse虽然稳定，但是安装的太全面，我的笔记本太老打开sts都好费劲，所以暂时我用它来写java
+- 基于arch
 
-[archlinux](https://www.archlinux.org)
+[arch](https://www.archlinux.org)
 
 - 可定制，需要折腾。
+
+[anarchy](https://anarchyinstaller.org/)
+
+- 是一个arch的安装器
+
+[archman](https://archman.org/en/)
+
+- Archman GNU/Linux是一份基于Arch Linux的发行，其特色在于Calamares系统安装程序及一份预配置的桌面环境。Archman还拥有Pamac包管理器，能使得安装新软件变得容易。
