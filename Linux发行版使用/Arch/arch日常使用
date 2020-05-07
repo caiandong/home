@@ -1,3 +1,4 @@
+
 1.关闭swap
     一方面目前内存日常使用足够,另一方面swap空间换出换进影响运行速度.
         systemctl list-units --type swap        //找出目前所用的交换区单元名字

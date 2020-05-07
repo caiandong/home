@@ -79,7 +79,7 @@ struct IfThenElse<false,T1,T2>
 };
 ```
 
-从`c++ templates`节选
+从`c++ templates`节选,对应`std::conditional`
 
 ### 部分特化
 
