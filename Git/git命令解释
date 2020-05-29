@@ -6,7 +6,8 @@
     其包含了常用的命令,以及部分解释.我会尽力让之后的自己,或者一些读者能够理解此处的命令用法.
     
 说明:
-   1.对于工程中的没有跟踪的文件,它们对于git是不可知的,因此,git并不会操作它们,就好像透明一样.它们仅仅是在同一个文件系统目录内,不在git控制之内.
+   1.对于工程中的没有跟踪的文件,它们对于git是不可知的,因此,git并不会操作它们,就好像透明一样(虽然会在git status的命令中显示烦人的未跟踪文件).
+        它们仅仅是在同一个文件系统目录内,不在git控制之内.
    2.一般对于需要commit的地方,可以使用十六进制散列名,也可用HEAD,分支名,甚至是标签名.
 HEAD^       表示HEAD的父
 HEAD^^      表示HEAD的父的父亲(爷爷)
@@ -19,7 +20,7 @@ HEAD^2      第二个父
     xx yy可以是:标签名,分支名,提交,HEAD等等
     a..b:双点表示从b可到达,但从a不可到达的.例如,提交
     a...b:三点表示从a和b到达,但不能同时从两个点到达.例如,a和b有共同祖先c,则a...b表示c..a和c..b
-工作树(working tree)   表示实际检出的文件树.工作树通常包含HEAD提交所对应的树的内容,加上树中你所做的任何的但还没有提交的本地改变.     
+工作树(working tree)   表示实际检出的文件树.有时,可以认为是检出的index产生的文件,以及之后可能对这些文件所做的变化
 
                 开始
         
@@ -40,14 +41,12 @@ git restore(新命令)
     
 git diff
     1   git diff
-    查看当前index(索引区)的变化,即已跟踪的文件的变化.也就是对已跟踪文件的修改(注意:实际上与当前工作目录(work directory)变化无关)
-        使用git add新跟踪的文件也不算在内
+    默认情况下,工作目录中的文件与index中是一致对应的.如果修改了其中的文件,则此命令会让这些变化会显示出来
+        (注意:实际上与当前工作目录(work directory)不属于index的变化无关),使用git add新跟踪的文件不算在内
     2   git diff --cached [<commit>]
-    这样使用时,是假如当前使用git commit命令进行提交时,它与已提交的对象,commit,的变化.默认情况(即不存在commit参数)下,相对于HEAD
-        当我们修改一个已暂存的对象时,使用命令1可以查看对应改变.然后git add后,再用当前命令,之前的改变才会出现.
-        此命令是索引区(index)相对于已提交对象的变化,因此,使用git add新跟踪的文件,这样的变化也会显示.
+    此命令是索引区(index)相对于已提交对象的变化,因此,使用git add新跟踪的文件,这样的变化也会显示.
     3   git diff <commit>
-    比较工作树与某个提交的改变.实际上包含了命令1与命令2的输出.即,输出是命令1与2的并集
+    比较工作树与某个提交的改变.
     
     以上3个命令分别表示:
         git diff    ----> 工作树与index的变化
@@ -89,6 +88,8 @@ git branch
         更重要的是,当新分支被检出时,它指示不带参数的git pull从上游pull.当开始点是一个remote-tracking(远程跟踪)分支时,这种行为是默认的.
     3   git branch (--set-upstream-to=<upstream> | -u <upstream>) [<branchname>]
     修改branchname分支的上游分支为upstream.不存在branchname参数时,默认为当前分支
+    4   git branch --unset-upstream master
+    移除master的上游.如果不提供分支,则默认当前分支
     
 git switch(新命令) 
     1   git switch  <branchname>
@@ -106,11 +107,13 @@ git rebase
     表示重新应用一个分支的一系列改变到一个不同的基底上,然后重置那个分支的头到之后的结果.默认情况下遇到相同的提交改变会丢弃(提交是不同的,但提交对应的树会是相同的).
     当在公共仓库使用此命令时万分谨慎,例如,必须让所有人都进行一遍git pull --rebase,因此最佳适用范围是个人独立开发,或者没有推送到上游之前
     1   git rebase <upstream>
-    假设当前分支和upstream有共同祖先c,把c..的那部分改变暂时存储起来,重新再应用到upstream上,然后修改当前分支head到之后的结果.
+    找到当前分支和upstream有共同祖先c,把c到那个祖先的那部分改变暂时存储起来为temp,再git reset --hard当前分支到upstream,
+    重新再把temp应用到upstream指向的提交,然后修改当前分支head到应用之后的结果.
     2   git rebase  <upstream> <branch>
-    把branch分支的变化重新应用到upstream上
+    先git checkout到<branch>分支,然后执行过程和1命令一样.
     3   git rebase --onto a b c
-    它所做的就好像计算完毕c要应用到b的部分后,但不是随后应用到b上,而是转而应用到a上.当c不依赖b或者依赖b的部分已被合并到a上,可以使用它.
+    它所做的是先git checkout到c,再找到c到b的共同祖先,存储c到祖先的改变为temp,然后git reset --hard当前分支(即c)到a对应的commit,以此temp应用到c,
+    最后把c git reset --hard到最终的结果.
     k   git rebase --continue
     解决冲突后,继续rebase
     k   git rebase --abort
@@ -272,8 +275,8 @@ git submodule
         添加子模块,然后添加对应的目录path(目录名不存在,则生成),这个目录是相对目录,相对于父工程的顶级目录.如果不存在path参数,则使用repository
         中最后的一个路径,例如,http://github.com/a/b.git,那么目录是b.
     *   这条裸命令效果是clone一个工程到path路径下,然后增加或修改一个文件.gitmodules,这个文件在superproject顶级目录.
-        然后,你会会在git status命令下看见两个待提交的新条目.
-    git submodule init [--] [<path>...]
+        然后,你会会在git status命令下看见两个待提交的新条目,一个是path,另一个是.gitmodules.
+    git submodule init [--] [<path>...] [--recursive]
         初始化子模块path,或者初始化submodule.active配置的模块,或者所有模块.
     *   实际效果是在superproject的.git/config文件中增加submodule.$name.url条目,它使用.gitmodules中
         一样的设置来作为模板

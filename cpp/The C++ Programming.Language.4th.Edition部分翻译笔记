@@ -7,7 +7,7 @@
 
 我们想要知道是否一个引用指向临量,因为如果是这样,我们有时候可以把一个昂贵的复制操作转化为一个廉价的移动操作.被一个小的,指向可能有大量信息的描述符表示的对象,可以被简单廉价地移动,要是我们知道那样的资源不再打算被使用的话.典型的例子是返回值,编译器知道一个本地返回的变量将永不再会被使用.
 
-一个右值引用可以绑定到一个右值,而不能到一个左值.在那样的情况下,右值引用和左值引用完全想法.例如:
+一个右值引用可以绑定到一个右值,而不能到一个左值.在那样的情况下,右值引用和左值引用完全相反.例如:
 
 ```cpp
 string var {"Cambridge"};
@@ -77,7 +77,7 @@ template<class T> class vector
 };
 vector<string> s;
 vector<string> s2 {s};              // s is an lvalue, so use copy constructor
-vector<string> s3 {s+"tail");       // s+"tail" is an rvalue so pick move constr uctor
+vector<string> s3 {s+"tail");       // s+"tail" is an rvalue so pick move constructor
 ```
 
 swap()中使用static_cast有点啰嗦且有点容易打错,所以标准库提供move()函数:move(x)意味着static_cast<X&&>(x),X是x的类型.使用给定函数,我们可以清理下swap()的定义:   
