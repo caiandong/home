@@ -21,6 +21,8 @@ github clone慢
         例如:proxychains git clone https://github.com/caiandong/home.git
 搜狗
     fcitx-configtool fcitx-lilydjwg-git fcitx-sogoupinyin fcitx-qt5
+p2p下载
+    qbittorrent
 ==============kde============
 截图
     spectacle
@@ -37,11 +39,14 @@ pdf
     kcalc
 图片查看
     gwenview
+手机连接
+    kdeconnect
 =====================end=============
 百度网盘
     baidunetdisk-bin 
 字体
     wqy-microhei    //文泉驿正黑
+    ttf-dejavu
 
 Doxygen
     doxygen //生成文档.此打包包含了doxywizard

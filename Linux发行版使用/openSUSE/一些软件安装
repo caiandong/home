@@ -1,3 +1,12 @@
+privoxy
+    用来转发http代理到socks.
+    配置文件:
+        echo "forward-socks5 / 127.0.0.1:6380 ." >> /etc/privoxy/config
+        //追加到配置文件末尾，表示把所有http流量转发到socks代理的6380端口
+    启动:
+        systemctl start privoxy.service
+        //默认监听8118端口，因此需要设置终端环境变量:
+            http_proxy=http://127.0.0.1:8118
 
 Deepin桌面环境
     可以直接去

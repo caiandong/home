@@ -1,4 +1,7 @@
-
+代理下载
+    r.nichi.co
+    例如
+        http://r.nichi.co/github.com/Qv2ray/Qv2ray/releases/download/v2.6.0-rc3/qv2ray-2.6.0-rc3-win64.exe
 1.关闭swap
     一方面目前内存日常使用足够,另一方面swap空间换出换进影响运行速度.
         systemctl list-units --type swap        //找出目前所用的交换区单元名字
@@ -12,6 +15,15 @@ chmod
         chmod 55 表示的是0055的缩写
         和我们书写数学数字一样,从高位补零
     3.chmod -R  表示目录下所有文件都修改成同样的权限
+grub
+    /etc/default/grub中关闭掉下面的注释
+        GRUB_DEFAULT=saved
+        GRUB_SAVEDEFAULT=true
+    这样的话,每次选择的条目成为新的下一次开机的默认条目.
+    原本没有这个,grub官方文档有说明:https://www.gnu.org/software/grub/manual/grub/grub.html
+    然后重新生产配置:
+        grub-mkconfig -o /boot/grub/grub.cfg
+
 百度网盘搜索
     https://www.dalipan.com/        //大力盘搜索
     http://www.rufengso.net/        //如风搜索
