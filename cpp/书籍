@@ -9,17 +9,29 @@
 9 UNIX网络编程卷1：套接字联网API 第3版
 10 Cryptography Engineering:Design Principles and Practical Applications
 
-c++
+编译原理
 
+龙书,虎书,鲸书
+编译器设计 第二版
+计算机程序的构造和解释     (sicp)
+计算机程序设计艺术       (TAOCP)
+
+c++ 
+
+0 https://en.cppreference.com/w/(中文网站https://zh.cppreference.com/w/%E9%A6%96%E9%A1%B5)
 1 c++ primer 第五版
 2 c++ templates
-3 c++设计新思维:泛型编程与设计模式之应用   (modern c++ design)
+3 c++设计新思维:泛型编程与设计模式之应用   (Modern C++ Design. Generic Programming and Design Patterns)
 4 effective modern c++
 5 effective c++
 6 more effective c++
+7 c++程序设计原理与实践
+8 The C++ Programming Language 4th Edition
 
-设计模式    //也非常重要
+gof设计模式    //也非常重要
 
+
+//以下未读过
 
 c++代码整洁之道
 boost

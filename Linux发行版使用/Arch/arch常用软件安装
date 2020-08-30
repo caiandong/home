@@ -1,3 +1,8 @@
+c/c++
+    gcc gdb cmake 
+java
+    jdk-openjdk openjdk-doc openjdk-src
+
 查看arch上的包组
     https://www.archlinux.org/groups/
 assistant缺少libQt5WebKitWidgets.so.5 
@@ -21,8 +26,14 @@ github clone慢
         例如:proxychains git clone https://github.com/caiandong/home.git
 搜狗
     fcitx-configtool fcitx-lilydjwg-git fcitx-sogoupinyin fcitx-qt5
-p2p下载
+下载
     qbittorrent
+    uget
+git
+    git
+        tk  //gitk缺少此包
+    openssh     //ssh-keygen
+    xclip       //复制内容到剪贴板
 ==============kde============
 截图
     spectacle
@@ -33,6 +44,8 @@ chm查看
 pdf
     okular
         poppler-data //pdf乱码
+markdown
+    typora
 压缩
     ark
 计算器
@@ -41,6 +54,8 @@ pdf
     gwenview
 手机连接
     kdeconnect
+办公
+    libreoffice-still
 =====================end=============
 百度网盘
     baidunetdisk-bin 
