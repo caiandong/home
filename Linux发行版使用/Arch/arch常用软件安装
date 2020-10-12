@@ -5,6 +5,7 @@ java
 
 查看arch上的包组
     https://www.archlinux.org/groups/
+    https://www.archlinux.org/packages/
 assistant缺少libQt5WebKitWidgets.so.5 
     qt5-webkit
 查找含有某个文件的包，例如:pacman -F libQt5WebKitWidgets.so.5

@@ -30,3 +30,9 @@ grub
     http://www.bdyso.com/           //bdy搜
     https://www.58wangpan.com/      //58网盘搜
 
+pacman -Qqe > pkglist.txt   
+    //List of installed packages
+pacman -S --needed - < pkglist.txt
+    //Install packages from a list
+pacman -Qqn | pacman -S -
+    //reinstall all native packages

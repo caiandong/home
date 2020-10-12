@@ -69,6 +69,17 @@ void wrapper(T&& arg)
 - 例如传递参数5给arg.首先,`T&& arg`推导T为int,于是`std::forward<T>`中T为int,(之后会先选择上述第一个非特化版remove_reference)注意右值引用名arg是左值,此时arg是一个左值,从而选择第一个forward重载,返回int &&.转发成功,返回原来的右值参数.
 - 例如传递有名字的int变量a给arg.首先,因为arg是转发引用且a为左值,模板会推导T为int &也就是,`std::forward<T>`中T为int &(之后选择上述第二个特化版remove_reference),虽然也选择第一个forward重载,但会和它的返回值:`T &&`产生引用折叠,即`int & &&`返回值变为int &.转发成功,返回原来的左值参数.
 
+#### loki中的Typelist
+
+```cpp
+    template <class T, class U>
+    struct Typelist
+    {
+       typedef T Head;
+       typedef U Tail;
+    };
+```
+
 ### 根据编译时条件选择某个类型
 
 ```cpp
@@ -115,15 +126,17 @@ struct MakeIndexes<0,Indexes...>        //部分特化.基准情形
 - 基准情形是形参包元素数量为0.与以上相似,但它是**解包**(unpack),每次使参数包元素数量减少1.
 
 ```cpp
+//与上个不同,但在这里是主模板
+//将是基准情形
 template <class ...T>
-class fuckyou		//也是基准情形
+class fuckyou		
 {
 public:
     fuckyou(){std::cout<<"本来模板\n";}
 };
 
 template<class T1,class ...T2>
-class fuckyou<T1,T2...>:public fuckyou<T2...>	//递归情形.此处与上面不同
+class fuckyou<T1,T2...>:public fuckyou<T2...>	//递归情形,与上面不同
 {
 public:
     fuckyou(){std::cout<<"特化\n";}

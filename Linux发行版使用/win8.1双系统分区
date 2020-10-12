@@ -1,0 +1,10 @@
+GPT,MBR
+    fdisk
+    gdisk(only for GPT)
+    parted
+    cfdisk 
+
+Windows Recover Environment (win8.1 default 300M)
+EFI     (win8.1 default 100M)
+Microsoft Reserved  (win8.1 default 128M)
+ 
